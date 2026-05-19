@@ -1,0 +1,12 @@
+{
+  "name": "lunch-calendar-supabase",
+  "version": "2.0.0",
+  "description": "팀 GTL 캘린더 — Supabase 백엔드 + 실시간 동기화",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

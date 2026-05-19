@@ -1,0 +1,1469 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>팀 GTL · 캘린더 2026</title>
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.7.0/dist/tabler-icons.min.css">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root{
+    --bg:#f4f2ed;
+    --bg-2:#ede8df;
+    --surface:rgba(255,255,255,.88);
+    --surface-solid:#fff;
+    --surface-2:#f7f4ef;
+    --surface-3:#efebe4;
+    --bd:rgba(28,25,23,.08);
+    --bd-strong:rgba(28,25,23,.16);
+    --text:#1f1b18;
+    --text-2:#5f5852;
+    --text-3:#9a9188;
+
+    --teal:#0f6c58;
+    --teal-2:#1a8a68;
+    --teal-3:#e9f7f1;
+    --coral:#c2410c;
+    --coral-2:#fff5eb;
+
+    --sat:#2563eb;
+    --sun:#dc2626;
+
+    --hol-bg:#fff1f3;
+    --hol-bd:#f6c7cf;
+    --hol-t:#b4234f;
+    --off-bg:#fff8e7;
+    --off-bd:#f2d28b;
+    --off-t:#9a5b11;
+    --wk-bg:#eef5ff;
+    --wk-bd:#c2d9ff;
+    --today-bg:#eefaf5;
+
+    --r8:8px;
+    --r10:10px;
+    --r12:12px;
+    --r14:14px;
+    --r16:16px;
+    --r20:20px;
+
+    --shadow: 0 18px 42px rgba(30, 24, 20, .08);
+    --shadow-soft: 0 8px 22px rgba(30, 24, 20, .08);
+
+    --ff:'Pretendard Variable',Pretendard,-apple-system,'Apple SD Gothic Neo','Noto Sans KR',sans-serif;
+  }
+
+  html, body { height: 100%; }
+  body{
+    font-family:var(--ff);
+    background:
+      radial-gradient(1000px 500px at 15% -10%, rgba(15,108,88,.11), transparent 56%),
+      radial-gradient(800px 500px at 95% 8%, rgba(194,65,12,.08), transparent 50%),
+      linear-gradient(180deg, #f7f4ef 0%, var(--bg) 52%, #f2eee7 100%);
+    color:var(--text);
+    min-height:100vh;
+    font-size:14px;
+    line-height:1.45;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  *:focus-visible{
+    outline: 3px solid rgba(15,108,88,.22);
+    outline-offset: 2px;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes popIn {
+    from { opacity: 0; transform: translateY(12px) scale(.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  .page{
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 1.1rem 1.25rem 1.6rem;
+  }
+
+  .topbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap: 12px;
+    flex-wrap:wrap;
+    margin-bottom: .85rem;
+    animation: fadeUp .45s ease-out;
+  }
+
+  .brand{
+    display:flex;
+    align-items:center;
+    gap: 12px;
+    min-width: 0;
+  }
+
+  .brand-icon{
+    width: 42px;
+    height: 42px;
+    border-radius: 14px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#fff;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: .2px;
+    background: linear-gradient(135deg, var(--teal) 0%, #146f5a 42%, #1b8f6d 100%);
+    box-shadow: 0 10px 20px rgba(15,108,88,.22);
+    flex-shrink:0;
+  }
+
+  .brand-text{ min-width:0; }
+  .brand-text .name{
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: -.4px;
+    color: var(--text);
+  }
+  .brand-text .sub{
+    margin-top: 2px;
+    font-size: 12px;
+    color: var(--text-3);
+  }
+
+  .topbar-right{
+    display:flex;
+    align-items:center;
+    gap: 8px;
+    flex-wrap:wrap;
+  }
+
+  .month-ctrl{
+    display:flex;
+    align-items:center;
+    gap: 4px;
+    background: var(--surface);
+    border: 1px solid var(--bd);
+    border-radius: 16px;
+    padding: 5px;
+    box-shadow: var(--shadow-soft);
+    backdrop-filter: blur(14px);
+  }
+
+  .nav-btn{
+    width: 32px;
+    height: 32px;
+    border: 0;
+    border-radius: 10px;
+    background: transparent;
+    cursor: pointer;
+    color: var(--text-2);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transition: background .15s ease, color .15s ease, transform .15s ease;
+  }
+  .nav-btn:hover{
+    background: var(--surface-2);
+    color: var(--text);
+    transform: translateY(-1px);
+  }
+
+  .month-label{
+    min-width: 118px;
+    text-align:center;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: -.2px;
+    color: var(--text);
+    padding: 0 .25rem;
+    white-space: nowrap;
+  }
+
+  .sync-pill{
+    display:flex;
+    align-items:center;
+    gap: 7px;
+    padding: 7px 12px;
+    border-radius: 999px;
+    border: 1px solid var(--bd);
+    background: var(--surface);
+    box-shadow: var(--shadow-soft);
+    color: var(--text-2);
+    font-size: 12px;
+    white-space:nowrap;
+    backdrop-filter: blur(14px);
+  }
+  .sync-dot{
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: #22c55e;
+    box-shadow: 0 0 0 4px rgba(34,197,94,.12);
+    flex-shrink:0;
+  }
+  .sync-dot.saving{ background:#f59e0b; box-shadow: 0 0 0 4px rgba(245,158,11,.14); animation: blink 1s infinite; }
+  .sync-dot.error{ background:#ef4444; box-shadow: 0 0 0 4px rgba(239,68,68,.14); }
+  @keyframes blink{ 0%,100%{opacity:1} 50%{opacity:.35} }
+
+  .icon-btn{
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--bd);
+    border-radius: 12px;
+    background: var(--surface);
+    cursor: pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color: var(--text-2);
+    box-shadow: var(--shadow-soft);
+    transition: transform .15s ease, background .15s ease, color .15s ease, border-color .15s ease;
+  }
+  .icon-btn:hover{
+    background: var(--surface-2);
+    border-color: var(--bd-strong);
+    color: var(--text);
+    transform: translateY(-1px);
+  }
+
+  .tabs-wrap{
+    display:flex;
+    gap: 4px;
+    flex-wrap:wrap;
+    padding: 6px;
+    margin-bottom: .85rem;
+    border-radius: 18px;
+    border: 1px solid var(--bd);
+    background: var(--surface);
+    box-shadow: var(--shadow-soft);
+    backdrop-filter: blur(14px);
+    animation: fadeUp .5s ease-out .05s both;
+  }
+
+  .tab{
+    flex: 1 1 0;
+    min-width: 56px;
+    border: 0;
+    border-radius: 12px;
+    background: transparent;
+    color: var(--text-2);
+    font-family: var(--ff);
+    font-size: 13px;
+    font-weight: 600;
+    padding: 9px 10px;
+    cursor: pointer;
+    transition: background .15s ease, color .15s ease, transform .15s ease, box-shadow .15s ease;
+    position: relative;
+    white-space: nowrap;
+  }
+  .tab:hover{
+    background: var(--surface-2);
+    color: var(--text);
+    transform: translateY(-1px);
+  }
+  .tab.active{
+    background: linear-gradient(135deg, var(--teal), #0d7a61);
+    color: #fff;
+    box-shadow: 0 12px 20px rgba(15,108,88,.24);
+  }
+  .tab.has-data::after{
+    content:'';
+    position:absolute;
+    top: 6px;
+    right: 8px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--coral);
+  }
+  .tab.active.has-data::after{
+    background: rgba(255,255,255,.7);
+  }
+
+  .legend{
+    display:flex;
+    align-items:center;
+    gap: 12px;
+    flex-wrap:wrap;
+    padding: 10px 14px;
+    margin-bottom: .85rem;
+    border-radius: 16px;
+    border: 1px solid var(--bd);
+    background: var(--surface);
+    box-shadow: var(--shadow-soft);
+    backdrop-filter: blur(14px);
+    font-size: 12px;
+    animation: fadeUp .5s ease-out .12s both;
+  }
+  .leg{
+    display:flex;
+    align-items:center;
+    gap: 6px;
+    color: var(--text-2);
+    white-space:nowrap;
+  }
+  .ls{
+    width: 12px;
+    height: 12px;
+    border-radius: 4px;
+    flex-shrink:0;
+  }
+  .leg-sep{
+    width: 1px;
+    height: 16px;
+    background: var(--bd);
+    margin: 0 2px;
+  }
+  .leg-hint{
+    margin-left: auto;
+    color: var(--text-3);
+    font-size: 11px;
+  }
+
+  .cal{
+    display:grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 6px;
+    animation: fadeUp .55s ease-out .18s both;
+  }
+
+  .dow{
+    padding: 4px 2px 8px;
+    text-align:center;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .5px;
+    color: var(--text-3);
+  }
+  .dow.sun{ color: var(--sun); }
+  .dow.sat{ color: var(--sat); }
+
+  .cell{
+    min-height: 118px;
+    padding: 10px 10px 9px;
+    border-radius: 16px;
+    border: 1px solid var(--bd);
+    background: var(--surface);
+    box-shadow: var(--shadow-soft);
+    display:flex;
+    flex-direction:column;
+    gap: 4px;
+    cursor:pointer;
+    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease, background .18s ease;
+    animation: popIn .3s ease both;
+    backdrop-filter: blur(14px);
+  }
+  .cell:hover{
+    border-color: rgba(15,108,88,.22);
+    box-shadow: 0 16px 30px rgba(30,24,20,.12);
+    transform: translateY(-2px);
+  }
+  .cell.empty{
+    background: transparent;
+    box-shadow: none;
+    border: none;
+    min-height: 48px;
+    pointer-events:none;
+    cursor: default;
+    padding: 0;
+  }
+  .cell.wknd{
+    background: linear-gradient(180deg, var(--wk-bg) 0%, rgba(255,255,255,.9) 100%);
+    border-color: var(--wk-bd);
+  }
+  .cell.hol{
+    background: linear-gradient(180deg, var(--hol-bg) 0%, rgba(255,255,255,.92) 100%);
+    border-color: var(--hol-bd);
+  }
+  .cell.off{
+    background: linear-gradient(180deg, var(--off-bg) 0%, rgba(255,255,255,.92) 100%);
+    border-color: var(--off-bd);
+  }
+  .cell.today{
+    background: linear-gradient(180deg, var(--today-bg) 0%, rgba(255,255,255,.95) 100%);
+    border: 1.5px solid var(--teal);
+    box-shadow: 0 0 0 3px rgba(15,108,88,.08), var(--shadow-soft);
+  }
+
+  .dn{
+    font-size: 19px;
+    line-height: 1;
+    font-weight: 800;
+    letter-spacing: -.4px;
+    color: #655d56;
+  }
+  .cell.today .dn{ color: var(--teal); }
+  .dn.sun{ color: var(--sun); }
+  .dn.sat{ color: var(--sat); }
+
+  .day-tag{
+    display:inline-flex;
+    align-items:center;
+    max-width: 100%;
+    width: fit-content;
+    padding: 4px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    letter-spacing: -.1px;
+  }
+  .hol-tag{
+    color: var(--hol-t);
+    background: rgba(255,241,243,.92);
+    border: 1px solid var(--hol-bd);
+  }
+  .off-tag{
+    color: var(--off-t);
+    background: rgba(255,248,231,.94);
+    border: 1px solid var(--off-bd);
+  }
+
+  .chip{
+    display:flex;
+    align-items:center;
+    gap: 6px;
+    min-width: 0;
+    padding: 5px 8px;
+    border-radius: 10px;
+    background: var(--surface-2);
+    border: 1px solid rgba(28,25,23,.05);
+    cursor:pointer;
+    transition: background .15s ease, transform .15s ease, border-color .15s ease;
+  }
+  .chip:hover{
+    background: var(--surface-3);
+    transform: translateY(-1px);
+    border-color: var(--bd-strong);
+  }
+  .chip-dot{
+    width: 6px;
+    height: 6px;
+    border-radius: 999px;
+    background: var(--teal-2);
+    flex-shrink:0;
+  }
+  .chip-txt{
+    min-width: 0;
+    overflow:hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1;
+    font-size: 11.5px;
+    color: var(--text);
+  }
+  .more-lnk{
+    font-size: 11px;
+    color: var(--text-3);
+    border: 1px dashed rgba(28,25,23,.15);
+    border-radius: 8px;
+    padding: 3px 6px;
+    width: fit-content;
+    cursor: pointer;
+    transition: border-color .15s ease, color .15s ease, background .15s ease;
+  }
+  .more-lnk:hover{
+    color: var(--text-2);
+    border-color: rgba(28,25,23,.28);
+    background: rgba(255,255,255,.55);
+  }
+
+  .vrow{
+    display:flex;
+    gap: 4px;
+    flex-wrap:wrap;
+    margin-top: auto;
+    padding-top: 2px;
+  }
+  .vc{
+    display:inline-flex;
+    align-items:center;
+    gap: 4px;
+    font-size: 10px;
+    color: var(--text-2);
+    background: rgba(255,255,255,.76);
+    border: 1px solid var(--bd);
+    border-radius: 999px;
+    padding: 3px 7px;
+    cursor:pointer;
+    transition: transform .15s ease, border-color .15s ease, background .15s ease, color .15s ease;
+  }
+  .vc:hover{
+    border-color: var(--bd-strong);
+    transform: translateY(-1px);
+  }
+  .vc.voted{
+    background: var(--coral-2);
+    border-color: rgba(194,65,12,.24);
+    color: var(--coral);
+    font-weight: 700;
+  }
+  .vc i{ font-size: 10px; }
+
+  .add-hint{
+    margin-top: auto;
+    display:flex;
+    align-items:center;
+    gap: 4px;
+    color: var(--text-3);
+    font-size: 11px;
+    padding-top: 2px;
+  }
+  .add-hint i{ font-size: 12px; }
+
+  .notice{
+    margin-top: 1rem;
+    text-align:center;
+    font-size: 12px;
+    color: var(--text-3);
+    padding: .6rem .75rem;
+  }
+
+  .backdrop{
+    position:fixed;
+    inset:0;
+    background: rgba(18, 14, 12, .46);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index: 200;
+    padding: 1rem;
+    backdrop-filter: blur(8px);
+    animation: fadeUp .18s ease-out;
+  }
+
+  .modal{
+    width: min(420px, 100%);
+    background: var(--surface-solid);
+    border: 1px solid var(--bd);
+    border-radius: 24px;
+    padding: 1.25rem;
+    box-shadow: 0 28px 60px rgba(16, 12, 10, .18);
+    animation: popIn .18s cubic-bezier(.2,.9,.2,1);
+  }
+
+  .mhdr{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap: 12px;
+    margin-bottom: 1rem;
+  }
+  .mtitle{
+    font-size: 17px;
+    font-weight: 800;
+    letter-spacing: -.3px;
+    color: var(--text);
+  }
+  .msub{
+    margin-top: 3px;
+    font-size: 12px;
+    color: var(--text-3);
+  }
+
+  .mclose{
+    width: 30px;
+    height: 30px;
+    border: 0;
+    border-radius: 10px;
+    background: var(--surface-2);
+    cursor: pointer;
+    color: var(--text-2);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transition: background .15s ease, transform .15s ease, color .15s ease;
+    flex-shrink:0;
+  }
+  .mclose:hover{
+    background: var(--surface-3);
+    color: var(--text);
+    transform: translateY(-1px);
+  }
+
+  .elist{
+    display:flex;
+    flex-direction:column;
+    gap: 7px;
+    max-height: 230px;
+    overflow:auto;
+    margin-bottom: 1rem;
+    scrollbar-width: thin;
+    padding-right: 2px;
+  }
+
+  .erow{
+    display:flex;
+    align-items:flex-start;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 14px;
+    background: var(--surface-2);
+    border: 1px solid rgba(28,25,23,.04);
+    transition: background .15s ease, transform .15s ease, border-color .15s ease;
+  }
+  .erow:hover{
+    background: var(--surface-3);
+    border-color: rgba(28,25,23,.1);
+  }
+  .edot{
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    margin-top: 5px;
+    background: var(--teal-2);
+    flex-shrink:0;
+  }
+  .ename{
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+    word-break: break-word;
+  }
+  .ememo{
+    margin-top: 3px;
+    font-size: 11.5px;
+    color: var(--text-3);
+    word-break: break-word;
+  }
+
+  .evote{
+    display:inline-flex;
+    align-items:center;
+    gap: 4px;
+    font-size: 12px;
+    border-radius: 999px;
+    padding: 5px 9px;
+    background: #fff;
+    border: 1px solid var(--bd);
+    color: var(--text-2);
+    cursor:pointer;
+    transition: transform .15s ease, border-color .15s ease, background .15s ease, color .15s ease;
+    flex-shrink:0;
+    font-family: var(--ff);
+  }
+  .evote:hover{
+    border-color: var(--bd-strong);
+    transform: translateY(-1px);
+  }
+  .evote.voted{
+    background: var(--coral-2);
+    border-color: rgba(194,65,12,.24);
+    color: var(--coral);
+    font-weight: 700;
+  }
+  .evote i{ font-size: 12px; }
+
+  .edel{
+    width: 26px;
+    height: 26px;
+    border: 0;
+    border-radius: 9px;
+    background: transparent;
+    cursor: pointer;
+    color: var(--text-3);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transition: background .15s ease, color .15s ease, transform .15s ease;
+    flex-shrink:0;
+  }
+  .edel:hover{
+    background: var(--hol-bg);
+    color: var(--sun);
+    transform: translateY(-1px);
+  }
+
+  .empty-state{
+    text-align:center;
+    padding: 1.4rem 0 .9rem;
+    color: var(--text-3);
+    font-size: 13px;
+  }
+  .empty-state i{
+    display:block;
+    margin-bottom: 8px;
+    font-size: 28px;
+    opacity: .35;
+  }
+
+  .hr{
+    border: 0;
+    border-top: 1px solid var(--bd);
+    margin: .9rem 0 .85rem;
+  }
+
+  .igrp{
+    display:flex;
+    flex-direction:column;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .lbl{
+    font-size: 11.5px;
+    font-weight: 700;
+    color: var(--text-2);
+    margin-bottom: 5px;
+  }
+
+  .inp{
+    width: 100%;
+    border: 1px solid var(--bd);
+    border-radius: 14px;
+    padding: 10px 12px;
+    font-family: var(--ff);
+    font-size: 13.5px;
+    color: var(--text);
+    background: var(--surface-2);
+    transition: border-color .15s ease, background .15s ease, box-shadow .15s ease, transform .15s ease;
+  }
+  .inp:hover{
+    background: #fff;
+    border-color: var(--bd-strong);
+  }
+  .inp:focus{
+    background: #fff;
+    border-color: var(--teal);
+    box-shadow: 0 0 0 4px rgba(15,108,88,.12);
+  }
+  .inp::placeholder{ color: var(--text-3); }
+
+  .mbtns{
+    display:flex;
+    justify-content:flex-end;
+    gap: 8px;
+    margin-top: 6px;
+  }
+
+  .btn{
+    font-family: var(--ff);
+    font-size: 13px;
+    font-weight: 600;
+    padding: 9px 16px;
+    border-radius: 12px;
+    cursor: pointer;
+    display:inline-flex;
+    align-items:center;
+    gap: 6px;
+    transition: transform .15s ease, background .15s ease, border-color .15s ease, color .15s ease, box-shadow .15s ease;
+  }
+  .btn:active{ transform: translateY(0) scale(.98); }
+  .btn-ghost{
+    border: 1px solid var(--bd);
+    color: var(--text-2);
+    background: #fff;
+  }
+  .btn-ghost:hover{
+    background: var(--surface-2);
+    border-color: var(--bd-strong);
+  }
+  .btn-primary{
+    border: 1px solid transparent;
+    color:#fff;
+    background: linear-gradient(135deg, var(--teal) 0%, #0d7a61 100%);
+    box-shadow: 0 10px 18px rgba(15,108,88,.18);
+  }
+  .btn-primary:hover{
+    box-shadow: 0 14px 22px rgba(15,108,88,.24);
+    transform: translateY(-1px);
+  }
+
+  .mfooter{
+    margin-top: .95rem;
+    padding-top: .78rem;
+    border-top: 1px solid var(--bd);
+    display:flex;
+    align-items:center;
+    gap: 6px;
+    color: var(--text-3);
+    font-size: 11px;
+  }
+
+  .sr-only{
+    position:absolute;
+    width:1px;
+    height:1px;
+    overflow:hidden;
+    clip-path: inset(50%);
+    white-space:nowrap;
+  }
+
+  @media (max-width: 960px){
+    .page{ padding: .95rem .9rem 1.15rem; }
+    .brand-text .name{ font-size: 17px; }
+    .cell{ min-height: 106px; }
+  }
+
+  @media (max-width: 760px){
+    .topbar{ align-items:flex-start; }
+    .topbar-right{ width: 100%; }
+    .month-ctrl{ flex:1; justify-content:space-between; }
+    .month-label{ min-width: 0; flex:1; }
+    .sync-pill{ flex:1; justify-content:center; }
+    .legend{ gap: 10px; }
+    .leg-hint{ width: 100%; margin-left: 0; }
+    .cell{ min-height: 96px; padding: 9px 8px 8px; }
+    .dn{ font-size: 18px; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *, *::before, *::after{
+      animation-duration: .01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: .01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <h1 class="sr-only">팀 GTL 월간 캘린더 2026</h1>
+
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-icon">GTL</div>
+      <div class="brand-text">
+        <div class="name">팀 GTL 캘린더</div>
+        <div class="sub">2026년 5월 – 12월</div>
+      </div>
+    </div>
+
+    <div class="topbar-right">
+      <div class="month-ctrl" aria-label="월 이동">
+        <button class="nav-btn" type="button" onclick="changeMonth(-1)" aria-label="이전 달">
+          <i class="ti ti-chevron-left"></i>
+        </button>
+        <span class="month-label" id="monthTitle"></span>
+        <button class="nav-btn" type="button" onclick="changeMonth(1)" aria-label="다음 달">
+          <i class="ti ti-chevron-right"></i>
+        </button>
+      </div>
+
+      <div class="sync-pill" aria-live="polite">
+        <span class="sync-dot" id="syncDot"></span>
+        <span id="syncText">불러오는 중…</span>
+      </div>
+
+      <button class="icon-btn" type="button" onclick="openHelp()" aria-label="도움말">
+        <i class="ti ti-help"></i>
+      </button>
+    </div>
+  </header>
+
+  <div class="tabs-wrap" id="monthTabs" role="tablist"></div>
+
+  <div class="legend">
+    <div class="leg"><div class="ls" style="background:var(--hol-bg);border:1px solid var(--hol-bd)"></div>공휴일</div>
+    <div class="leg"><div class="ls" style="background:var(--off-bg);border:1px solid var(--off-bd)"></div>공동휴무</div>
+    <div class="leg"><div class="ls" style="background:var(--wk-bg);border:1px solid var(--wk-bd)"></div>주말</div>
+    <div class="leg"><div class="ls" style="background:var(--today-bg);border:1.5px solid var(--teal)"></div>오늘</div>
+    <div class="leg-sep"></div>
+    <div class="leg-hint">날짜 칸 클릭 → 기록 추가 · 방향키 ← → 로 월 이동</div>
+  </div>
+
+  <div class="cal" id="calGrid" role="grid" aria-label="월간 캘린더"></div>
+
+  <p class="notice" id="notice"></p>
+</div>
+
+<div id="mw"></div>
+
+<!-- Supabase JS SDK (브라우저용) -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<!-- 서버가 주입하는 환경 변수 (SUPABASE_URL, SUPABASE_ANON_KEY) -->
+<script src="/config.js"></script>
+
+<script>
+/* =================================================================
+   팀 GTL 캘린더 — Supabase 백엔드 클라이언트
+
+   원본과 동일한 UI/UX 를 유지하되, 데이터 레이어를 교체:
+   - data.json POST/GET 대신 Supabase 의 entries / votes 테이블 사용
+   - 다른 팀원의 변경은 realtime 채널로 즉시 푸시됨
+   - 투표는 (entry_id, voter_id) 쌍이라 동시 편집 안전 + 중복 방지
+
+   엔트리 스키마 (브라우저 메모리):
+     D[month][day].entries = [{ id, name, memo, voters: Set<voterId> }]
+================================================================== */
+
+const YEAR = 2026;
+const MONTHS = [5, 6, 7, 8, 9, 10, 11, 12];
+const MN = { 5:'5월',6:'6월',7:'7월',8:'8월',9:'9월',10:'10월',11:'11월',12:'12월' };
+const DOW_KR = ['일','월','화','수','목','금','토'];
+
+const YEAR_HOLIDAYS = {
+  2026: {
+    '1-1':'신정',
+    '2-16':'설날 연휴','2-17':'설날','2-18':'설날 연휴',
+    '3-1':'삼일절','3-2':'삼일절 대체공휴일',
+    '5-5':'어린이날','5-24':'부처님오신날','5-25':'부처님오신날 대체공휴일',
+    '6-3':'지방선거일','6-6':'현충일',
+    '7-17':'제헌절',
+    '8-15':'광복절','8-17':'광복절 대체공휴일',
+    '9-24':'추석 연휴','9-25':'추석','9-26':'추석 연휴',
+    '10-3':'개천절','10-5':'개천절 대체공휴일','10-9':'한글날',
+    '12-25':'크리스마스'
+  }
+};
+
+let cur = (() => {
+  const m = new Date().getMonth() + 1;
+  return MONTHS.includes(m) ? m : 5;
+})();
+
+let D = {};
+MONTHS.forEach(m => { D[m] = {}; });
+
+let openDay = null;       // 현재 열린 날 (null 이면 모달 없음)
+let helpOpen = false;
+let es = null;            // 모달 입력 임시 상태 { name, memo }
+let sb = null;            // supabase client
+let MY_VOTER_ID = '';
+
+/* ----------- helpers ----------- */
+function getHolidayName(y, m, d) {
+  return (YEAR_HOLIDAYS[y] || {})[m + '-' + d] || null;
+}
+function lastFri(y, m) {
+  let d = new Date(y, m, 0);
+  while (d.getDay() !== 5) d.setDate(d.getDate() - 1);
+  return d.getDate();
+}
+function hasDat(m) {
+  return Object.values(D[m] || {}).some(v => (v.entries || []).length > 0);
+}
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function ensureDay(m, d) {
+  if (!D[m][d]) D[m][d] = { entries: [] };
+  return D[m][d];
+}
+function findEntry(entryId) {
+  for (const m of MONTHS) {
+    for (const d of Object.keys(D[m] || {})) {
+      const idx = D[m][d].entries.findIndex(e => e.id === entryId);
+      if (idx >= 0) return { m: +m, d: +d, idx, entry: D[m][d].entries[idx] };
+    }
+  }
+  return null;
+}
+function getOrMakeVoterId() {
+  let id = '';
+  try { id = localStorage.getItem('gtl-voter-id') || ''; } catch(e) {}
+  if (!id) {
+    id = (window.crypto && crypto.randomUUID)
+      ? crypto.randomUUID()
+      : 'v-' + Math.random().toString(36).slice(2) + '-' + Date.now();
+    try { localStorage.setItem('gtl-voter-id', id); } catch(e) {}
+  }
+  return id;
+}
+
+function setSyncState(state) {
+  const dot = document.getElementById('syncDot');
+  const txt = document.getElementById('syncText');
+  if (!dot || !txt) return;
+  dot.className = 'sync-dot' + (state === 'sv' ? ' saving' : state === 'err' ? ' error' : '');
+  txt.textContent =
+    state === 'sv'  ? '저장 중…' :
+    state === 'err' ? '서버 연결 오류' :
+    state === 'load'? '불러오는 중…' :
+                      '서버에 저장됨';
+}
+
+/* ----------- supabase init + data layer ----------- */
+function initSupabase() {
+  if (!window.SUPABASE_URL || !window.SUPABASE_ANON_KEY) {
+    console.error('Supabase 설정이 없습니다. /config.js 확인.');
+    setSyncState('err');
+    const txt = document.getElementById('syncText');
+    if (txt) txt.textContent = '설정 누락';
+    return null;
+  }
+  return window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY, {
+    realtime: { params: { eventsPerSecond: 10 } }
+  });
+}
+
+async function loadAll() {
+  setSyncState('load');
+  MONTHS.forEach(m => { D[m] = {}; });
+
+  const { data: entries, error: e1 } = await sb
+    .from('entries')
+    .select('id, year, month, day, name, memo')
+    .eq('year', YEAR);
+  if (e1) { setSyncState('err'); console.error('entries load:', e1); return; }
+
+  const ids = entries.map(e => e.id);
+  let votes = [];
+  if (ids.length) {
+    const { data: vrows, error: e2 } = await sb
+      .from('votes')
+      .select('entry_id, voter_id')
+      .in('entry_id', ids);
+    if (e2) { setSyncState('err'); console.error('votes load:', e2); return; }
+    votes = vrows;
+  }
+
+  const byEntry = {};
+  votes.forEach(v => {
+    (byEntry[v.entry_id] = byEntry[v.entry_id] || new Set()).add(v.voter_id);
+  });
+
+  entries.forEach(e => {
+    if (!MONTHS.includes(e.month)) return;
+    ensureDay(e.month, e.day).entries.push({
+      id: e.id,
+      name: e.name,
+      memo: e.memo || '',
+      voters: byEntry[e.id] || new Set()
+    });
+  });
+  MONTHS.forEach(m => {
+    Object.keys(D[m]).forEach(d => {
+      D[m][d].entries.sort((a, b) => a.id - b.id);
+    });
+  });
+
+  setSyncState('ok');
+  rerender();
+}
+
+function subscribe() {
+  sb.channel('gtl-lunch')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'entries' }, onEntryChange)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'votes'   }, onVoteChange)
+    .subscribe();
+}
+
+function onEntryChange(p) {
+  const eN = p.new, eO = p.old;
+  if (p.eventType === 'INSERT') {
+    if (!MONTHS.includes(eN.month) || eN.year !== YEAR) return;
+    if (findEntry(eN.id)) return;
+    ensureDay(eN.month, eN.day).entries.push({
+      id: eN.id, name: eN.name, memo: eN.memo || '', voters: new Set()
+    });
+    D[eN.month][eN.day].entries.sort((a, b) => a.id - b.id);
+  } else if (p.eventType === 'DELETE') {
+    const f = findEntry(eO.id);
+    if (f) D[f.m][f.d].entries.splice(f.idx, 1);
+  }
+  rerender();
+}
+
+function onVoteChange(p) {
+  const v = p.eventType === 'DELETE' ? p.old : p.new;
+  const f = findEntry(v.entry_id);
+  if (!f) return;
+  if (p.eventType === 'INSERT') f.entry.voters.add(v.voter_id);
+  else if (p.eventType === 'DELETE') f.entry.voters.delete(v.voter_id);
+  rerender();
+}
+
+/* ----------- mutations (optimistic + write-through) ----------- */
+async function addEntryAsync(day, name, memo) {
+  setSyncState('sv');
+  const { error } = await sb.from('entries').insert({
+    year: YEAR, month: cur, day, name, memo: memo || '', created_by: MY_VOTER_ID
+  });
+  setSyncState(error ? 'err' : 'ok');
+  if (error) { alert('저장 실패: ' + error.message); return false; }
+  return true;
+}
+
+async function deleteEntryAsync(entryId) {
+  // optimistic
+  const f = findEntry(entryId);
+  let restore = null;
+  if (f) {
+    restore = { m: f.m, d: f.d, idx: f.idx, entry: f.entry };
+    D[f.m][f.d].entries.splice(f.idx, 1);
+    rerender();
+  }
+  setSyncState('sv');
+  const { error } = await sb.from('entries').delete().eq('id', entryId);
+  if (error) {
+    if (restore) D[restore.m][restore.d].entries.splice(restore.idx, 0, restore.entry);
+    rerender();
+    setSyncState('err');
+    alert('삭제 실패: ' + error.message);
+    return;
+  }
+  setSyncState('ok');
+}
+
+async function toggleVoteAsync(entryId) {
+  const f = findEntry(entryId);
+  if (!f) return;
+  const wasVoted = f.entry.voters.has(MY_VOTER_ID);
+
+  // optimistic
+  if (wasVoted) f.entry.voters.delete(MY_VOTER_ID);
+  else          f.entry.voters.add(MY_VOTER_ID);
+  rerender();
+
+  setSyncState('sv');
+  const { error } = wasVoted
+    ? await sb.from('votes').delete().eq('entry_id', entryId).eq('voter_id', MY_VOTER_ID)
+    : await sb.from('votes').insert({ entry_id: entryId, voter_id: MY_VOTER_ID });
+
+  if (error) {
+    // revert
+    if (wasVoted) f.entry.voters.add(MY_VOTER_ID);
+    else          f.entry.voters.delete(MY_VOTER_ID);
+    rerender();
+    setSyncState('err');
+    return;
+  }
+  setSyncState('ok');
+}
+
+/* ----------- rendering ----------- */
+function rerender() {
+  renderTabs();
+  render();
+  if (openDay != null) renderModal(openDay);
+}
+
+function renderTabs() {
+  const c = document.getElementById('monthTabs');
+  c.innerHTML = '';
+  MONTHS.forEach(m => {
+    const t = document.createElement('button');
+    t.type = 'button';
+    t.className = 'tab' + (m === cur ? ' active' : '') + (hasDat(m) && m !== cur ? ' has-data' : '');
+    t.setAttribute('role', 'tab');
+    t.textContent = MN[m];
+    t.onclick = () => sw(m);
+    c.appendChild(t);
+  });
+}
+
+function sw(m) {
+  if (!MONTHS.includes(m)) return;
+  cur = m;
+  renderTabs();
+  render();
+}
+
+function changeMonth(delta) {
+  const i = MONTHS.indexOf(cur);
+  const n = i + delta;
+  if (n < 0 || n >= MONTHS.length) return;
+  sw(MONTHS[n]);
+}
+
+function render() {
+  document.getElementById('monthTitle').textContent = '2026년 ' + MN[cur];
+
+  const g = document.getElementById('calGrid');
+  g.innerHTML = '';
+
+  DOW_KR.forEach((d, i) => {
+    const el = document.createElement('div');
+    el.className = 'dow' + (i === 0 ? ' sun' : i === 6 ? ' sat' : '');
+    el.textContent = d;
+    g.appendChild(el);
+  });
+
+  const firstDay = new Date(YEAR, cur - 1, 1).getDay();
+  const dim = new Date(YEAR, cur, 0).getDate();
+  const total = Math.ceil((firstDay + dim) / 7) * 7;
+  const today = new Date();
+  const lf = lastFri(YEAR, cur);
+  const dat = D[cur] || {};
+
+  for (let i = 0; i < total; i++) {
+    const col = i % 7;
+    const dn = i - firstDay + 1;
+    const inMonth = dn >= 1 && dn <= dim;
+    const cell = document.createElement('div');
+
+    if (!inMonth) {
+      cell.className = 'cell empty';
+      g.appendChild(cell);
+      continue;
+    }
+
+    const h = getHolidayName(YEAR, cur, dn);
+    const isOff = dn === lf;
+    const isWeekend = col === 0 || col === 6;
+    const isToday = today.getFullYear() === YEAR && today.getMonth() + 1 === cur && today.getDate() === dn;
+
+    let cls = 'cell';
+    if (isToday) cls += ' today';
+    else if (h) cls += ' hol';
+    else if (isOff) cls += ' off';
+    else if (isWeekend) cls += ' wknd';
+    cell.className = cls;
+    cell.onclick = () => openModal(dn);
+
+    const nd = document.createElement('div');
+    nd.className = 'dn' + (col === 0 ? ' sun' : col === 6 ? ' sat' : '');
+    nd.textContent = dn;
+    cell.appendChild(nd);
+
+    if (h) {
+      const t = document.createElement('div');
+      t.className = 'day-tag hol-tag';
+      t.textContent = h;
+      cell.appendChild(t);
+    } else if (isOff) {
+      const t = document.createElement('div');
+      t.className = 'day-tag off-tag';
+      t.textContent = '공동 휴무';
+      cell.appendChild(t);
+    }
+
+    const entries = (dat[dn] && dat[dn].entries) || [];
+    entries.slice(0, 2).forEach(e => {
+      const c = document.createElement('div');
+      c.className = 'chip';
+      c.innerHTML = '<span class="chip-dot"></span><span class="chip-txt">' +
+        esc(e.name) + (e.memo ? ' · ' + esc(e.memo) : '') + '</span>';
+      c.onclick = ev => { ev.stopPropagation(); openModal(dn); };
+      cell.appendChild(c);
+    });
+
+    if (entries.length > 2) {
+      const more = document.createElement('div');
+      more.className = 'more-lnk';
+      more.textContent = '+' + (entries.length - 2) + '개 더';
+      more.onclick = ev => { ev.stopPropagation(); openModal(dn); };
+      cell.appendChild(more);
+    }
+
+    const vr = document.createElement('div');
+    vr.className = 'vrow';
+    entries.forEach(e => {
+      const count = e.voters.size;
+      const myVote = e.voters.has(MY_VOTER_ID);
+      if (count > 0 || myVote) {
+        const vc = document.createElement('div');
+        vc.className = 'vc' + (myVote ? ' voted' : '');
+        vc.innerHTML = '<i class="ti ti-thumb-up"></i>' +
+          (e.name.length > 4 ? esc(e.name.slice(0, 4)) + '…' : esc(e.name)) + ' ' + count;
+        vc.onclick = ev => { ev.stopPropagation(); toggleVoteAsync(e.id); };
+        vr.appendChild(vc);
+      }
+    });
+    if (vr.children.length > 0) cell.appendChild(vr);
+
+    if (entries.length === 0 && !isWeekend) {
+      const ah = document.createElement('div');
+      ah.className = 'add-hint';
+      ah.innerHTML = '<i class="ti ti-plus"></i>기록 추가';
+      cell.appendChild(ah);
+    }
+
+    g.appendChild(cell);
+  }
+
+  const cnt = Object.values(dat).reduce((s, d) => s + (d.entries || []).length, 0);
+  document.getElementById('notice').textContent =
+    cnt > 0 ? MN[cur] + ' · 총 ' + cnt + '개 기록 · 팀원 모두와 실시간 공유 중'
+            : '날짜 칸을 클릭해서 이번 달을 기록해보세요!';
+}
+
+function openModal(dn) {
+  ensureDay(cur, dn);
+  es = { name: '', memo: '' };
+  openDay = dn;
+  renderModal(dn);
+}
+
+function closeMod(ev, ov) {
+  if (ev && ov && ev.target !== ov) return;
+  document.getElementById('mw').innerHTML = '';
+  openDay = null;
+  helpOpen = false;
+}
+
+function renderModal(dn) {
+  const entries = (D[cur][dn] && D[cur][dn].entries) || [];
+  const h = getHolidayName(YEAR, cur, dn);
+  const isOff = dn === lastFri(YEAR, cur);
+  const dow = DOW_KR[new Date(YEAR, cur - 1, dn).getDay()];
+  const sub = MN[cur] + ' ' + dn + '일 (' + dow + ')' + (h ? ' · ' + h : isOff ? ' · 공동휴무' : '');
+
+  const eHTML = entries.length ? entries.map(e => {
+    const count = e.voters.size;
+    const myVote = e.voters.has(MY_VOTER_ID);
+    return `
+    <div class="erow">
+      <span class="edot"></span>
+      <div style="flex:1;min-width:0">
+        <div class="ename">${esc(e.name)}</div>
+        ${e.memo ? '<div class="ememo">' + esc(e.memo) + '</div>' : ''}
+      </div>
+      <button class="evote${myVote ? ' voted' : ''}" type="button" onclick="toggleVoteAsync(${e.id})">
+        <i class="ti ti-thumb-up"></i>${count}
+      </button>
+      <button class="edel" type="button" onclick="onDeleteClick(${e.id})" aria-label="삭제">
+        <i class="ti ti-x"></i>
+      </button>
+    </div>`;
+  }).join('')
+    : '<div class="empty-state"><i class="ti ti-clipboard-list"></i>아직 기록된 내용이 없어요</div>';
+
+  document.getElementById('mw').innerHTML = `
+    <div class="backdrop" onclick="closeMod(event,this)">
+      <div class="modal" onclick="event.stopPropagation()" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <div class="mhdr">
+          <div>
+            <div class="mtitle" id="modalTitle">기록 관리</div>
+            <div class="msub">${esc(sub)}</div>
+          </div>
+          <button class="mclose" type="button" onclick="closeMod()" aria-label="닫기">
+            <i class="ti ti-x"></i>
+          </button>
+        </div>
+
+        <div class="elist">${eHTML}</div>
+
+        <hr class="hr" />
+
+        <div class="igrp">
+          <div>
+            <div class="lbl">식당 이름</div>
+            <input class="inp" type="text" id="nName" placeholder="예) 한판돼지 삼겹살"
+                   maxlength="30" value="${esc(es.name)}"
+                   oninput="es.name=this.value"
+                   onkeydown="if(event.key==='Enter'){event.preventDefault();onAddClick(${dn})}" />
+          </div>
+          <div>
+            <div class="lbl">메모 (선택)</div>
+            <input class="inp" type="text" id="nMemo" placeholder="예) 3층, 파스타 추천"
+                   maxlength="40" value="${esc(es.memo)}"
+                   oninput="es.memo=this.value"
+                   onkeydown="if(event.key==='Enter'){event.preventDefault();onAddClick(${dn})}" />
+          </div>
+        </div>
+
+        <div class="mbtns">
+          <button class="btn btn-ghost" type="button" onclick="closeMod()">닫기</button>
+          <button class="btn btn-primary" type="button" onclick="onAddClick(${dn})">
+            <i class="ti ti-plus"></i>추가
+          </button>
+        </div>
+
+        <div class="mfooter">
+          <i class="ti ti-cloud" style="font-size:13px"></i>
+          실시간 동기화 · 팀원 모두와 공유됩니다
+        </div>
+      </div>
+    </div>
+  `;
+
+  setTimeout(() => {
+    const el = document.getElementById('nName');
+    if (el) el.focus();
+  }, 30);
+}
+
+async function onAddClick(dn) {
+  const name = (es && es.name ? es.name : '').trim();
+  const memo = (es && es.memo ? es.memo : '').trim();
+  if (!name) {
+    const el = document.getElementById('nName');
+    if (el) el.focus();
+    return;
+  }
+  const ok = await addEntryAsync(dn, name, memo);
+  if (ok) {
+    es.name = '';
+    es.memo = '';
+    closeMod();
+  }
+}
+
+async function onDeleteClick(entryId) {
+  if (!confirm('이 기록을 삭제할까요?')) return;
+  await deleteEntryAsync(entryId);
+}
+
+function openHelp() {
+  helpOpen = true;
+  document.getElementById('mw').innerHTML = `
+    <div class="backdrop" onclick="closeMod(event,this)">
+      <div class="modal" onclick="event.stopPropagation()" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+        <div class="mhdr">
+          <div>
+            <div class="mtitle" id="helpTitle">사용 방법</div>
+            <div class="msub">팀 GTL 캘린더 · 2026 · Supabase 실시간</div>
+          </div>
+          <button class="mclose" type="button" onclick="closeMod()" aria-label="닫기">
+            <i class="ti ti-x"></i>
+          </button>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:14px;font-size:13px;color:var(--text-2);line-height:1.65;margin-bottom:1.2rem">
+          ${[
+            ['ti-bolt', '실시간 공유', '다른 팀원이 기록·투표·삭제하면 새로고침 없이 즉시 반영됩니다.'],
+            ['ti-calendar-month', '월 이동', '상단 탭(5~12월) 또는 방향키 ← → 로 월을 이동합니다.'],
+            ['ti-pencil', '기록 추가', '날짜 칸 클릭 → 식당 이름 입력 → Enter 또는 추가 버튼으로 저장합니다.'],
+            ['ti-thumb-up', '투표', '항목 옆 👍 버튼으로 투표하고, 다시 누르면 취소됩니다. 한 사람당 항목별 1표.'],
+            ['ti-badge', '공휴일 표시', '대한민국 공휴일과 대체공휴일은 다른 색으로 구분됩니다.']
+          ].map(row => {
+            const ic = row[0], t = row[1], d = row[2];
+            return `
+              <div>
+                <div style="font-weight:800;color:var(--text);margin-bottom:2px;display:flex;align-items:center;gap:7px">
+                  <i class="ti ${ic}" style="color:var(--teal);font-size:15px"></i>${t}
+                </div>
+                <div>${d}</div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+
+        <div class="mbtns">
+          <button class="btn btn-primary" type="button" onclick="closeMod()">확인</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function isTypingTarget(el) {
+  if (!el) return false;
+  const tag = (el.tagName || '').toUpperCase();
+  return tag === 'INPUT' || tag === 'TEXTAREA' || el.isContentEditable;
+}
+
+document.addEventListener('keydown', (e) => {
+  if (isTypingTarget(document.activeElement)) return;
+  if (e.key === 'ArrowLeft')  { e.preventDefault(); changeMonth(-1); }
+  else if (e.key === 'ArrowRight') { e.preventDefault(); changeMonth(1); }
+  else if (e.key === 'Escape') {
+    if (document.getElementById('mw').innerHTML.trim()) closeMod();
+  }
+});
+
+/* ----------- boot ----------- */
+(async () => {
+  MY_VOTER_ID = getOrMakeVoterId();
+  renderTabs();
+  render();
+  sb = initSupabase();
+  if (!sb) return;
+  await loadAll();
+  subscribe();
+})();
+</script>
+</body>
+</html>
