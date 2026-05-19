@@ -449,6 +449,46 @@
     box-shadow: var(--shadow-soft);
   }
 
+  /* === dark mode: replace flat cell fills with a soft top-lit gradient
+         so the grid reads as layered material instead of two-tone blocks === */
+  [data-theme="dark"] .cell{
+    background:
+      linear-gradient(180deg, rgba(255,245,235,.045) 0%, rgba(255,245,235,0) 55%),
+      radial-gradient(140% 90% at 50% -20%, rgba(255,245,235,.035), transparent 65%),
+      linear-gradient(180deg, rgba(54,46,40,.72) 0%, rgba(36,30,26,.62) 100%);
+    border-color: rgba(255,245,235,.05);
+    box-shadow:
+      inset 0 1px 0 rgba(255,245,235,.05),
+      0 8px 20px rgba(0,0,0,.22);
+  }
+  [data-theme="dark"] .cell.wknd{
+    background:
+      linear-gradient(180deg, rgba(255,245,235,.045) 0%, rgba(255,245,235,0) 55%),
+      linear-gradient(180deg, rgba(90,143,255,.10) 0%, rgba(36,30,26,.62) 100%);
+    border-color: rgba(90,143,255,.18);
+  }
+  [data-theme="dark"] .cell.hol{
+    background:
+      linear-gradient(180deg, rgba(255,245,235,.045) 0%, rgba(255,245,235,0) 55%),
+      linear-gradient(180deg, rgba(255,107,107,.10) 0%, rgba(36,30,26,.62) 100%);
+    border-color: rgba(255,107,107,.22);
+  }
+  [data-theme="dark"] .cell.off{
+    background:
+      linear-gradient(180deg, rgba(255,245,235,.045) 0%, rgba(255,245,235,0) 55%),
+      linear-gradient(180deg, rgba(255,191,75,.10) 0%, rgba(36,30,26,.62) 100%);
+    border-color: rgba(255,191,75,.22);
+  }
+  [data-theme="dark"] .cell.today{
+    background:
+      linear-gradient(180deg, rgba(255,245,235,.055) 0%, rgba(255,245,235,0) 55%),
+      linear-gradient(180deg, rgba(62,170,138,.22) 0%, rgba(36,30,26,.55) 100%);
+    border-color: var(--teal);
+    box-shadow:
+      inset 0 1px 0 rgba(255,245,235,.08),
+      0 10px 24px rgba(62,170,138,.18);
+  }
+
   .dn{ font-size: 19px; line-height: 1; font-weight: 800; letter-spacing: -.4px; color: var(--text-2); }
   .cell.today .dn{ color: var(--teal); }
   .dn.sun{ color: var(--sun); }
@@ -725,7 +765,6 @@
     .cal { gap: 4px; }
     .cell {
       min-height: 78px; padding: 6px 5px 5px; border-radius: 11px; gap: 3px;
-      background: var(--surface-solid);
     }
     .cell.today { box-shadow: 0 0 0 2px var(--teal-glow); }
     .dn { font-size: 15px; }
