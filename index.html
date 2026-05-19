@@ -144,6 +144,47 @@
     50%  { transform: scale(1.02); box-shadow: 0 0 0 18px transparent; }
     100% { transform: scale(1);    box-shadow: 0 0 0 0 transparent; }
   }
+  @keyframes dice-winner {
+    0%   { transform: scale(1);    box-shadow: 0 0 0 0 var(--teal-glow); }
+    25%  { transform: scale(1.05); box-shadow: 0 0 0 14px var(--teal-glow); }
+    50%  { transform: scale(.99);  box-shadow: 0 0 0 24px transparent; }
+    75%  { transform: scale(1.02); box-shadow: 0 0 0 10px var(--teal-glow); }
+    100% { transform: scale(1);    box-shadow: 0 0 0 0 transparent; }
+  }
+  @keyframes flash-ring {
+    0%   { box-shadow: 0 0 0 0 var(--teal-glow), 0 0 0 0 var(--teal); }
+    40%  { box-shadow: 0 0 0 6px var(--teal-glow), 0 0 0 2px var(--teal); }
+    100% { box-shadow: 0 0 0 0 transparent, 0 0 0 0 transparent; }
+  }
+  @keyframes vote-pop {
+    0%   { transform: scale(1) rotate(0deg); }
+    30%  { transform: scale(1.45) rotate(-12deg); }
+    60%  { transform: scale(.92) rotate(8deg); }
+    100% { transform: scale(1) rotate(0deg); }
+  }
+  @keyframes count-bump {
+    0%   { transform: translateY(0); }
+    40%  { transform: translateY(-4px); }
+    100% { transform: translateY(0); }
+  }
+  @keyframes row-collapse {
+    0%   { opacity: 1; max-height: 200px; transform: translateX(0); margin-bottom: var(--row-mb, 7px); padding-top: var(--row-pt, 10px); padding-bottom: var(--row-pb, 10px); }
+    40%  { opacity: 0; transform: translateX(28px); max-height: 200px; }
+    100% { opacity: 0; transform: translateX(28px); max-height: 0; margin-bottom: 0; padding-top: 0; padding-bottom: 0; border-width: 0; }
+  }
+  @keyframes chip-collapse {
+    0%   { opacity: 1; max-height: 40px; transform: scale(1); }
+    100% { opacity: 0; max-height: 0; transform: scale(.9); margin: 0; padding-top: 0; padding-bottom: 0; }
+  }
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-6px); }
+    40%, 80% { transform: translateX(6px); }
+  }
+  @keyframes shimmer {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
 
   .page{ max-width: 1280px; margin: 0 auto; padding: 1.1rem 1.25rem 1.6rem; }
 
@@ -582,6 +623,61 @@
   .modal-sm { max-width: 360px; padding: 1.1rem 1.15rem; }
   .modal-sm .ctitle { font-size: 14.5px; font-weight: 700; color: var(--text); margin-bottom: 12px; line-height: 1.5; }
 
+  /* === interaction animations === */
+  .hero-row.flash, .erow.flash { animation: flash-ring 1.2s var(--ease-out); }
+  .chip.flash { animation: flash-ring 1s var(--ease-out); }
+  .hero-row.dice-winner { animation: dice-winner 1.6s var(--ease-spring); border-color: var(--teal); }
+  .evote.popping i, .hero-vote.popping i { animation: vote-pop .55s var(--ease-spring); display: inline-block; }
+  .evote.bumping, .hero-vote.bumping { animation: count-bump .4s var(--ease-spring); }
+  .erow.removing {
+    animation: row-collapse .32s var(--ease-out) forwards;
+    overflow: hidden; pointer-events: none;
+  }
+  .chip.removing, .hero-row.removing {
+    animation: chip-collapse .26s var(--ease-out) forwards;
+    overflow: hidden; pointer-events: none;
+  }
+  .inp.shake { animation: shake .42s var(--ease-out); border-color: var(--sun) !important; }
+
+  /* === skeleton === */
+  .cell.skeleton {
+    background: linear-gradient(90deg, var(--surface-2) 25%, var(--surface-3) 50%, var(--surface-2) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.6s linear infinite;
+    border-color: transparent;
+    cursor: default; pointer-events: none;
+    box-shadow: none;
+  }
+  .cell.skeleton::after { content: ''; display: block; }
+
+  /* === edit mode in modal === */
+  .erow.editing { background: var(--surface-3); border-color: var(--bd-strong); flex-wrap: wrap; }
+  .erow .edit-form { flex: 1; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+  .erow .edit-form .inp { padding: 7px 10px; font-size: 12.5px; border-radius: 10px; background: var(--surface-solid); }
+  .erow .edit-actions { display: flex; gap: 6px; flex-shrink: 0; align-items: center; }
+  .eedit, .esave, .ecancel {
+    width: 26px; height: 26px; border: 0; border-radius: 9px;
+    background: transparent; cursor: pointer; color: var(--text-3);
+    display:flex; align-items:center; justify-content:center;
+    transition: all var(--dur-fast) var(--ease-out);
+  }
+  .eedit:hover { background: var(--teal-3); color: var(--teal); }
+  .esave { background: var(--teal-3); color: var(--teal); width: auto; padding: 0 10px; font-family: var(--ff); font-size: 12px; font-weight: 700; height: 28px; }
+  .esave:hover { background: var(--teal); color: #fff; }
+  .ecancel:hover { background: var(--surface-2); color: var(--text-2); }
+
+  /* === theme transition (only active during toggle) === */
+  html.theme-switching,
+  html.theme-switching *,
+  html.theme-switching *::before,
+  html.theme-switching *::after {
+    transition: background-color .5s var(--ease-out),
+                color .35s var(--ease-out),
+                border-color .4s var(--ease-out),
+                box-shadow .4s var(--ease-out),
+                fill .35s var(--ease-out) !important;
+  }
+
   /* === RESPONSIVE === */
   @media (max-width: 960px){
     .page{ padding: .9rem .85rem 1.15rem; }
@@ -791,6 +887,9 @@ MONTHS.forEach(m => { D[m] = {}; });
 
 let openDay = null, helpOpen = false, es = null;
 let sb = null, MY_VOTER_ID = '';
+let _loaded = false;          // turns true after first loadAll() resolves
+let _editingId = null;        // entry id currently in edit mode in modal
+let _editDraft = { name:'', memo:'' };
 
 /* ---------- helpers ---------- */
 function getHolidayName(y,m,d){ return (YEAR_HOLIDAYS[y]||{})[m+'-'+d] || null; }
@@ -883,7 +982,9 @@ function applyTheme(theme){
 function toggleTheme(){
   const cur = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
   try{ localStorage.setItem('gtl-theme', cur); }catch(e){}
+  document.documentElement.classList.add('theme-switching');
   applyTheme(cur);
+  setTimeout(() => document.documentElement.classList.remove('theme-switching'), 600);
 }
 
 /* ---------- supabase init + load ---------- */
@@ -928,6 +1029,7 @@ async function loadAll(){
   });
   MONTHS.forEach(m => Object.keys(D[m]).forEach(d => D[m][d].entries.sort((a,b)=>a.id-b.id)));
 
+  _loaded = true;
   setSyncState('ok');
   rerender(true);
 }
@@ -938,6 +1040,20 @@ function subscribe(){
     .on('postgres_changes',{event:'*',schema:'public',table:'votes'},   onVoteChange)
     .subscribe();
 }
+function flashEntry(id){
+  requestAnimationFrame(() => {
+    document.querySelectorAll(
+      '[data-eid="'+id+'"], [data-entry-id="'+id+'"]'
+    ).forEach(el => {
+      el.classList.remove('flash');
+      // force reflow so re-adding restarts the animation
+      void el.offsetWidth;
+      el.classList.add('flash');
+      el.addEventListener('animationend', () => el.classList.remove('flash'), { once: true });
+    });
+  });
+}
+
 function onEntryChange(p){
   const eN=p.new, eO=p.old;
   if(p.eventType==='INSERT'){
@@ -947,10 +1063,19 @@ function onEntryChange(p){
       id:eN.id, name:eN.name, memo:eN.memo||'', voters:new Set()
     });
     D[eN.month][eN.day].entries.sort((a,b)=>a.id-b.id);
+    rerender();
+    if(eN.created_by !== MY_VOTER_ID) flashEntry(eN.id);
+  } else if(p.eventType==='UPDATE'){
+    if(!MONTHS.includes(eN.month) || eN.year!==YEAR) return;
+    const f = findEntry(eN.id); if(!f){ rerender(); return; }
+    f.entry.name = eN.name;
+    f.entry.memo = eN.memo || '';
+    rerender();
+    if(eN.created_by !== MY_VOTER_ID) flashEntry(eN.id);
   } else if(p.eventType==='DELETE'){
     const f=findEntry(eO.id); if(f) D[f.m][f.d].entries.splice(f.idx,1);
+    rerender();
   }
-  rerender();
 }
 function onVoteChange(p){
   const v = p.eventType==='DELETE' ? p.old : p.new;
@@ -958,9 +1083,24 @@ function onVoteChange(p){
   if(p.eventType==='INSERT') f.entry.voters.add(v.voter_id);
   else if(p.eventType==='DELETE') f.entry.voters.delete(v.voter_id);
   rerender();
+  if(v.voter_id !== MY_VOTER_ID) flashEntry(v.entry_id);
 }
 
 /* ---------- mutations ---------- */
+function normalizeName(s){ return String(s||'').trim().toLowerCase().replace(/\s+/g,' '); }
+function getAllRestaurantNames(){
+  const set = new Set();
+  MONTHS.forEach(m => Object.values(D[m]||{}).forEach(d =>
+    (d.entries||[]).forEach(e => { if(e.name) set.add(e.name); })
+  ));
+  return Array.from(set).sort((a,b)=>a.localeCompare(b,'ko'));
+}
+function isDuplicateOnDay(day, name, ignoreId){
+  const list = (D[cur] && D[cur][day] && D[cur][day].entries) || [];
+  const norm = normalizeName(name);
+  return list.some(e => e.id !== ignoreId && normalizeName(e.name) === norm);
+}
+
 async function addEntryAsync(day, name, memo){
   setSyncState('sv');
   const { error } = await sb.from('entries').insert({
@@ -970,7 +1110,27 @@ async function addEntryAsync(day, name, memo){
   if(error){ showToast('저장 실패: '+error.message, 'err'); return false; }
   return true;
 }
+async function updateEntryAsync(entryId, name, memo){
+  const f = findEntry(entryId);
+  let backup=null;
+  if(f){ backup = { name:f.entry.name, memo:f.entry.memo }; f.entry.name=name; f.entry.memo=memo||''; rerender(); }
+  setSyncState('sv');
+  const { error } = await sb.from('entries').update({ name, memo: memo||'' }).eq('id', entryId);
+  if(error){
+    if(f && backup){ f.entry.name=backup.name; f.entry.memo=backup.memo; rerender(); }
+    setSyncState('err'); showToast('수정 실패: '+error.message, 'err'); return false;
+  }
+  setSyncState('ok');
+  return true;
+}
 async function deleteEntryAsync(entryId){
+  // animate out first so the row collapses instead of vanishing
+  const els = document.querySelectorAll(
+    '[data-eid="'+entryId+'"], [data-entry-id="'+entryId+'"]'
+  );
+  els.forEach(el => el.classList.add('removing'));
+  if(els.length){ await new Promise(r => setTimeout(r, 240)); }
+
   const f = findEntry(entryId);
   let restore=null;
   if(f){ restore={m:f.m,d:f.d,idx:f.idx,entry:f.entry}; D[f.m][f.d].entries.splice(f.idx,1); rerender(); }
@@ -983,6 +1143,19 @@ async function deleteEntryAsync(entryId){
   setSyncState('ok');
 }
 const _votingIds = new Set();
+function _animateVote(entryId, becameVoted){
+  if(becameVoted && navigator.vibrate){ try { navigator.vibrate(10); } catch(e){} }
+  requestAnimationFrame(() => {
+    document.querySelectorAll(
+      '[data-eid="'+entryId+'"] .evote, [data-entry-id="'+entryId+'"] .hero-vote'
+    ).forEach(btn => {
+      btn.classList.remove('popping','bumping');
+      void btn.offsetWidth;
+      btn.classList.add('popping','bumping');
+      btn.addEventListener('animationend', () => btn.classList.remove('popping','bumping'), { once: true });
+    });
+  });
+}
 async function toggleVoteAsync(entryId){
   if(_votingIds.has(entryId)) return;
   _votingIds.add(entryId);
@@ -991,6 +1164,7 @@ async function toggleVoteAsync(entryId){
     const was = f.entry.voters.has(MY_VOTER_ID);
     if(was) f.entry.voters.delete(MY_VOTER_ID); else f.entry.voters.add(MY_VOTER_ID);
     rerender();
+    _animateVote(entryId, !was);
     setSyncState('sv');
     const { error } = was
       ? await sb.from('votes').delete().eq('entry_id', entryId).eq('voter_id', MY_VOTER_ID)
@@ -1039,7 +1213,7 @@ function getTodayEntries(){
 function renderHero(){
   const el = document.getElementById('todayHero');
   if(!el) return;
-  if(!shouldShowHero()){ el.hidden = true; el.innerHTML=''; return; }
+  if(!_loaded || !shouldShowHero()){ el.hidden = true; el.innerHTML=''; return; }
   el.hidden = false;
 
   const t = todayInfo();
@@ -1128,9 +1302,12 @@ function rollDice(){
       i++;
       if(i >= shuffleCount){
         clearInterval(id);
-        rows.forEach(r => r.classList.remove('spotlight'));
-        rows[pickIdx].classList.add('spotlight');
-        rows[pickIdx].scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        rows.forEach(r => r.classList.remove('spotlight','dice-winner'));
+        const winner = rows[pickIdx];
+        winner.classList.add('dice-winner');
+        winner.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        if(navigator.vibrate){ try { navigator.vibrate([12, 60, 18]); } catch(e){} }
+        winner.addEventListener('animationend', () => winner.classList.remove('dice-winner'), { once: true });
       }
     }, 80);
   }, 900);
@@ -1225,6 +1402,17 @@ function render(animate){
     g.appendChild(el);
   });
 
+  if(!_loaded){
+    // skeleton grid while initial data loads
+    for(let i=0;i<35;i++){
+      const sk = document.createElement('div');
+      sk.className = 'cell skeleton';
+      g.appendChild(sk);
+    }
+    document.getElementById('notice').textContent = '';
+    return;
+  }
+
   const firstDay=new Date(YEAR,cur-1,1).getDay();
   const dim=new Date(YEAR,cur,0).getDate();
   const total=Math.ceil((firstDay+dim)/7)*7;
@@ -1274,6 +1462,7 @@ function render(animate){
       const my = e.voters.has(MY_VOTER_ID);
       const c=document.createElement('div');
       c.className='chip'+(my?' voted':'');
+      c.dataset.eid = e.id;
       c.innerHTML='<span class="chip-dot"></span><span class="chip-txt">'+esc(e.name)+(e.memo?' · '+esc(e.memo):'')+'</span>'+
         (v>0 ? '<span class="chip-count'+(my?' voted':'')+'">👍 '+v+'</span>' : '');
       c.onclick=ev=>{ ev.stopPropagation(); openModal(dn); };
@@ -1342,6 +1531,11 @@ function buildModalShellHTML(dn){
   const dow=DOW_KR[new Date(YEAR,cur-1,dn).getDay()];
   const sub=MN[cur]+' '+dn+'일 ('+dow+')'+(h?' · '+h:isOff?' · 공동휴무':'');
 
+  const names = getAllRestaurantNames();
+  const dataListHTML = names.length
+    ? '<datalist id="restNames">'+names.map(n=>'<option value="'+esc(n)+'"></option>').join('')+'</datalist>'
+    : '';
+
   return `
     <div class="backdrop" onclick="closeMod(event,this)">
       <div class="modal" data-day="${dn}" onclick="event.stopPropagation()" role="dialog" aria-modal="true">
@@ -1360,9 +1554,10 @@ function buildModalShellHTML(dn){
           <div>
             <div class="lbl">식당 이름</div>
             <input class="inp" type="text" id="nName" placeholder="예) 한판돼지 삼겹살"
-                   maxlength="30" value=""
+                   maxlength="30" value="" list="restNames" autocomplete="off"
                    oninput="es.name=this.value"
                    onkeydown="if(event.key==='Enter'){event.preventDefault();onAddClick(${dn})}" />
+            ${dataListHTML}
           </div>
           <div>
             <div class="lbl">메모 (선택)</div>
@@ -1395,6 +1590,26 @@ function refreshModalContent(dn, modalEl){
 
   const eHTML = sorted.length ? sorted.map(e=>{
     const v=e.voters.size, my=e.voters.has(MY_VOTER_ID);
+    if(_editingId === e.id){
+      return `
+      <div class="erow editing" data-eid="${e.id}">
+        <span class="edot"></span>
+        <div class="edit-form">
+          <input class="inp" type="text" id="editName_${e.id}" maxlength="30"
+                 value="${esc(_editDraft.name)}" list="restNames" autocomplete="off"
+                 oninput="_editDraft.name=this.value"
+                 onkeydown="if(event.key==='Enter'){event.preventDefault();onSaveEditClick(${e.id})}else if(event.key==='Escape'){event.preventDefault();onCancelEditClick()}" />
+          <input class="inp" type="text" id="editMemo_${e.id}" maxlength="40" placeholder="메모 (선택)"
+                 value="${esc(_editDraft.memo)}"
+                 oninput="_editDraft.memo=this.value"
+                 onkeydown="if(event.key==='Enter'){event.preventDefault();onSaveEditClick(${e.id})}else if(event.key==='Escape'){event.preventDefault();onCancelEditClick()}" />
+        </div>
+        <div class="edit-actions">
+          <button class="esave" type="button" onclick="onSaveEditClick(${e.id})">저장</button>
+          <button class="ecancel" type="button" onclick="onCancelEditClick()" aria-label="취소"><i class="ti ti-x"></i></button>
+        </div>
+      </div>`;
+    }
     return `
     <div class="erow" data-eid="${e.id}">
       <span class="edot"></span>
@@ -1405,6 +1620,7 @@ function refreshModalContent(dn, modalEl){
       <button class="evote${my?' voted':''}" type="button" onclick="toggleVoteAsync(${e.id})">
         <i class="ti ti-thumb-up"></i>${v}
       </button>
+      <button class="eedit" type="button" onclick="onEditClick(${e.id})" aria-label="수정"><i class="ti ti-pencil"></i></button>
       <button class="edel" type="button" onclick="onDeleteClick(${e.id})" aria-label="삭제">
         <i class="ti ti-x"></i>
       </button>
@@ -1413,12 +1629,30 @@ function refreshModalContent(dn, modalEl){
 
   const list = modalEl.querySelector('#modalList');
   if(list) list.innerHTML = eHTML;
+  if(_editingId != null){
+    const el = document.getElementById('editName_'+_editingId);
+    if(el){ el.focus(); el.setSelectionRange(el.value.length, el.value.length); }
+  }
 }
 
+function _shakeInput(id){
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.classList.remove('shake');
+  void el.offsetWidth;
+  el.classList.add('shake');
+  el.addEventListener('animationend', () => el.classList.remove('shake'), { once: true });
+  el.focus();
+}
 async function onAddClick(dn){
   const name=(es&&es.name?es.name:'').trim();
   const memo=(es&&es.memo?es.memo:'').trim();
-  if(!name){ const el=document.getElementById('nName'); if(el) el.focus(); return; }
+  if(!name){ _shakeInput('nName'); return; }
+  if(isDuplicateOnDay(dn, name, null)){
+    _shakeInput('nName');
+    showToast('이미 같은 식당이 있어요', 'err');
+    return;
+  }
   const ok = await addEntryAsync(dn, name, memo);
   if(ok){ es.name=''; es.memo=''; closeMod(); }
 }
@@ -1426,6 +1660,31 @@ async function onDeleteClick(entryId){
   const ok = await showConfirm('이 기록을 삭제할까요?', '삭제');
   if(!ok) return;
   await deleteEntryAsync(entryId);
+}
+
+function onEditClick(entryId){
+  const f = findEntry(entryId); if(!f) return;
+  _editingId = entryId;
+  _editDraft = { name: f.entry.name, memo: f.entry.memo || '' };
+  renderModal(openDay);
+}
+function onCancelEditClick(){
+  _editingId = null;
+  _editDraft = { name:'', memo:'' };
+  renderModal(openDay);
+}
+async function onSaveEditClick(entryId){
+  const name = (_editDraft.name||'').trim();
+  const memo = (_editDraft.memo||'').trim();
+  if(!name){ _shakeInput('editName_'+entryId); return; }
+  if(isDuplicateOnDay(openDay, name, entryId)){
+    _shakeInput('editName_'+entryId);
+    showToast('이미 같은 식당이 있어요', 'err');
+    return;
+  }
+  const editId = entryId;
+  _editingId = null; _editDraft = { name:'', memo:'' };
+  await updateEntryAsync(editId, name, memo);
 }
 
 function openHelp(){

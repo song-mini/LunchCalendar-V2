@@ -36,15 +36,17 @@ alter table public.entries enable row level security;
 alter table public.votes   enable row level security;
 
 -- 기존 정책이 남아 있을 수 있으니 idempotent 하게 다시 만듦
-drop policy if exists "anyone reads entries"  on public.entries;
+drop policy if exists "anyone reads entries"   on public.entries;
 drop policy if exists "anyone inserts entries" on public.entries;
+drop policy if exists "anyone updates entries" on public.entries;
 drop policy if exists "anyone deletes entries" on public.entries;
-drop policy if exists "anyone reads votes"    on public.votes;
-drop policy if exists "anyone inserts votes"  on public.votes;
-drop policy if exists "anyone deletes votes"  on public.votes;
+drop policy if exists "anyone reads votes"     on public.votes;
+drop policy if exists "anyone inserts votes"   on public.votes;
+drop policy if exists "anyone deletes votes"   on public.votes;
 
 create policy "anyone reads entries"   on public.entries for select using (true);
 create policy "anyone inserts entries" on public.entries for insert with check (true);
+create policy "anyone updates entries" on public.entries for update using (true) with check (true);
 create policy "anyone deletes entries" on public.entries for delete using (true);
 
 create policy "anyone reads votes"     on public.votes   for select using (true);
