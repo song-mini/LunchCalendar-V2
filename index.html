@@ -31,7 +31,7 @@
     --bd-strong:rgba(28,25,23,.16);
     --text:#1f1b18;
     --text-2:#5f5852;
-    --text-3:#9a9188;
+    --text-3:#7c736a;
 
     --teal:#0f6c58;
     --teal-2:#1a8a68;
@@ -125,11 +125,12 @@
 
   /* === unified animations === */
   @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
   @keyframes popIn  { from { opacity: 0; transform: translateY(10px) scale(.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
-  @keyframes slideInRight { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
-  @keyframes slideInLeft  { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
-  @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
-  @keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.04); } }
+  @keyframes popOut { from { opacity: 1; transform: translateY(0) scale(1); } to { opacity: 0; transform: translateY(6px) scale(.97); } }
+  @keyframes monthSlideRight { from { opacity: 0; transform: translateX(28px); } to { opacity: 1; transform: translateX(0); } }
+  @keyframes monthSlideLeft  { from { opacity: 0; transform: translateX(-28px); } to { opacity: 1; transform: translateX(0); } }
+  @keyframes sync-pulse { 0%,100% { opacity: 1; } 50% { opacity: .55; } }
   @keyframes dice-roll {
     0%   { transform: rotate(0deg)   scale(1);   }
     20%  { transform: rotate(-90deg) scale(1.15); }
@@ -159,9 +160,11 @@
     color:#fff; font-size: 13px; font-weight: 800; letter-spacing: .2px;
     background: linear-gradient(135deg, var(--teal) 0%, #146f5a 42%, #1b8f6d 100%);
     box-shadow: 0 10px 20px var(--teal-glow);
-    transition: transform .25s var(--ease-spring);
+    cursor: pointer; user-select: none; border: 0;
+    transition: transform .25s var(--ease-spring), box-shadow .2s var(--ease-out);
   }
-  .brand-icon:hover { transform: rotate(-4deg) scale(1.04); }
+  .brand-icon:hover { transform: rotate(-4deg) scale(1.04); box-shadow: 0 14px 26px var(--teal-glow); }
+  .brand-icon:active { transform: scale(.96); }
   .brand-text .name{ font-size: 18px; font-weight: 800; letter-spacing: -.4px; color: var(--text); }
   .brand-text .sub{ margin-top: 2px; font-size: 12px; color: var(--text-3); }
 
@@ -214,9 +217,8 @@
     transition: all var(--dur-fast) var(--ease-out);
   }
   .sync-dot{ width: 8px; height: 8px; border-radius: 999px; background: #22c55e; box-shadow: 0 0 0 4px rgba(34,197,94,.12); transition: background .3s; }
-  .sync-dot.saving{ background:#f59e0b; box-shadow: 0 0 0 4px rgba(245,158,11,.14); animation: blink 1s infinite; }
+  .sync-dot.saving{ background:#f59e0b; box-shadow: 0 0 0 4px rgba(245,158,11,.14); animation: sync-pulse 1.8s var(--ease-out) infinite; }
   .sync-dot.error { background:#ef4444; box-shadow: 0 0 0 4px rgba(239,68,68,.14); }
-  @keyframes blink{ 0%,100%{opacity:1} 50%{opacity:.35} }
 
   .icon-btn{
     width: 36px; height: 36px; border: 1px solid var(--bd); border-radius: 12px;
@@ -224,9 +226,9 @@
     display:flex; align-items:center; justify-content:center;
     color: var(--text-2); box-shadow: var(--shadow-soft);
     backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
-    transition: all var(--dur-fast) var(--ease-out);
+    transition: background-color var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out);
   }
-  .icon-btn:hover{ background: var(--surface-2); border-color: var(--bd-strong); color: var(--text); transform: translateY(-1px) rotate(-2deg); }
+  .icon-btn:hover{ background: var(--surface-2); border-color: var(--bd-strong); color: var(--text); transform: translateY(-1px); }
   .icon-btn:active { transform: scale(.92); }
   .icon-btn .ti { transition: transform .4s var(--ease-spring); }
   .theme-btn:hover .ti { transform: rotate(180deg); }
@@ -300,13 +302,13 @@
   }
   .hero-row.enter { animation: fadeUp .4s var(--ease-out) both; }
   [data-theme="dark"] .hero-row {
-    background: #3d342e;
-    border-color: rgba(255,245,235,.10);
+    background: var(--surface-3);
+    border-color: var(--bd);
     box-shadow: 0 2px 10px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.04);
   }
   [data-theme="dark"] .hero-row:hover {
-    background: #463a33;
-    border-color: rgba(255,245,235,.18);
+    background: var(--surface-3);
+    border-color: var(--bd-strong);
     box-shadow: 0 10px 22px rgba(0,0,0,.4);
   }
   .hero-row:hover { transform: translateY(-2px); border-color: var(--bd-strong); box-shadow: 0 10px 22px rgba(30,24,20,.08); }
@@ -359,11 +361,10 @@
     transition: all var(--dur-fast) var(--ease-out);
     position: relative; white-space: nowrap;
   }
-  .tab:hover{ background: var(--surface-2); color: var(--text); transform: translateY(-1px); }
+  .tab:hover{ background: var(--surface-2); color: var(--text); }
   .tab.active{
-    background: linear-gradient(135deg, var(--teal), #0d7a61);
-    color: #fff; box-shadow: 0 10px 20px var(--teal-glow);
-    transform: translateY(-1px);
+    background: var(--teal);
+    color: #fff; box-shadow: 0 4px 10px var(--teal-glow);
   }
   .tab.has-data::after{
     content:''; position:absolute; top: 6px; right: 8px;
@@ -376,7 +377,8 @@
     display:grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px;
     animation: fadeUp .55s var(--ease-out) .12s both;
   }
-  .cal.switching { animation: none; }
+  .cal.slide-r { animation: monthSlideRight .34s var(--ease-out); }
+  .cal.slide-l { animation: monthSlideLeft  .34s var(--ease-out); }
 
   .dow{ padding: 4px 2px 8px; text-align:center; font-size: 11px; font-weight: 700; letter-spacing: .5px; color: var(--text-3); }
   .dow.sun{ color: var(--sun); }
@@ -388,12 +390,14 @@
     background: var(--surface); box-shadow: var(--shadow-soft);
     display:flex; flex-direction:column; gap: 4px;
     cursor:pointer;
-    backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
-    transition: transform .22s var(--ease-out), box-shadow .22s var(--ease-out), border-color .22s var(--ease-out);
+    transition: border-color .22s var(--ease-out), background-color .22s var(--ease-out);
   }
-  .cal.mounting .cell { animation: popIn .35s var(--ease-out) both; }
-  .cell:hover{ border-color: rgba(15,108,88,.22); box-shadow: var(--shadow-lift); transform: translateY(-2px); }
-  [data-theme="dark"] .cell:hover { border-color: rgba(62,170,138,.32); }
+  .cal.mounting .cell {
+    animation: popIn .4s var(--ease-out) both;
+    animation-delay: calc(var(--cell-i, 0) * 14ms);
+  }
+  .cell:hover{ border-color: rgba(15,108,88,.32); }
+  [data-theme="dark"] .cell:hover { border-color: rgba(62,170,138,.42); }
   .cell.empty{ background: transparent; box-shadow: none; border: none; min-height: 48px; pointer-events: none; padding: 0; animation: none; }
   .cell.wknd{ background: linear-gradient(180deg, var(--wk-bg) 0%, var(--surface) 100%); border-color: var(--wk-bd); }
   .cell.hol{ background: linear-gradient(180deg, var(--hol-bg) 0%, var(--surface) 100%); border-color: var(--hol-bd); }
@@ -401,7 +405,7 @@
   .cell.today{
     background: linear-gradient(180deg, var(--today-bg) 0%, var(--surface) 100%);
     border: 1.5px solid var(--teal);
-    box-shadow: 0 0 0 3px var(--teal-glow), var(--shadow-soft);
+    box-shadow: var(--shadow-soft);
   }
 
   .dn{ font-size: 19px; line-height: 1; font-weight: 800; letter-spacing: -.4px; color: var(--text-2); }
@@ -414,18 +418,20 @@
     padding: 4px 8px; border-radius: 999px; font-size: 11px; font-weight: 700;
     white-space: nowrap; overflow:hidden; text-overflow:ellipsis; letter-spacing: -.1px;
   }
-  .hol-tag{ color: var(--hol-t); background: var(--hol-bg); border: 1px solid var(--hol-bd); }
-  .off-tag{ color: var(--off-t); background: var(--off-bg); border: 1px solid var(--off-bd); }
+  .hol-tag{ color: var(--hol-t); background: var(--surface-solid); border: 1px solid var(--hol-bd); }
+  .off-tag{ color: var(--off-t); background: var(--surface-solid); border: 1px solid var(--off-bd); }
 
   .chip{
     display:flex; align-items:center; gap: 6px; min-width: 0;
     padding: 5px 8px; border-radius: 10px;
     background: var(--surface-2); border: 1px solid var(--bd);
     cursor:pointer;
-    transition: all var(--dur-fast) var(--ease-out);
+    transition: background-color var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out);
   }
-  .chip:hover{ background: var(--surface-3); transform: translateY(-1px); border-color: var(--bd-strong); }
+  .chip:hover{ background: var(--surface-3); border-color: var(--bd-strong); }
+  .chip.voted { background: var(--coral-2); border-color: var(--coral); }
   .chip-dot{ width: 6px; height: 6px; border-radius: 999px; background: var(--teal-2); flex-shrink: 0; }
+  .chip.voted .chip-dot { background: var(--coral); }
   .chip-txt{ min-width: 0; overflow:hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; font-size: 11.5px; color: var(--text); }
   .chip-count { font-size: 10.5px; color: var(--text-3); font-weight: 700; flex-shrink: 0; }
   .chip-count.voted { color: var(--coral); }
@@ -454,16 +460,18 @@
     display:flex; align-items:center; justify-content:center;
     z-index: 200; padding: 1rem;
     backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-    animation: fadeUp .22s var(--ease-out);
+    animation: fadeIn .2s var(--ease-out);
   }
+  .backdrop.closing { animation: fadeIn .18s var(--ease-out) reverse forwards; }
   [data-theme="dark"] .backdrop { background: rgba(0,0,0,.58); }
 
   .modal{
     width: min(440px, 100%); background: var(--surface-solid);
     border: 1px solid var(--bd); border-radius: 24px; padding: 1.25rem;
     box-shadow: var(--shadow-modal);
-    animation: popIn .32s var(--ease-spring);
+    animation: popIn .32s var(--ease-spring) .04s both;
   }
+  .backdrop.closing .modal { animation: popOut .18s var(--ease-out) forwards; }
 
   .mhdr{ display:flex; align-items:flex-start; justify-content:space-between; gap: 12px; margin-bottom: 1rem; }
   .mtitle{ font-size: 17px; font-weight: 800; letter-spacing: -.3px; color: var(--text); }
@@ -474,7 +482,8 @@
     display:flex; align-items:center; justify-content:center;
     transition: all var(--dur-fast) var(--ease-out);
   }
-  .mclose:hover{ background: var(--surface-3); color: var(--text); transform: translateY(-1px) rotate(90deg); }
+  .mclose:hover{ background: var(--surface-3); color: var(--text); }
+  .mclose:active{ transform: scale(.92) rotate(90deg); }
 
   .elist{ display:flex; flex-direction:column; gap: 7px; max-height: 240px; overflow:auto; margin-bottom: 1rem; padding-right: 2px; }
   .erow{
@@ -548,6 +557,31 @@
 
   .sr-only{ position:absolute; width:1px; height:1px; overflow:hidden; clip-path: inset(50%); white-space:nowrap; }
 
+  body.modal-open { overflow: hidden; }
+
+  /* === toast & confirm === */
+  .toast-wrap{
+    position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%);
+    z-index: 320; display: flex; flex-direction: column; gap: 8px;
+    pointer-events: none; max-width: calc(100% - 32px);
+  }
+  .toast{
+    padding: 11px 16px; border-radius: 14px;
+    background: var(--surface-solid); border: 1px solid var(--bd);
+    box-shadow: var(--shadow-lift); color: var(--text); font-size: 13px;
+    display: inline-flex; align-items: center; gap: 8px;
+    animation: popIn .26s var(--ease-spring);
+    pointer-events: auto;
+  }
+  .toast i { font-size: 15px; }
+  .toast.err { border-color: var(--hol-bd); color: var(--hol-t); }
+  .toast.ok { border-color: var(--teal); color: var(--teal); }
+  .toast.leave { animation: popOut .2s var(--ease-out) forwards; }
+
+  .confirm-wrap { z-index: 300; }
+  .modal-sm { max-width: 360px; padding: 1.1rem 1.15rem; }
+  .modal-sm .ctitle { font-size: 14.5px; font-weight: 700; color: var(--text); margin-bottom: 12px; line-height: 1.5; }
+
   /* === RESPONSIVE === */
   @media (max-width: 960px){
     .page{ padding: .9rem .85rem 1.15rem; }
@@ -610,8 +644,8 @@
 
   @media (max-width: 380px) {
     .cell { min-height: 72px; padding: 6px 4px 5px; }
-    .chip { padding: 3px 5px; }
-    .chip-txt { font-size: 10.5px; }
+    .chip { padding: 3px 5px; justify-content: center; gap: 4px; }
+    .chip-txt { display: none; }
   }
 
   @media (prefers-reduced-motion: reduce){
@@ -642,7 +676,7 @@
 
   <header class="topbar">
     <div class="brand">
-      <div class="brand-icon">GTL</div>
+      <button class="brand-icon" type="button" onclick="jumpToToday()" aria-label="오늘로 이동" title="오늘로 이동">GTL</button>
       <div class="brand-text">
         <div class="name">팀 GTL 캘린더</div>
         <div class="sub">2026년 5월 – 12월</div>
@@ -690,6 +724,8 @@
 </div>
 
 <div id="mw"></div>
+<div id="cw"></div>
+<div id="tw" class="toast-wrap" aria-live="polite"></div>
 
 <!-- Supabase JS SDK -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -756,6 +792,53 @@ function getOrMakeVoterId(){
     try{ localStorage.setItem('gtl-voter-id', id); }catch(e){}
   }
   return id;
+}
+
+/* ---------- toast & confirm ---------- */
+function showToast(msg, type){
+  const wrap = document.getElementById('tw');
+  if(!wrap) return;
+  const el = document.createElement('div');
+  el.className = 'toast' + (type ? ' '+type : '');
+  const icon = type==='err' ? 'ti-alert-circle' : type==='ok' ? 'ti-check' : 'ti-info-circle';
+  el.innerHTML = '<i class="ti '+icon+'"></i><span></span>';
+  el.querySelector('span').textContent = msg;
+  wrap.appendChild(el);
+  setTimeout(() => {
+    el.classList.add('leave');
+    el.addEventListener('animationend', () => el.remove(), { once: true });
+  }, 2600);
+}
+
+let _confirmResolve = null;
+function showConfirm(msg, confirmLabel){
+  return new Promise(resolve => {
+    _confirmResolve = resolve;
+    const cw = document.getElementById('cw');
+    cw.innerHTML = `
+      <div class="backdrop confirm-wrap" onclick="resolveConfirm(event,this,false)">
+        <div class="modal modal-sm" onclick="event.stopPropagation()" role="alertdialog" aria-modal="true">
+          <div class="ctitle"></div>
+          <div class="mbtns">
+            <button class="btn btn-ghost" type="button" onclick="resolveConfirm(null,null,false)">취소</button>
+            <button class="btn btn-primary" type="button" onclick="resolveConfirm(null,null,true)"></button>
+          </div>
+        </div>
+      </div>`;
+    cw.querySelector('.ctitle').textContent = msg;
+    cw.querySelector('.btn-primary').textContent = confirmLabel || '확인';
+  });
+}
+function resolveConfirm(ev, ov, val){
+  if(ev && ov && ev.target !== ov) return;
+  const cw = document.getElementById('cw');
+  const bd = cw.querySelector('.backdrop');
+  if(!bd){ if(_confirmResolve){ _confirmResolve(val); _confirmResolve=null; } return; }
+  bd.classList.add('closing');
+  setTimeout(() => {
+    cw.innerHTML = '';
+    if(_confirmResolve){ _confirmResolve(val); _confirmResolve=null; }
+  }, 180);
 }
 
 function setSyncState(state){
@@ -861,7 +944,7 @@ async function addEntryAsync(day, name, memo){
     year:YEAR, month:cur, day, name, memo:memo||'', created_by:MY_VOTER_ID
   });
   setSyncState(error?'err':'ok');
-  if(error){ alert('저장 실패: '+error.message); return false; }
+  if(error){ showToast('저장 실패: '+error.message, 'err'); return false; }
   return true;
 }
 async function deleteEntryAsync(entryId){
@@ -872,24 +955,31 @@ async function deleteEntryAsync(entryId){
   const { error } = await sb.from('entries').delete().eq('id', entryId);
   if(error){
     if(restore) D[restore.m][restore.d].entries.splice(restore.idx, 0, restore.entry);
-    rerender(); setSyncState('err'); alert('삭제 실패: '+error.message); return;
+    rerender(); setSyncState('err'); showToast('삭제 실패: '+error.message, 'err'); return;
   }
   setSyncState('ok');
 }
+const _votingIds = new Set();
 async function toggleVoteAsync(entryId){
-  const f = findEntry(entryId); if(!f) return;
-  const was = f.entry.voters.has(MY_VOTER_ID);
-  if(was) f.entry.voters.delete(MY_VOTER_ID); else f.entry.voters.add(MY_VOTER_ID);
-  rerender();
-  setSyncState('sv');
-  const { error } = was
-    ? await sb.from('votes').delete().eq('entry_id', entryId).eq('voter_id', MY_VOTER_ID)
-    : await sb.from('votes').insert({ entry_id: entryId, voter_id: MY_VOTER_ID });
-  if(error){
-    if(was) f.entry.voters.add(MY_VOTER_ID); else f.entry.voters.delete(MY_VOTER_ID);
-    rerender(); setSyncState('err'); return;
+  if(_votingIds.has(entryId)) return;
+  _votingIds.add(entryId);
+  try{
+    const f = findEntry(entryId); if(!f) return;
+    const was = f.entry.voters.has(MY_VOTER_ID);
+    if(was) f.entry.voters.delete(MY_VOTER_ID); else f.entry.voters.add(MY_VOTER_ID);
+    rerender();
+    setSyncState('sv');
+    const { error } = was
+      ? await sb.from('votes').delete().eq('entry_id', entryId).eq('voter_id', MY_VOTER_ID)
+      : await sb.from('votes').insert({ entry_id: entryId, voter_id: MY_VOTER_ID });
+    if(error){
+      if(was) f.entry.voters.add(MY_VOTER_ID); else f.entry.voters.delete(MY_VOTER_ID);
+      rerender(); setSyncState('err'); showToast('투표 처리 실패', 'err'); return;
+    }
+    setSyncState('ok');
+  } finally {
+    _votingIds.delete(entryId);
   }
-  setSyncState('ok');
 }
 
 /* ---------- today hero ---------- */
@@ -992,34 +1082,35 @@ function rollDice(){
   const entries = getTodayEntries();
   if(entries.length < 2) return;
   const btn = document.getElementById('diceBtn');
-  if(btn) btn.classList.add('rolling');
+  if(btn){ btn.classList.add('rolling'); btn.disabled = true; }
   const list = document.getElementById('heroList');
   if(!list) return;
 
-  // pick weighted by votes+1 so popular places more likely but underdogs still in
   const weights = entries.map(e => (e.voters.size||0) + 1);
   const sum = weights.reduce((a,b)=>a+b,0);
   let r = Math.random()*sum;
   let pickIdx = 0;
   for(let i=0;i<weights.length;i++){ r -= weights[i]; if(r<=0){ pickIdx=i; break; } }
 
-  // animation: shuffle highlight a few times then settle
-  const rows = list.querySelectorAll('.hero-row');
-  let i = 0;
-  const shuffleCount = 12;
-  const id = setInterval(() => {
-    rows.forEach(r => r.classList.remove('spotlight'));
-    rows[i % rows.length].classList.add('spotlight');
-    i++;
-    if(i >= shuffleCount){
-      clearInterval(id);
+  // Phase 1: dice rolls solo (~900ms). Phase 2: shuffle-spotlight, then settle on pick.
+  setTimeout(() => {
+    if(btn){ btn.classList.remove('rolling'); btn.disabled = false; }
+    const rows = list.querySelectorAll('.hero-row');
+    if(!rows.length) return;
+    let i = 0;
+    const shuffleCount = 8;
+    const id = setInterval(() => {
       rows.forEach(r => r.classList.remove('spotlight'));
-      rows[pickIdx].classList.add('spotlight');
-      rows[pickIdx].scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-    }
-  }, 70);
-
-  setTimeout(()=> { if(btn) btn.classList.remove('rolling'); }, 900);
+      rows[i % rows.length].classList.add('spotlight');
+      i++;
+      if(i >= shuffleCount){
+        clearInterval(id);
+        rows.forEach(r => r.classList.remove('spotlight'));
+        rows[pickIdx].classList.add('spotlight');
+        rows[pickIdx].scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      }
+    }, 80);
+  }, 900);
 }
 
 /* ---------- jump to today ---------- */
@@ -1075,22 +1166,16 @@ function renderTabs(){
 function sw(m){
   if(!MONTHS.includes(m) || m===cur) return;
   const prev = cur;
-  cur=m;
+  cur = m;
+  renderTabs();
+  renderHero();
+  render(false); // skip mount stagger; slide handles entrance
   const g = document.getElementById('calGrid');
-  // simple cross-fade
-  g.style.opacity = '0';
-  g.style.transform = (m>prev ? 'translateX(12px)' : 'translateX(-12px)');
-  setTimeout(()=> {
-    renderTabs();
-    renderHero();
-    render(true);
-    requestAnimationFrame(() => {
-      g.style.transition = 'opacity .28s cubic-bezier(.22,1,.36,1), transform .28s cubic-bezier(.22,1,.36,1)';
-      g.style.opacity = '1';
-      g.style.transform = 'translateX(0)';
-    });
-    updateNavButtons();
-  }, 120);
+  g.classList.remove('slide-r', 'slide-l');
+  // force reflow so animation restarts
+  void g.offsetWidth;
+  g.classList.add(m > prev ? 'slide-r' : 'slide-l');
+  updateNavButtons();
 }
 
 function changeMonth(delta){
@@ -1141,7 +1226,7 @@ function render(animate){
     else if(isOff) cls+=' off';
     else if(isWeekend) cls+=' wknd';
     cell.className=cls;
-    cell.style.animationDelay = ((dn % 7) * 0.02) + 's';
+    cell.style.setProperty('--cell-i', i);
     cell.onclick=()=>openModal(dn);
 
     const nd=document.createElement('div');
@@ -1165,7 +1250,7 @@ function render(animate){
       const v = e.voters.size;
       const my = e.voters.has(MY_VOTER_ID);
       const c=document.createElement('div');
-      c.className='chip';
+      c.className='chip'+(my?' voted':'');
       c.innerHTML='<span class="chip-dot"></span><span class="chip-txt">'+esc(e.name)+(e.memo?' · '+esc(e.memo):'')+'</span>'+
         (v>0 ? '<span class="chip-count'+(my?' voted':'')+'">👍 '+v+'</span>' : '');
       c.onclick=ev=>{ ev.stopPropagation(); openModal(dn); };
@@ -1201,11 +1286,19 @@ function openModal(dn){
   es = { name: '', memo: '' };
   openDay = dn;
   renderModal(dn);
+  document.body.classList.add('modal-open');
 }
 function closeMod(ev, ov){
   if(ev && ov && ev.target !== ov) return;
-  document.getElementById('mw').innerHTML='';
-  openDay=null; helpOpen=false;
+  const mw = document.getElementById('mw');
+  const bd = mw.querySelector('.backdrop');
+  if(!bd){ mw.innerHTML=''; openDay=null; helpOpen=false; document.body.classList.remove('modal-open'); return; }
+  bd.classList.add('closing');
+  setTimeout(() => {
+    mw.innerHTML='';
+    openDay=null; helpOpen=false;
+    document.body.classList.remove('modal-open');
+  }, 180);
 }
 function renderModal(dn){
   // If modal for the same day is already on screen, only refresh the list — no re-animation.
@@ -1307,12 +1400,14 @@ async function onAddClick(dn){
   if(ok){ es.name=''; es.memo=''; closeMod(); }
 }
 async function onDeleteClick(entryId){
-  if(!confirm('이 기록을 삭제할까요?')) return;
+  const ok = await showConfirm('이 기록을 삭제할까요?', '삭제');
+  if(!ok) return;
   await deleteEntryAsync(entryId);
 }
 
 function openHelp(){
   helpOpen=true;
+  document.body.classList.add('modal-open');
   document.getElementById('mw').innerHTML = `
     <div class="backdrop" onclick="closeMod(event,this)">
       <div class="modal" onclick="event.stopPropagation()" role="dialog" aria-modal="true">
@@ -1348,15 +1443,20 @@ function isTypingTarget(el){
   const 태그=(el.tagName||'').toUpperCase();
   return 태그==='INPUT'||태그==='TEXTAREA'||el.isContentEditable;
 }
+function isModalOpen(){
+  return !!(document.getElementById('mw').innerHTML.trim() || document.getElementById('cw').innerHTML.trim());
+}
 document.addEventListener('keydown',(e)=>{
   if(isTypingTarget(document.activeElement)) return;
+  if(e.key==='Escape'){
+    if(document.getElementById('cw').innerHTML.trim()){ resolveConfirm(null,null,false); return; }
+    if(document.getElementById('mw').innerHTML.trim()){ closeMod(); return; }
+  }
+  if(isModalOpen()) return;
   if(e.key==='ArrowLeft'){ e.preventDefault(); changeMonth(-1); }
   else if(e.key==='ArrowRight'){ e.preventDefault(); changeMonth(1); }
   else if(e.key==='Home' || e.key==='t' || e.key==='T'){ e.preventDefault(); jumpToToday(); }
   else if(e.key==='d' || e.key==='D'){ e.preventDefault(); toggleTheme(); }
-  else if(e.key==='Escape'){
-    if(document.getElementById('mw').innerHTML.trim()) closeMod();
-  }
 });
 
 // Re-check hero visibility every minute (covers 13:00 boundary without reload)
