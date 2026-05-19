@@ -390,8 +390,8 @@
     cursor:pointer;
     backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
     transition: transform .22s var(--ease-out), box-shadow .22s var(--ease-out), border-color .22s var(--ease-out);
-    animation: popIn .35s var(--ease-out) both;
   }
+  .cal.mounting .cell { animation: popIn .35s var(--ease-out) both; }
   .cell:hover{ border-color: rgba(15,108,88,.22); box-shadow: var(--shadow-lift); transform: translateY(-2px); }
   [data-theme="dark"] .cell:hover { border-color: rgba(62,170,138,.32); }
   .cell.empty{ background: transparent; box-shadow: none; border: none; min-height: 48px; pointer-events: none; padding: 0; animation: none; }
@@ -823,7 +823,7 @@ async function loadAll(){
   MONTHS.forEach(m => Object.keys(D[m]).forEach(d => D[m][d].entries.sort((a,b)=>a.id-b.id)));
 
   setSyncState('ok');
-  rerender();
+  rerender(true);
 }
 
 function subscribe(){
@@ -1044,10 +1044,10 @@ function jumpToToday(){
 }
 
 /* ---------- render ---------- */
-function rerender(){
+function rerender(animate){
   renderTabs();
   renderHero();
-  render();
+  render(animate);
   if(openDay!=null) renderModal(openDay);
   updateNavButtons();
 }
@@ -1083,7 +1083,7 @@ function sw(m){
   setTimeout(()=> {
     renderTabs();
     renderHero();
-    render();
+    render(true);
     requestAnimationFrame(() => {
       g.style.transition = 'opacity .28s cubic-bezier(.22,1,.36,1), transform .28s cubic-bezier(.22,1,.36,1)';
       g.style.opacity = '1';
@@ -1099,11 +1099,16 @@ function changeMonth(delta){
   sw(MONTHS[n]);
 }
 
-function render(){
+function render(animate){
   document.getElementById('monthTitle').textContent='2026년 '+MN[cur];
 
   const g=document.getElementById('calGrid');
+  g.classList.remove('mounting');
   g.innerHTML='';
+  if(animate){
+    g.classList.add('mounting');
+    setTimeout(()=> g.classList.remove('mounting'), 700);
+  }
 
   DOW_KR.forEach((d,i)=>{
     const el=document.createElement('div');
@@ -1203,33 +1208,27 @@ function closeMod(ev, ov){
   openDay=null; helpOpen=false;
 }
 function renderModal(dn){
-  const entries=(D[cur][dn]&&D[cur][dn].entries)||[];
-  const sorted = entries.slice().sort((a,b)=> (b.voters.size - a.voters.size) || (a.id - b.id));
+  // If modal for the same day is already on screen, only refresh the list — no re-animation.
+  const mw = document.getElementById('mw');
+  const existing = mw.querySelector('.modal[data-day="' + dn + '"]');
+  if(existing){
+    refreshModalContent(dn, existing);
+    return;
+  }
+  // Full mount: build shell + list, animations run once.
+  mw.innerHTML = buildModalShellHTML(dn);
+  refreshModalContent(dn, mw.querySelector('.modal'));
+  setTimeout(()=>{ const el=document.getElementById('nName'); if(el) el.focus(); }, 30);
+}
+
+function buildModalShellHTML(dn){
   const h=getHolidayName(YEAR,cur,dn), isOff=dn===lastFri(YEAR,cur);
   const dow=DOW_KR[new Date(YEAR,cur-1,dn).getDay()];
   const sub=MN[cur]+' '+dn+'일 ('+dow+')'+(h?' · '+h:isOff?' · 공동휴무':'');
 
-  const eHTML = sorted.length ? sorted.map(e=>{
-    const v=e.voters.size, my=e.voters.has(MY_VOTER_ID);
-    return `
-    <div class="erow">
-      <span class="edot"></span>
-      <div style="flex:1;min-width:0">
-        <div class="ename">${esc(e.name)}</div>
-        ${e.memo?'<div class="ememo">'+esc(e.memo)+'</div>':''}
-      </div>
-      <button class="evote${my?' voted':''}" type="button" onclick="toggleVoteAsync(${e.id})">
-        <i class="ti ti-thumb-up"></i>${v}
-      </button>
-      <button class="edel" type="button" onclick="onDeleteClick(${e.id})" aria-label="삭제">
-        <i class="ti ti-x"></i>
-      </button>
-    </div>`;
-  }).join('') : '<div class="empty-state"><i class="ti ti-clipboard-list"></i>아직 기록된 내용이 없어요</div>';
-
-  document.getElementById('mw').innerHTML = `
+  return `
     <div class="backdrop" onclick="closeMod(event,this)">
-      <div class="modal" onclick="event.stopPropagation()" role="dialog" aria-modal="true">
+      <div class="modal" data-day="${dn}" onclick="event.stopPropagation()" role="dialog" aria-modal="true">
         <div class="mhdr">
           <div>
             <div class="mtitle">기록 관리</div>
@@ -1238,21 +1237,21 @@ function renderModal(dn){
           <button class="mclose" type="button" onclick="closeMod()" aria-label="닫기"><i class="ti ti-x"></i></button>
         </div>
 
-        <div class="elist">${eHTML}</div>
+        <div class="elist" id="modalList"></div>
         <hr class="hr" />
 
         <div class="igrp">
           <div>
             <div class="lbl">식당 이름</div>
             <input class="inp" type="text" id="nName" placeholder="예) 한판돼지 삼겹살"
-                   maxlength="30" value="${esc(es.name)}"
+                   maxlength="30" value=""
                    oninput="es.name=this.value"
                    onkeydown="if(event.key==='Enter'){event.preventDefault();onAddClick(${dn})}" />
           </div>
           <div>
             <div class="lbl">메모 (선택)</div>
             <input class="inp" type="text" id="nMemo" placeholder="예) 3층, 파스타 추천"
-                   maxlength="40" value="${esc(es.memo)}"
+                   maxlength="40" value=""
                    oninput="es.memo=this.value"
                    onkeydown="if(event.key==='Enter'){event.preventDefault();onAddClick(${dn})}" />
           </div>
@@ -1270,9 +1269,34 @@ function renderModal(dn){
           실시간 동기화 · 팀원 모두와 공유됩니다
         </div>
       </div>
-    </div>
-  `;
-  setTimeout(()=>{ const el=document.getElementById('nName'); if(el) el.focus(); }, 30);
+    </div>`;
+}
+
+function refreshModalContent(dn, modalEl){
+  if(!modalEl) return;
+  const entries=(D[cur][dn]&&D[cur][dn].entries)||[];
+  const sorted = entries.slice().sort((a,b)=> (b.voters.size - a.voters.size) || (a.id - b.id));
+
+  const eHTML = sorted.length ? sorted.map(e=>{
+    const v=e.voters.size, my=e.voters.has(MY_VOTER_ID);
+    return `
+    <div class="erow" data-eid="${e.id}">
+      <span class="edot"></span>
+      <div style="flex:1;min-width:0">
+        <div class="ename">${esc(e.name)}</div>
+        ${e.memo?'<div class="ememo">'+esc(e.memo)+'</div>':''}
+      </div>
+      <button class="evote${my?' voted':''}" type="button" onclick="toggleVoteAsync(${e.id})">
+        <i class="ti ti-thumb-up"></i>${v}
+      </button>
+      <button class="edel" type="button" onclick="onDeleteClick(${e.id})" aria-label="삭제">
+        <i class="ti ti-x"></i>
+      </button>
+    </div>`;
+  }).join('') : '<div class="empty-state"><i class="ti ti-clipboard-list"></i>아직 기록된 내용이 없어요</div>';
+
+  const list = modalEl.querySelector('#modalList');
+  if(list) list.innerHTML = eHTML;
 }
 
 async function onAddClick(dn){
@@ -1346,7 +1370,7 @@ setInterval(() => { if(isTodaysMonth()) renderHero(); }, 60*1000);
   MY_VOTER_ID = getOrMakeVoterId();
   renderTabs();
   renderHero();
-  render();
+  render(true);
   updateNavButtons();
 
   sb = initSupabase();
