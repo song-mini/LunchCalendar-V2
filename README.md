@@ -89,11 +89,14 @@ git push -u origin main
    - **Build Command**: 비워둠
    - **Start Command**: `node server.js`
    - **Instance Type**: `Free`
-4. **Environment Variables** 섹션에서 두 개 추가:
+4. **Environment Variables** 섹션에서 추가:
    | Key | Value |
    | --- | --- |
    | `SUPABASE_URL` | (4번에서 복사한 URL) |
    | `SUPABASE_ANON_KEY` | (4번에서 복사한 anon key) |
+   | `HOLIDAY_API_KEY` | (공공데이터포털 "특일 정보" Decoding 서비스키, 선택) |
+
+   > `HOLIDAY_API_KEY`는 공휴일 자동 동기화용입니다. 비워두면 캘린더는 정상 작동하지만 공휴일 표시가 비활성화됩니다. 발급: https://www.data.go.kr → "특일 정보" 검색 → 활용신청 → 마이페이지 → 인증키.
 5. **Create Web Service** → 자동 배포 (약 1~2분)
 
 ### 5-2. 기존 서비스의 리포만 바꾸고 싶다면
