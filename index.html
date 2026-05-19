@@ -627,25 +627,48 @@
 
     /* Calendar tightens but stays 7-col */
     .cal { gap: 4px; }
-    .cell { min-height: 84px; padding: 7px 6px 6px; border-radius: 12px; gap: 3px; }
-    .dn { font-size: 16px; }
-    .chip { padding: 4px 6px; gap: 4px; border-radius: 8px; }
-    .chip-txt { font-size: 11px; }
-    .chip-count { font-size: 10px; }
-    .day-tag { padding: 3px 6px; font-size: 10px; }
+    .cell {
+      min-height: 78px; padding: 6px 5px 5px; border-radius: 11px; gap: 3px;
+      background: var(--surface-solid);
+    }
+    .cell.today { box-shadow: 0 0 0 2px var(--teal-glow); }
+    .dn { font-size: 15px; }
+
+    /* Chips: allow 2-line wrap so real text shows instead of "구." */
+    .chip { padding: 3px 5px; gap: 3px; border-radius: 7px; align-items: flex-start; }
+    .chip-dot { margin-top: 4px; }
+    .chip-txt {
+      font-size: 10.5px; line-height: 1.2; white-space: normal;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+      overflow: hidden; text-overflow: clip;
+      word-break: break-all;
+    }
+    .chip-count { font-size: 9.5px; margin-top: 2px; }
+
+    /* Holiday/off tags: smaller, wrap allowed */
+    .day-tag {
+      padding: 2px 5px; font-size: 9.5px; line-height: 1.25;
+      white-space: normal; max-width: 100%;
+      display: inline-block;
+    }
+
     .more-lnk { font-size: 10px; padding: 2px 5px; }
-    .add-hint { font-size: 10.5px; }
-    .add-hint i { font-size: 11px; }
+
+    /* Hide "+ 기록 추가" hint on mobile — cells are obvious tap targets */
+    .add-hint { display: none; }
+
     .dow { font-size: 10px; padding: 2px 0 6px; }
 
     .modal { padding: 1rem; border-radius: 20px; }
     .notice { font-size: 11px; }
   }
 
-  @media (max-width: 380px) {
-    .cell { min-height: 72px; padding: 6px 4px 5px; }
-    .chip { padding: 3px 5px; justify-content: center; gap: 4px; }
-    .chip-txt { display: none; }
+  @media (max-width: 420px) {
+    .cell { min-height: 70px; padding: 5px 4px 4px; gap: 2px; }
+    .dn { font-size: 14px; }
+    .chip { padding: 2px 4px; }
+    .chip-txt { font-size: 10px; }
+    .day-tag { font-size: 9px; padding: 1px 4px; }
   }
 
   @media (prefers-reduced-motion: reduce){
