@@ -413,6 +413,20 @@
   }
   .tab.active.has-data::after { background: rgba(255,255,255,.7); }
 
+  /* === year selector (lives inside .tabs-wrap, before month tabs) === */
+  .year-sel{
+    display:flex; align-items:center; gap: 2px;
+    padding: 0 6px 0 2px;
+    border-right: 1px solid var(--bd);
+    margin-right: 4px;
+  }
+  .year-sel .nav-btn{ width: 26px; height: 26px; border-radius: 8px; }
+  .year-sel .year-label{
+    min-width: 44px; text-align: center;
+    font-size: 13px; font-weight: 800; letter-spacing: -.2px;
+    color: var(--text);
+  }
+
   /* === calendar (smoother) === */
   .cal{
     display:grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px;
@@ -447,6 +461,46 @@
     background: linear-gradient(180deg, var(--today-bg) 0%, var(--surface) 100%);
     border: 1.5px solid var(--teal);
     box-shadow: var(--shadow-soft);
+  }
+
+  /* === dark mode: replace flat cell fills with a soft top-lit gradient
+         so the grid reads as layered material instead of two-tone blocks === */
+  [data-theme="dark"] .cell{
+    background:
+      linear-gradient(180deg, rgba(255,245,235,.045) 0%, rgba(255,245,235,0) 55%),
+      radial-gradient(140% 90% at 50% -20%, rgba(255,245,235,.035), transparent 65%),
+      linear-gradient(180deg, rgba(54,46,40,.72) 0%, rgba(36,30,26,.62) 100%);
+    border-color: rgba(255,245,235,.05);
+    box-shadow:
+      inset 0 1px 0 rgba(255,245,235,.05),
+      0 8px 20px rgba(0,0,0,.22);
+  }
+  [data-theme="dark"] .cell.wknd{
+    background:
+      linear-gradient(180deg, rgba(255,245,235,.045) 0%, rgba(255,245,235,0) 55%),
+      linear-gradient(180deg, rgba(90,143,255,.10) 0%, rgba(36,30,26,.62) 100%);
+    border-color: rgba(90,143,255,.18);
+  }
+  [data-theme="dark"] .cell.hol{
+    background:
+      linear-gradient(180deg, rgba(255,245,235,.045) 0%, rgba(255,245,235,0) 55%),
+      linear-gradient(180deg, rgba(255,107,107,.10) 0%, rgba(36,30,26,.62) 100%);
+    border-color: rgba(255,107,107,.22);
+  }
+  [data-theme="dark"] .cell.off{
+    background:
+      linear-gradient(180deg, rgba(255,245,235,.045) 0%, rgba(255,245,235,0) 55%),
+      linear-gradient(180deg, rgba(255,191,75,.10) 0%, rgba(36,30,26,.62) 100%);
+    border-color: rgba(255,191,75,.22);
+  }
+  [data-theme="dark"] .cell.today{
+    background:
+      linear-gradient(180deg, rgba(255,245,235,.055) 0%, rgba(255,245,235,0) 55%),
+      linear-gradient(180deg, rgba(62,170,138,.22) 0%, rgba(36,30,26,.55) 100%);
+    border-color: var(--teal);
+    box-shadow:
+      inset 0 1px 0 rgba(255,245,235,.08),
+      0 10px 24px rgba(62,170,138,.18);
   }
 
   .dn{ font-size: 19px; line-height: 1; font-weight: 800; letter-spacing: -.4px; color: var(--text-2); }
@@ -721,11 +775,18 @@
     .tabs-wrap { padding: 5px; gap: 3px; }
     .tab { font-size: 12px; padding: 8px 6px; min-width: 0; }
 
+    /* On mobile, year selector gets its own full-width row above month tabs */
+    .year-sel {
+      flex: 0 0 100%; justify-content: center; gap: 6px;
+      border-right: none; border-bottom: 1px solid var(--bd);
+      margin-right: 0; margin-bottom: 4px; padding: 2px 0 6px;
+    }
+    .year-sel .year-label { min-width: 60px; font-size: 13.5px; }
+
     /* Calendar tightens but stays 7-col */
     .cal { gap: 4px; }
     .cell {
       min-height: 78px; padding: 6px 5px 5px; border-radius: 11px; gap: 3px;
-      background: var(--surface-solid);
     }
     .cell.today { box-shadow: 0 0 0 2px var(--teal-glow); }
     .dn { font-size: 15px; }
@@ -798,7 +859,7 @@
       <button class="brand-icon" type="button" onclick="jumpToToday()" aria-label="오늘로 이동" title="오늘로 이동">GTL</button>
       <div class="brand-text">
         <div class="name">팀 GTL 캘린더</div>
-        <div class="sub">2026년 5월 – 12월</div>
+        <div class="sub">2026 – 2030</div>
       </div>
     </div>
 
@@ -857,33 +918,32 @@
    팀 GTL 캘린더 v3 — Supabase + Today hero + Dark mode
 ================================================================== */
 
-const YEAR = 2026;
-const MONTHS = [5,6,7,8,9,10,11,12];
-const MN = { 5:'5월',6:'6월',7:'7월',8:'8월',9:'9월',10:'10월',11:'11월',12:'12월' };
+const YEAR_START = 2026;
+const YEAR_END   = 2030;
+const YEARS = (()=>{ const a=[]; for(let y=YEAR_START; y<=YEAR_END; y++) a.push(y); return a; })();
+const MONTHS = [1,2,3,4,5,6,7,8,9,10,11,12];
+const MN = { 1:'1월',2:'2월',3:'3월',4:'4월',5:'5월',6:'6월',7:'7월',8:'8월',9:'9월',10:'10월',11:'11월',12:'12월' };
 const DOW_KR = ['일','월','화','수','목','금','토'];
 
-const YEAR_HOLIDAYS = {
-  2026: {
-    '1-1':'신정',
-    '2-16':'설날 연휴','2-17':'설날','2-18':'설날 연휴',
-    '3-1':'삼일절','3-2':'삼일절 대체공휴일',
-    '5-5':'어린이날','5-24':'부처님오신날','5-25':'부처님오신날 대체공휴일',
-    '6-3':'지방선거일','6-6':'현충일',
-    '7-17':'제헌절',
-    '8-15':'광복절','8-17':'광복절 대체공휴일',
-    '9-24':'추석 연휴','9-25':'추석','9-26':'추석 연휴',
-    '10-3':'개천절','10-5':'개천절 대체공휴일','10-9':'한글날',
-    '12-25':'크리스마스'
-  }
-};
+// 공휴일 정보는 서버 프록시(/api/holidays/YYYY) 를 통해 KASI 특일 정보 API 로 받아옴.
+// 키가 없거나 네트워크 실패 시 빈 객체로 떨어져도 앱은 계속 작동.
+let HOLIDAYS = {};
+YEARS.forEach(y => { HOLIDAYS[y] = {}; });
+
 const HERO_HIDE_HOUR = 13;  // 13시 이후 히어로 숨김
 
-let cur = (() => {
-  const m = new Date().getMonth() + 1;
-  return MONTHS.includes(m) ? m : 5;
+let curYear = (() => {
+  const y = new Date().getFullYear();
+  return YEARS.includes(y) ? y : YEAR_START;
 })();
+let cur = (() => {
+  const t = new Date();
+  return (t.getFullYear() === curYear) ? (t.getMonth() + 1) : 1;
+})();
+
+// D[year][month][day] = { entries: [...] }
 let D = {};
-MONTHS.forEach(m => { D[m] = {}; });
+YEARS.forEach(y => { D[y] = {}; MONTHS.forEach(m => { D[y][m] = {}; }); });
 
 let openDay = null, helpOpen = false, es = null;
 let sb = null, MY_VOTER_ID = '';
@@ -892,19 +952,52 @@ let _editingId = null;        // entry id currently in edit mode in modal
 let _editDraft = { name:'', memo:'' };
 
 /* ---------- helpers ---------- */
-function getHolidayName(y,m,d){ return (YEAR_HOLIDAYS[y]||{})[m+'-'+d] || null; }
+function getHolidayName(y,m,d){ return (HOLIDAYS[y]||{})[m+'-'+d] || null; }
 function lastFri(y,m){ let d=new Date(y,m,0); while(d.getDay()!==5) d.setDate(d.getDate()-1); return d.getDate(); }
-function hasDat(m){ return Object.values(D[m]||{}).some(v => (v.entries||[]).length>0); }
+function hasDat(y,m){ return Object.values((D[y]||{})[m]||{}).some(v => (v.entries||[]).length>0); }
 function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-function ensureDay(m,d){ if(!D[m][d]) D[m][d]={entries:[]}; return D[m][d]; }
+function ensureDay(y,m,d){
+  if(!D[y]) D[y] = {};
+  if(!D[y][m]) D[y][m] = {};
+  if(!D[y][m][d]) D[y][m][d] = { entries: [] };
+  return D[y][m][d];
+}
 function findEntry(id){
-  for(const m of MONTHS){
-    for(const d of Object.keys(D[m]||{})){
-      const idx = D[m][d].entries.findIndex(e => e.id===id);
-      if(idx>=0) return { m:+m, d:+d, idx, entry: D[m][d].entries[idx] };
+  for(const y of YEARS){
+    for(const m of MONTHS){
+      const days = (D[y]||{})[m] || {};
+      for(const d of Object.keys(days)){
+        const idx = days[d].entries.findIndex(e => e.id===id);
+        if(idx>=0) return { y, m, d:+d, idx, entry: days[d].entries[idx] };
+      }
     }
   }
   return null;
+}
+
+/* ---------- holidays ---------- */
+async function loadHolidaysForYear(y){
+  // try localStorage cache first so the calendar paints instantly
+  try {
+    const cached = localStorage.getItem('gtl-holidays-' + y);
+    if(cached){ HOLIDAYS[y] = JSON.parse(cached) || {}; }
+  } catch(e) {}
+
+  try {
+    const res = await fetch('/api/holidays/' + y);
+    if(res.ok){
+      const data = await res.json();
+      if(data && typeof data === 'object' && !data.error){
+        HOLIDAYS[y] = data;
+        try { localStorage.setItem('gtl-holidays-' + y, JSON.stringify(data)); } catch(e){}
+      }
+    }
+  } catch(e){ console.warn('holiday fetch failed', y, e); }
+
+  if(!HOLIDAYS[y]) HOLIDAYS[y] = {};
+}
+async function loadAllHolidays(){
+  await Promise.all(YEARS.map(loadHolidaysForYear));
 }
 function getOrMakeVoterId(){
   let id=''; try{ id = localStorage.getItem('gtl-voter-id') || ''; }catch(e){}
@@ -1002,10 +1095,14 @@ function initSupabase(){
 
 async function loadAll(){
   setSyncState('load');
-  MONTHS.forEach(m=>{ D[m]={}; });
+  YEARS.forEach(y => { D[y] = {}; MONTHS.forEach(m => { D[y][m] = {}; }); });
 
-  const { data: entries, error: e1 } = await sb.from('entries')
-    .select('id,year,month,day,name,memo').eq('year', YEAR);
+  // entries + votes from supabase, and holidays from server proxy — in parallel
+  const [entriesRes] = await Promise.all([
+    sb.from('entries').select('id,year,month,day,name,memo').in('year', YEARS),
+    loadAllHolidays()
+  ]);
+  const { data: entries, error: e1 } = entriesRes;
   if(e1){ setSyncState('err'); console.error(e1); return; }
 
   const ids = entries.map(e=>e.id);
@@ -1021,13 +1118,15 @@ async function loadAll(){
   votes.forEach(v => (byEntry[v.entry_id] = byEntry[v.entry_id]||new Set()).add(v.voter_id));
 
   entries.forEach(e=>{
-    if(!MONTHS.includes(e.month)) return;
-    ensureDay(e.month, e.day).entries.push({
+    if(!YEARS.includes(e.year) || !MONTHS.includes(e.month)) return;
+    ensureDay(e.year, e.month, e.day).entries.push({
       id:e.id, name:e.name, memo:e.memo||'',
       voters: byEntry[e.id] || new Set()
     });
   });
-  MONTHS.forEach(m => Object.keys(D[m]).forEach(d => D[m][d].entries.sort((a,b)=>a.id-b.id)));
+  YEARS.forEach(y => MONTHS.forEach(m =>
+    Object.keys(D[y][m]).forEach(d => D[y][m][d].entries.sort((a,b)=>a.id-b.id))
+  ));
 
   _loaded = true;
   setSyncState('ok');
@@ -1057,23 +1156,23 @@ function flashEntry(id){
 function onEntryChange(p){
   const eN=p.new, eO=p.old;
   if(p.eventType==='INSERT'){
-    if(!MONTHS.includes(eN.month) || eN.year!==YEAR) return;
+    if(!YEARS.includes(eN.year) || !MONTHS.includes(eN.month)) return;
     if(findEntry(eN.id)) return;
-    ensureDay(eN.month, eN.day).entries.push({
+    ensureDay(eN.year, eN.month, eN.day).entries.push({
       id:eN.id, name:eN.name, memo:eN.memo||'', voters:new Set()
     });
-    D[eN.month][eN.day].entries.sort((a,b)=>a.id-b.id);
+    D[eN.year][eN.month][eN.day].entries.sort((a,b)=>a.id-b.id);
     rerender();
     if(eN.created_by !== MY_VOTER_ID) flashEntry(eN.id);
   } else if(p.eventType==='UPDATE'){
-    if(!MONTHS.includes(eN.month) || eN.year!==YEAR) return;
+    if(!YEARS.includes(eN.year) || !MONTHS.includes(eN.month)) return;
     const f = findEntry(eN.id); if(!f){ rerender(); return; }
     f.entry.name = eN.name;
     f.entry.memo = eN.memo || '';
     rerender();
     if(eN.created_by !== MY_VOTER_ID) flashEntry(eN.id);
   } else if(p.eventType==='DELETE'){
-    const f=findEntry(eO.id); if(f) D[f.m][f.d].entries.splice(f.idx,1);
+    const f=findEntry(eO.id); if(f) D[f.y][f.m][f.d].entries.splice(f.idx,1);
     rerender();
   }
 }
@@ -1090,13 +1189,13 @@ function onVoteChange(p){
 function normalizeName(s){ return String(s||'').trim().toLowerCase().replace(/\s+/g,' '); }
 function getAllRestaurantNames(){
   const set = new Set();
-  MONTHS.forEach(m => Object.values(D[m]||{}).forEach(d =>
+  YEARS.forEach(y => MONTHS.forEach(m => Object.values((D[y]||{})[m]||{}).forEach(d =>
     (d.entries||[]).forEach(e => { if(e.name) set.add(e.name); })
-  ));
+  )));
   return Array.from(set).sort((a,b)=>a.localeCompare(b,'ko'));
 }
 function isDuplicateOnDay(day, name, ignoreId){
-  const list = (D[cur] && D[cur][day] && D[cur][day].entries) || [];
+  const list = (((D[curYear]||{})[cur]||{})[day] || {}).entries || [];
   const norm = normalizeName(name);
   return list.some(e => e.id !== ignoreId && normalizeName(e.name) === norm);
 }
@@ -1104,7 +1203,7 @@ function isDuplicateOnDay(day, name, ignoreId){
 async function addEntryAsync(day, name, memo){
   setSyncState('sv');
   const { error } = await sb.from('entries').insert({
-    year:YEAR, month:cur, day, name, memo:memo||'', created_by:MY_VOTER_ID
+    year:curYear, month:cur, day, name, memo:memo||'', created_by:MY_VOTER_ID
   });
   setSyncState(error?'err':'ok');
   if(error){ showToast('저장 실패: '+error.message, 'err'); return false; }
@@ -1133,11 +1232,15 @@ async function deleteEntryAsync(entryId){
 
   const f = findEntry(entryId);
   let restore=null;
-  if(f){ restore={m:f.m,d:f.d,idx:f.idx,entry:f.entry}; D[f.m][f.d].entries.splice(f.idx,1); rerender(); }
+  if(f){
+    restore = { y:f.y, m:f.m, d:f.d, idx:f.idx, entry:f.entry };
+    D[f.y][f.m][f.d].entries.splice(f.idx, 1);
+    rerender();
+  }
   setSyncState('sv');
   const { error } = await sb.from('entries').delete().eq('id', entryId);
   if(error){
-    if(restore) D[restore.m][restore.d].entries.splice(restore.idx, 0, restore.entry);
+    if(restore) D[restore.y][restore.m][restore.d].entries.splice(restore.idx, 0, restore.entry);
     rerender(); setSyncState('err'); showToast('삭제 실패: '+error.message, 'err'); return;
   }
   setSyncState('ok');
@@ -1192,7 +1295,7 @@ function todayInfo(){
 }
 function isTodaysMonth(){
   const t = todayInfo();
-  return t.y===YEAR && t.m===cur;
+  return t.y===curYear && t.m===cur;
 }
 function shouldShowHero(){
   const t = todayInfo();
@@ -1203,8 +1306,8 @@ function shouldShowHero(){
 }
 function getTodayEntries(){
   const t = todayInfo();
-  if(t.y!==YEAR || !MONTHS.includes(t.m)) return [];
-  const day = D[t.m] && D[t.m][t.d];
+  if(!YEARS.includes(t.y) || !MONTHS.includes(t.m)) return [];
+  const day = ((D[t.y]||{})[t.m]||{})[t.d];
   if(!day) return [];
   // sort by votes desc, then by id asc
   return day.entries.slice().sort((a,b) => (b.voters.size - a.voters.size) || (a.id - b.id));
@@ -1254,7 +1357,7 @@ function renderHero(){
       <div class="hero-title-wrap">
         <div class="hero-title">오늘 뭐 먹지?</div>
         <div class="hero-sub">
-          <b>${YEAR}년 ${MN[t.m]} ${t.d}일 (${t.dow})</b>
+          <b>${t.y}년 ${MN[t.m]} ${t.d}일 (${t.dow})</b>
           ${count>0 ? '<span class="hero-count-pill"><i class="ti ti-flame" style="font-size:11px"></i>후보 '+count+'</span>' : ''}
         </div>
       </div>
@@ -1271,7 +1374,7 @@ function renderHero(){
 
 function openModalForToday(day){
   const t = todayInfo();
-  if(t.m !== cur) sw(t.m);
+  if(t.y !== curYear || t.m !== cur) sw(t.y, t.m);
   openModal(day);
 }
 
@@ -1316,11 +1419,11 @@ function rollDice(){
 /* ---------- jump to today ---------- */
 function jumpToToday(){
   const t = todayInfo();
-  if(t.y!==YEAR || !MONTHS.includes(t.m)){
+  if(!YEARS.includes(t.y) || !MONTHS.includes(t.m)){
     // outside the calendar's range — just bounce
     return;
   }
-  if(t.m !== cur) sw(t.m);
+  if(t.y !== curYear || t.m !== cur) sw(t.y, t.m);
   // gentle scroll to today cell on small screens
   setTimeout(() => {
     const cells = document.querySelectorAll('.cell.today');
@@ -1342,50 +1445,82 @@ function rerender(animate){
   if(openDay!=null) renderModal(openDay);
   updateNavButtons();
 }
+function _curIdx(){ return YEARS.indexOf(curYear) * 12 + (cur - 1); }
+function _totalMonths(){ return YEARS.length * 12; }
+
 function updateNavButtons(){
-  const i = MONTHS.indexOf(cur);
-  const navs = document.querySelectorAll('.nav-btn');
-  if(navs[0]) navs[0].disabled = (i<=0);
-  if(navs[1]) navs[1].disabled = (i>=MONTHS.length-1);
+  const i = _curIdx(), total = _totalMonths();
+  const navs = document.querySelectorAll('.month-ctrl .nav-btn');
+  if(navs[0]) navs[0].disabled = (i <= 0);
+  if(navs[1]) navs[1].disabled = (i >= total - 1);
+  const yns = document.querySelectorAll('.year-sel .nav-btn');
+  const yi = YEARS.indexOf(curYear);
+  if(yns[0]) yns[0].disabled = (yi <= 0);
+  if(yns[1]) yns[1].disabled = (yi >= YEARS.length - 1);
 }
 
 function renderTabs(){
   const c=document.getElementById('monthTabs');
   c.innerHTML='';
+
+  // Year selector — prev / label / next
+  const ys = document.createElement('div');
+  ys.className = 'year-sel';
+  ys.innerHTML =
+    '<button class="nav-btn" type="button" onclick="changeYear(-1)" aria-label="이전 해">' +
+      '<i class="ti ti-chevron-left"></i></button>' +
+    '<span class="year-label">' + curYear + '</span>' +
+    '<button class="nav-btn" type="button" onclick="changeYear(1)" aria-label="다음 해">' +
+      '<i class="ti ti-chevron-right"></i></button>';
+  c.appendChild(ys);
+
+  // Month tabs (1-12 for the current year)
   MONTHS.forEach(m => {
     const t=document.createElement('button');
     t.type='button';
-    t.className='tab'+(m===cur?' active':'')+(hasDat(m)&&m!==cur?' has-data':'');
+    t.className='tab'+(m===cur?' active':'')+(hasDat(curYear, m)&&m!==cur?' has-data':'');
     t.setAttribute('role','tab');
     t.textContent=MN[m];
-    t.onclick=()=>sw(m);
+    t.onclick=()=>sw(curYear, m);
     c.appendChild(t);
   });
 }
 
-function sw(m){
-  if(!MONTHS.includes(m) || m===cur) return;
-  const prev = cur;
-  cur = m;
+function sw(y, m){
+  // Backwards-compatible: sw(month) means same year.
+  if(m === undefined){ m = y; y = curYear; }
+  if(!YEARS.includes(y) || !MONTHS.includes(m)) return;
+  if(y === curYear && m === cur) return;
+  const prevIdx = _curIdx();
+  curYear = y; cur = m;
+  const newIdx = _curIdx();
   renderTabs();
   renderHero();
   render(false); // skip mount stagger; slide handles entrance
   const g = document.getElementById('calGrid');
   g.classList.remove('slide-r', 'slide-l');
-  // force reflow so animation restarts
   void g.offsetWidth;
-  g.classList.add(m > prev ? 'slide-r' : 'slide-l');
+  g.classList.add(newIdx > prevIdx ? 'slide-r' : 'slide-l');
   updateNavButtons();
 }
 
 function changeMonth(delta){
-  const i=MONTHS.indexOf(cur), n=i+delta;
-  if(n<0||n>=MONTHS.length) return;
-  sw(MONTHS[n]);
+  // Step across year boundaries
+  const n = _curIdx() + delta;
+  if(n < 0 || n >= _totalMonths()) return;
+  const newY = YEARS[Math.floor(n / 12)];
+  const newM = (n % 12) + 1;
+  sw(newY, newM);
+}
+function changeYear(delta){
+  const i = YEARS.indexOf(curYear);
+  const n = i + delta;
+  if(n < 0 || n >= YEARS.length) return;
+  sw(YEARS[n], cur);
 }
 
 function render(animate){
-  document.getElementById('monthTitle').textContent='2026년 '+MN[cur];
+  document.getElementById('monthTitle').textContent = curYear + '년 ' + MN[cur];
 
   const g=document.getElementById('calGrid');
   g.classList.remove('mounting');
@@ -1413,12 +1548,12 @@ function render(animate){
     return;
   }
 
-  const firstDay=new Date(YEAR,cur-1,1).getDay();
-  const dim=new Date(YEAR,cur,0).getDate();
+  const firstDay=new Date(curYear,cur-1,1).getDay();
+  const dim=new Date(curYear,cur,0).getDate();
   const total=Math.ceil((firstDay+dim)/7)*7;
   const today=new Date();
-  const lf=lastFri(YEAR,cur);
-  const dat=D[cur]||{};
+  const lf=lastFri(curYear,cur);
+  const dat=((D[curYear]||{})[cur])||{};
 
   for(let i=0;i<total;i++){
     const col=i%7, dn=i-firstDay+1, inMonth=dn>=1&&dn<=dim;
@@ -1426,10 +1561,10 @@ function render(animate){
 
     if(!inMonth){ cell.className='cell empty'; g.appendChild(cell); continue; }
 
-    const h=getHolidayName(YEAR,cur,dn);
+    const h=getHolidayName(curYear,cur,dn);
     const isOff=dn===lf;
     const isWeekend=col===0||col===6;
-    const isToday=today.getFullYear()===YEAR&&today.getMonth()+1===cur&&today.getDate()===dn;
+    const isToday=today.getFullYear()===curYear&&today.getMonth()+1===cur&&today.getDate()===dn;
 
     let cls='cell';
     if(isToday) cls+=' today';
@@ -1488,13 +1623,13 @@ function render(animate){
 
   const cnt=Object.values(dat).reduce((s,d)=>s+(d.entries||[]).length,0);
   document.getElementById('notice').textContent =
-    cnt>0 ? MN[cur]+' · 총 '+cnt+'개 기록 · 팀원 모두와 실시간 공유 중'
+    cnt>0 ? curYear+'년 '+MN[cur]+' · 총 '+cnt+'개 기록 · 팀원 모두와 실시간 공유 중'
           : '날짜 칸을 클릭해서 이번 달을 기록해보세요!';
 }
 
 /* ---------- modal ---------- */
 function openModal(dn){
-  ensureDay(cur, dn);
+  ensureDay(curYear, cur, dn);
   es = { name: '', memo: '' };
   openDay = dn;
   renderModal(dn);
@@ -1527,9 +1662,9 @@ function renderModal(dn){
 }
 
 function buildModalShellHTML(dn){
-  const h=getHolidayName(YEAR,cur,dn), isOff=dn===lastFri(YEAR,cur);
-  const dow=DOW_KR[new Date(YEAR,cur-1,dn).getDay()];
-  const sub=MN[cur]+' '+dn+'일 ('+dow+')'+(h?' · '+h:isOff?' · 공동휴무':'');
+  const h=getHolidayName(curYear,cur,dn), isOff=dn===lastFri(curYear,cur);
+  const dow=DOW_KR[new Date(curYear,cur-1,dn).getDay()];
+  const sub=curYear+'년 '+MN[cur]+' '+dn+'일 ('+dow+')'+(h?' · '+h:isOff?' · 공동휴무':'');
 
   const names = getAllRestaurantNames();
   const dataListHTML = names.length
@@ -1585,7 +1720,7 @@ function buildModalShellHTML(dn){
 
 function refreshModalContent(dn, modalEl){
   if(!modalEl) return;
-  const entries=(D[cur][dn]&&D[cur][dn].entries)||[];
+  const entries=(((D[curYear]||{})[cur]||{})[dn]&&D[curYear][cur][dn].entries)||[];
   const sorted = entries.slice().sort((a,b)=> (b.voters.size - a.voters.size) || (a.id - b.id));
 
   const eHTML = sorted.length ? sorted.map(e=>{

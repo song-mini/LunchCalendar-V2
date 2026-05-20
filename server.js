@@ -17,10 +17,50 @@ const PORT = process.env.PORT || 3000;
 
 const SUPABASE_URL      = process.env.SUPABASE_URL      || '';
 const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || '';
+const HOLIDAY_API_KEY   = process.env.HOLIDAY_API_KEY   || '';
 
 if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
   console.warn('⚠️  환경 변수 SUPABASE_URL / SUPABASE_ANON_KEY 가 설정되지 않았습니다.');
   console.warn('    Render → Environment 에서 두 값을 추가해주세요.');
+}
+if (!HOLIDAY_API_KEY) {
+  console.warn('ℹ️  환경 변수 HOLIDAY_API_KEY 가 비어 있어 공휴일 자동 조회가 비활성화됩니다.');
+  console.warn('    공공데이터포털 "특일 정보" 서비스키를 Render 에 추가하면 자동 동기화됩니다.');
+}
+
+// 공공데이터포털 KASI 특일 정보 — getRestDeInfo (공휴일 정보 조회)
+const HOLIDAY_API_URL = 'https://apis.data.go.kr/B090041/openapi/service/SpcdeInfoService/getRestDeInfo';
+const HOLIDAY_TTL_MS  = 24 * 60 * 60 * 1000;   // 1 day
+const holidayCache    = new Map();              // year -> { fetchedAt, data }
+
+async function fetchHolidaysForYear(year) {
+  const cached = holidayCache.get(year);
+  if (cached && Date.now() - cached.fetchedAt < HOLIDAY_TTL_MS) return cached.data;
+
+  const url = HOLIDAY_API_URL
+    + '?solYear=' + year
+    + '&ServiceKey=' + encodeURIComponent(HOLIDAY_API_KEY)
+    + '&_type=json&numOfRows=100';
+
+  const res = await fetch(url);
+  if (!res.ok) throw new Error('upstream HTTP ' + res.status);
+  const json = await res.json();
+
+  const items = json && json.response && json.response.body && json.response.body.items
+    ? json.response.body.items.item : null;
+  const list = Array.isArray(items) ? items : items ? [items] : [];
+
+  const result = {};
+  for (const it of list) {
+    const ld = String(it.locdate || '');
+    if (ld.length !== 8) continue;
+    const m = parseInt(ld.slice(4, 6), 10);
+    const d = parseInt(ld.slice(6, 8), 10);
+    if (Number.isInteger(m) && Number.isInteger(d)) result[m + '-' + d] = it.dateName || '';
+  }
+
+  holidayCache.set(year, { fetchedAt: Date.now(), data: result });
+  return result;
 }
 
 function getLocalIP() {
@@ -63,6 +103,31 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  // 공휴일 프록시 — /api/holidays/YYYY
+  const holidayMatch = req.method === 'GET' && req.url.match(/^\/api\/holidays\/(\d{4})(?:\?.*)?$/);
+  if (holidayMatch) {
+    const year = parseInt(holidayMatch[1], 10);
+    if (!HOLIDAY_API_KEY) {
+      res.writeHead(503, { 'Content-Type': 'application/json; charset=utf-8' });
+      res.end(JSON.stringify({ error: 'HOLIDAY_API_KEY not configured on server' }));
+      return;
+    }
+    fetchHolidaysForYear(year)
+      .then(data => {
+        res.writeHead(200, {
+          'Content-Type': 'application/json; charset=utf-8',
+          'Cache-Control': 'public, max-age=86400'
+        });
+        res.end(JSON.stringify(data));
+      })
+      .catch(err => {
+        console.error('holiday fetch error', year, err && err.message);
+        res.writeHead(502, { 'Content-Type': 'application/json; charset=utf-8' });
+        res.end(JSON.stringify({ error: String(err && err.message || err) }));
+      });
+    return;
+  }
+
   res.writeHead(404); res.end('Not found');
 });
 
@@ -76,5 +141,6 @@ server.listen(PORT, '0.0.0.0', () => {
   console.log('');
   console.log('   Supabase URL 설정됨:', SUPABASE_URL ? 'yes' : 'NO ❗');
   console.log('   Anon key 설정됨:    ', SUPABASE_ANON_KEY ? 'yes' : 'NO ❗');
+  console.log('   공휴일 API 키 설정됨:', HOLIDAY_API_KEY ? 'yes' : 'no');
   console.log('');
 });
