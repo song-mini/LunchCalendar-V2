@@ -128,6 +128,19 @@
   @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
   @keyframes popIn  { from { opacity: 0; transform: translateY(10px) scale(.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
   @keyframes popOut { from { opacity: 1; transform: translateY(0) scale(1); } to { opacity: 0; transform: translateY(6px) scale(.97); } }
+
+  /* Modal pop animations — smooth scale from cell position.
+     A real curved "genie" needs an SVG displacement filter or WebGL mesh;
+     pure CSS funnel attempts look janky. This stays clean + buttery. */
+  @keyframes modalZoomIn  {
+    from { opacity: 0; transform: scale(0.06) translateY(6px); }
+    to   { opacity: 1; transform: scale(1)    translateY(0);   }
+  }
+  @keyframes modalZoomOut {
+    0%   { opacity: 1; transform: scale(1.0)  translateY(0);   }
+    20%  { opacity: 1; transform: scale(1.05) translateY(-2px);}
+    100% { opacity: 0; transform: scale(0.05) translateY(8px); }
+  }
   @keyframes monthSlideRight { from { opacity: 0; transform: translateX(28px); } to { opacity: 1; transform: translateX(0); } }
   @keyframes monthSlideLeft  { from { opacity: 0; transform: translateX(-28px); } to { opacity: 1; transform: translateX(0); } }
   @keyframes sync-pulse { 0%,100% { opacity: 1; } 50% { opacity: .55; } }
@@ -585,16 +598,17 @@
     backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
     animation: fadeIn .2s var(--ease-out);
   }
-  .backdrop.closing { animation: fadeIn .18s var(--ease-out) reverse forwards; }
+  .backdrop.closing { animation: fadeIn .42s var(--ease-out) reverse forwards; }
   [data-theme="dark"] .backdrop { background: rgba(0,0,0,.58); }
 
   .modal{
     width: min(440px, 100%); background: var(--surface-solid);
     border: 1px solid var(--bd); border-radius: 24px; padding: 1.25rem;
     box-shadow: var(--shadow-modal);
-    animation: popIn .32s var(--ease-spring) .04s both;
+    /* CSS animation removed — handled by Web Animations API in v3 polish JS
+       below to avoid conflict with the .modal transition (used for tilt). */
   }
-  .backdrop.closing .modal { animation: popOut .18s var(--ease-out) forwards; }
+  /* .backdrop.closing .modal animation removed — handled by JS (Web Animations API) */
 
   .mhdr{ display:flex; align-items:flex-start; justify-content:space-between; gap: 12px; margin-bottom: 1rem; }
   .mtitle{ font-size: 17px; font-weight: 800; letter-spacing: -.3px; color: var(--text); }
@@ -874,34 +888,187 @@
   /* (a) Living background — slow drifting blobs behind the page.
      Kept lightweight: no filter (heavy in some compositors), small
      opacity, GPU-friendly transform-only animation. */
-  body::before{
-    content:'';
-    position: fixed; inset: 0;
-    pointer-events: none; z-index: 0;
-    background:
-      radial-gradient(45vw 32vw at 22% 28%, var(--teal-glow) 0%, transparent 62%),
-      radial-gradient(40vw 30vw at 78% 72%, rgba(194,65,12,.10) 0%, transparent 60%);
-    opacity: .55;
-    animation: ambient-drift 26s ease-in-out infinite alternate;
-  }
-  [data-theme="dark"] body::before{
-    background:
-      radial-gradient(45vw 32vw at 22% 28%, rgba(62,170,138,.22) 0%, transparent 62%),
-      radial-gradient(40vw 30vw at 78% 72%, rgba(255,138,85,.12) 0%, transparent 60%);
-    opacity: .85;
-  }
+  /* (a) Living background — REPLACED in v4 by the .spotlight cursor follower.
+     The body::before ambient gradient is disabled to keep visual focus on
+     the cursor glow. .page stays at z-index 1 above the spotlight. */
+  body::before{ content: none; }
   .page { position: relative; z-index: 1; }
   @keyframes ambient-drift {
-    0%   { transform: translate3d(-1.5vw, -1vh, 0) scale(1);    }
-    50%  { transform: translate3d( 2vw,   1vh, 0) scale(1.04); }
-    100% { transform: translate3d(-1vw,   2vh, 0) scale(1.02); }
+    0% { transform: none; } 100% { transform: none; }
   }
 
-  /* (b) Cell: smoother lift + GPU layer */
-  .cell { will-change: transform; }
-  .cell:hover:not(.empty):not(.skeleton){
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-lift);
+  /* Pomelo-style border glow — each card lights up at the cursor position
+     along its border using a radial gradient masked to the padding ring.
+     CSS sets up the pseudo-element; JS updates --glow-x / --glow-y /
+     --glow-intensity per-card on mousemove. */
+  .cell, .today-hero, .tabs-wrap, .modal,
+  .month-ctrl, .sync-pill, .today-btn, .icon-btn,
+  .dice-btn, .add-btn-ghost, .brand-icon,
+  .hero-row, .tab, .chip, .btn, .erow {
+    --glow-x: 50%;
+    --glow-y: 50%;
+    --glow-intensity: 0;
+    --glow-radius: 180px;
+    --border-glow-color: 15, 108, 88;
+  }
+  [data-theme="dark"] .cell,
+  [data-theme="dark"] .today-hero,
+  [data-theme="dark"] .tabs-wrap,
+  [data-theme="dark"] .modal,
+  [data-theme="dark"] .month-ctrl,
+  [data-theme="dark"] .sync-pill,
+  [data-theme="dark"] .today-btn,
+  [data-theme="dark"] .icon-btn,
+  [data-theme="dark"] .dice-btn,
+  [data-theme="dark"] .add-btn-ghost,
+  [data-theme="dark"] .brand-icon,
+  [data-theme="dark"] .hero-row,
+  [data-theme="dark"] .tab,
+  [data-theme="dark"] .chip,
+  [data-theme="dark"] .btn,
+  [data-theme="dark"] .erow {
+    --border-glow-color: 62, 170, 138;
+  }
+
+  /* Brand glyph + dice-btn glow in coral instead — accent surfaces */
+  .brand-icon, .dice-btn { --border-glow-color: 230, 130, 60; }
+  [data-theme="dark"] .brand-icon, [data-theme="dark"] .dice-btn { --border-glow-color: 255, 158, 100; }
+
+  .cell::after, .today-hero::after, .tabs-wrap::after, .modal::after,
+  .month-ctrl::after, .sync-pill::after, .today-btn::after, .icon-btn::after,
+  .dice-btn::after, .add-btn-ghost::after, .brand-icon::after,
+  .hero-row::after, .tab::after, .chip::after, .btn::after, .erow::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    padding: 2px;
+    border-radius: inherit;
+    /* Premium two-stop glow: bright white peak + colored halo + soft outer fade.
+       The white peak gives a "lit metal" sheen at the cursor; the colored halo
+       carries the brand tint; the outer fade keeps the edge soft. */
+    background:
+      radial-gradient(
+        calc(var(--glow-radius) * 0.32) circle at var(--glow-x) var(--glow-y),
+        rgba(255, 255, 255, calc(var(--glow-intensity) * 0.55)) 0%,
+        rgba(255, 255, 255, calc(var(--glow-intensity) * 0.15)) 50%,
+        transparent 80%
+      ),
+      radial-gradient(
+        calc(var(--glow-radius) * 0.85) circle at var(--glow-x) var(--glow-y),
+        rgba(var(--border-glow-color), calc(var(--glow-intensity) * 0.95)) 0%,
+        rgba(var(--border-glow-color), calc(var(--glow-intensity) * 0.55)) 22%,
+        rgba(var(--border-glow-color), calc(var(--glow-intensity) * 0.18)) 48%,
+        transparent 68%
+      );
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    pointer-events: none;
+    opacity: calc(var(--glow-intensity) * 1);
+    transition: opacity .35s var(--ease-out);
+    z-index: 1;
+    box-sizing: border-box;
+    filter: drop-shadow(0 0 6px rgba(var(--border-glow-color), calc(var(--glow-intensity) * 0.35)));
+  }
+  /* Empty/skeleton cells don't need the glow ring. */
+  .cell.empty::after, .cell.skeleton::after { content: none; }
+
+  /* Light click ripple — gives subtle visual feedback on every click. */
+  .click-ripple{
+    position: fixed;
+    pointer-events: none;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--teal) 0%, var(--teal-glow) 35%, transparent 70%);
+    transform: translate(-50%, -50%);
+    z-index: 60;
+    animation: click-ripple-out .9s var(--ease-out) forwards;
+  }
+  @keyframes click-ripple-out{
+    0%   { opacity: 0.40; transform: translate(-50%, -50%) scale(1);  }
+    100% { opacity: 0;    transform: translate(-50%, -50%) scale(14); }
+  }
+
+  /* Month tabs — scale + lift on hover, matching the cell zoom feel. */
+  .tabs-wrap { perspective: 800px; }
+  .tab {
+    transition: all var(--dur-fast) var(--ease-out), transform .22s var(--ease-spring);
+    transform-style: preserve-3d;
+    transform-origin: center center;
+    will-change: transform;
+  }
+  .tab:hover {
+    transform: scale(1.15) translateZ(14px);
+    z-index: 2;
+  }
+  .tab.active:hover {
+    transform: scale(1.18) translateZ(18px);
+  }
+  /* Year stepper buttons also pop a little */
+  .year-sel .nav-btn { transition: all var(--dur-fast) var(--ease-out), transform .22s var(--ease-spring); }
+  .year-sel .nav-btn:hover { transform: scale(1.2); }
+  .year-sel .year-label {
+    transition: transform .22s var(--ease-spring);
+    display: inline-block;
+  }
+  .year-sel:hover .year-label { transform: scale(1.1); }
+  .cell, .modal {
+    will-change: transform;
+    --tilt-x: 0deg;
+    --tilt-y: 0deg;
+    --tilt-lift: 0px;
+    --tilt-z: 0px;
+    --tilt-scale: 1;
+    transform-style: preserve-3d;
+  }
+  .cell {
+    transform: perspective(800px)
+      rotateX(var(--tilt-x))
+      rotateY(var(--tilt-y))
+      translateZ(var(--tilt-z))
+      translateY(var(--tilt-lift))
+      scale(var(--tilt-scale));
+    transition: transform .18s var(--ease-out), box-shadow .25s var(--ease-out), z-index 0s;
+  }
+  .modal {
+    transform: perspective(1200px) rotateX(var(--tilt-x)) rotateY(var(--tilt-y)) translateZ(0);
+    transition: transform .22s var(--ease-out);
+  }
+  .cell.tilt-reset, .modal.tilt-reset {
+    transition: transform .55s var(--ease-spring);
+  }
+
+  /* Day-number parallax — floats forward on hover for depth. */
+  .cell:not(.empty):not(.skeleton) .dn {
+    transition: transform .25s var(--ease-out);
+    transform: translateZ(0);
+  }
+  /* Chips inside hovered cell also lift a touch. */
+  .cell:not(.empty):not(.skeleton) .chip,
+  .cell:not(.empty):not(.skeleton) .day-tag,
+  .cell:not(.empty):not(.skeleton) .add-hint,
+  .cell:not(.empty):not(.skeleton) .more-lnk {
+    transition: transform .25s var(--ease-out);
+  }
+  /* Hover-only effects: skip on touch devices so tapping a cell doesn't
+     leave it stuck in a lifted state covering neighbours. */
+  @media (hover: hover) and (pointer: fine) {
+    .cell:hover:not(.empty):not(.skeleton){
+      --tilt-lift: -4px;
+      --tilt-z: 30px;
+      --tilt-scale: 1.07;
+      z-index: 5;
+      box-shadow: 0 22px 38px rgba(30,24,20,.16), 0 8px 14px rgba(30,24,20,.10);
+    }
+    [data-theme="dark"] .cell:hover:not(.empty):not(.skeleton){
+      box-shadow: 0 22px 38px rgba(0,0,0,.55), 0 8px 14px rgba(0,0,0,.4);
+    }
+    .cell:hover:not(.empty):not(.skeleton) .dn { transform: translateZ(24px); }
+    .cell:hover:not(.empty):not(.skeleton) .chip,
+    .cell:hover:not(.empty):not(.skeleton) .day-tag,
+    .cell:hover:not(.empty):not(.skeleton) .more-lnk { transform: translateZ(14px); }
+    .cell:hover:not(.empty):not(.skeleton) .add-hint   { transform: translateZ(8px); }
   }
 
   /* (c) Chip: gentle hover scale */
@@ -1041,6 +1208,7 @@
 </script>
 </head>
 <body>
+
 <div class="page">
   <h1 class="sr-only">팀 GTL 월간 캘린더 2026</h1>
 
@@ -1335,18 +1503,48 @@ function showConfirm(msg, confirmLabel){
       </div>`;
     cw.querySelector('.ctitle').textContent = msg;
     cw.querySelector('.btn-primary').textContent = confirmLabel || '확인';
+    // Open animation parity with the main modal
+    requestAnimationFrame(() => {
+      const m = cw.querySelector('.modal');
+      if(!m || typeof m.animate !== 'function') return;
+      if(window._freezeModalTilt) window._freezeModalTilt(m);
+      m.animate([
+        { opacity: 0, transform: 'perspective(1200px) scale(0.1) translateY(8px)' },
+        { opacity: 1, transform: 'perspective(1200px) scale(1.02) translateY(-2px)', offset: 0.7 },
+        { opacity: 1, transform: 'perspective(1200px) scale(1) translateY(0)' }
+      ], { duration: 360, easing: 'cubic-bezier(.22, 1.2, .36, 1)' });
+    });
   });
 }
 function resolveConfirm(ev, ov, val){
   if(ev && ov && ev.target !== ov) return;
   const cw = document.getElementById('cw');
   const bd = cw.querySelector('.backdrop');
+  const m  = cw.querySelector('.modal');
   if(!bd){ if(_confirmResolve){ _confirmResolve(val); _confirmResolve=null; } return; }
   bd.classList.add('closing');
-  setTimeout(() => {
+
+  const finalize = () => {
     cw.innerHTML = '';
     if(_confirmResolve){ _confirmResolve(val); _confirmResolve=null; }
-  }, 180);
+  };
+
+  if(m && typeof m.animate === 'function'){
+    if(window._freezeModalTilt) window._freezeModalTilt(m);
+    const anim = m.animate([
+      { opacity: 1, transform: 'perspective(1200px) scale(1) translateY(0)' },
+      { opacity: 1, transform: 'perspective(1200px) scale(1.04) translateY(-3px)', offset: 0.2 },
+      { opacity: 0, transform: 'perspective(1200px) scale(0.1) translateY(8px)' }
+    ], {
+      duration: 380,
+      easing: 'cubic-bezier(.45, .05, .55, .95)',
+      fill: 'forwards'
+    });
+    anim.onfinish = finalize;
+    setTimeout(() => { if(cw.innerHTML) finalize(); }, 500);
+  } else {
+    setTimeout(finalize, 420);
+  }
 }
 
 function setSyncState(state){
@@ -1945,7 +2143,7 @@ function closeMod(ev, ov){
     mw.innerHTML='';
     openDay=null; helpOpen=false;
     document.body.classList.remove('modal-open');
-  }, 180);
+  }, 450);
 }
 function renderModal(dn){
   // If modal for the same day is already on screen, only refresh the list — no re-animation.
@@ -2203,6 +2401,79 @@ setInterval(() => { if(isTodaysMonth()) renderHero(); }, 60*1000);
 (function v2Polish(){
   const REDUCE = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+  /* (0) Pomelo-style card border glow — each "glowy" element lights up at
+     the cursor position. CSS sets up the ::after; JS updates --glow-x/y
+     and --glow-intensity per-card on mouseover/mousemove/mouseleave. */
+  (function initCardGlow(){
+    const SEL = '.cell, .today-hero, .tabs-wrap, .modal, .month-ctrl, .sync-pill, .today-btn, .icon-btn, .dice-btn, .add-btn-ghost, .brand-icon, .hero-row, .tab, .chip, .btn, .erow';
+    let last = null;
+
+    function updatePos(el, e){
+      const r = el.getBoundingClientRect();
+      const xPct = (e.clientX - r.left) / r.width;
+      const yPct = (e.clientY - r.top)  / r.height;
+      el.style.setProperty('--glow-x', (xPct * 100) + '%');
+      el.style.setProperty('--glow-y', (yPct * 100) + '%');
+      // 3D tilt — calendar cells get a bigger tilt; the modal gets a subtle one.
+      const isCell = el.classList.contains('cell') && !el.classList.contains('empty') && !el.classList.contains('skeleton');
+      const isModal = el.classList.contains('modal');
+      if(isCell){
+        const tiltMax = 14;
+        el.style.setProperty('--tilt-y',  ((xPct - 0.5) * tiltMax) + 'deg');
+        el.style.setProperty('--tilt-x', (-(yPct - 0.5) * tiltMax) + 'deg');
+      } else if(isModal){
+        const tiltMax = 4;
+        el.style.setProperty('--tilt-y',  ((xPct - 0.5) * tiltMax) + 'deg');
+        el.style.setProperty('--tilt-x', (-(yPct - 0.5) * tiltMax) + 'deg');
+      }
+    }
+
+    function resetTilt(el){
+      if(!el) return;
+      if(!el.classList.contains('cell') && !el.classList.contains('modal')) return;
+      el.classList.add('tilt-reset');
+      el.style.setProperty('--tilt-x', '0deg');
+      el.style.setProperty('--tilt-y', '0deg');
+      setTimeout(() => el.classList.remove('tilt-reset'), 600);
+    }
+
+    let _glowRAF = null, _glowE = null;
+    document.addEventListener('mousemove', (e) => {
+      _glowE = e;
+      if(_glowRAF) return;
+      _glowRAF = requestAnimationFrame(() => {
+        _glowRAF = null;
+        const e = _glowE;
+        const t = e.target && e.target.closest && e.target.closest(SEL);
+        if(t !== last){
+          if(last){
+            last.style.setProperty('--glow-intensity', '0');
+            resetTilt(last);
+          }
+          last = t;
+          if(t) t.style.setProperty('--glow-intensity', '1');
+        }
+        if(t) updatePos(t, e);
+      });
+    }, { passive: true });
+
+    // mouseleave on document only fires when leaving the window —
+    // the `t !== last` branch in mousemove already handles cell-exit cleanup.
+  })();
+
+  /* (0b) Click ripple — subtle teal pulse on every click.
+     Skip inputs/textareas/selects so the caret doesn't get a glow halo. */
+  document.addEventListener('click', (e) => {
+    if(REDUCE) return;
+    if(e.target.closest('input, textarea, select, .inp, [contenteditable]')) return;
+    const r = document.createElement('div');
+    r.className = 'click-ripple';
+    r.style.left = e.clientX + 'px';
+    r.style.top  = e.clientY + 'px';
+    document.body.appendChild(r);
+    setTimeout(() => r.remove(), 950);
+  });
+
   /* (1) Hero blob — insert once, parallax on mousemove */
   const _renderHeroOrig = renderHero;
   renderHero = function(){
@@ -2214,41 +2485,59 @@ setInterval(() => { if(isTodaysMonth()) renderHero(); }, 60*1000);
       el.insertBefore(blob, el.firstChild);
     }
   };
+  let _blobRAF = null, _blobE = null;
   document.addEventListener('mousemove', e => {
-    const hero = e.target.closest && e.target.closest('.today-hero');
-    if(!hero || REDUCE) return;
-    const blob = hero.querySelector('.hero-blob');
-    if(!blob) return;
-    const r = hero.getBoundingClientRect();
-    const dx = (e.clientX - r.left - r.width/2) / r.width;
-    const dy = (e.clientY - r.top - r.height/2) / r.height;
-    blob.style.transform = 'translate('+(dx*-22)+'px,'+(dy*-14)+'px)';
-  });
+    if(REDUCE) return;
+    _blobE = e;
+    if(_blobRAF) return;
+    _blobRAF = requestAnimationFrame(() => {
+      _blobRAF = null;
+      const e = _blobE;
+      const hero = e.target && e.target.closest && e.target.closest('.today-hero');
+      if(!hero) return;
+      const blob = hero.querySelector('.hero-blob');
+      if(!blob) return;
+      const r = hero.getBoundingClientRect();
+      const dx = (e.clientX - r.left - r.width/2) / r.width;
+      const dy = (e.clientY - r.top - r.height/2) / r.height;
+      blob.style.transform = 'translate('+(dx*-22)+'px,'+(dy*-14)+'px)';
+    });
+  }, { passive: true });
   document.addEventListener('mouseleave', e => {
     document.querySelectorAll('.hero-blob').forEach(b => b.style.transform = '');
   }, true);
 
   /* (2) Magnetic CTAs */
   const MAGNET_SEL = '.dice-btn, .brand-icon, .add-btn-ghost';
+  let _magnetRAF = null, _magnetE = null;
   document.addEventListener('mousemove', e => {
     if(REDUCE) return;
-    document.querySelectorAll(MAGNET_SEL).forEach(btn => {
-      if(btn.disabled) return;
-      const r = btn.getBoundingClientRect();
-      const cx = r.left + r.width/2, cy = r.top + r.height/2;
-      const dx = e.clientX - cx, dy = e.clientY - cy;
-      const dist = Math.hypot(dx, dy);
-      const max = 110;
-      if(dist < max){
-        const p = (1 - dist/max) * 0.28;
-        btn.style.transform = 'translate('+(dx*p)+'px,'+(dy*p)+'px)';
-      } else if(btn.style.transform){
-        btn.style.transform = '';
-      }
+    _magnetE = e;
+    if(_magnetRAF) return;
+    _magnetRAF = requestAnimationFrame(() => {
+      _magnetRAF = null;
+      const e = _magnetE;
+      document.querySelectorAll(MAGNET_SEL).forEach(btn => {
+        if(btn.disabled) return;
+        const r = btn.getBoundingClientRect();
+        const cx = r.left + r.width/2, cy = r.top + r.height/2;
+        const dx = e.clientX - cx, dy = e.clientY - cy;
+        const dist = Math.hypot(dx, dy);
+        const max = 110;
+        if(dist < max){
+          const p = (1 - dist/max) * 0.28;
+          btn.style.transform = 'translate('+(dx*p)+'px,'+(dy*p)+'px)';
+        } else if(btn.style.transform){
+          btn.style.transform = '';
+        }
+      });
     });
-  });
+  }, { passive: true });
 
-  /* (3) Cell hover preview — built from in-memory data D[y][m][d] */
+  /* (3) Cell hover preview — built from in-memory data D[y][m][d].
+     Only enabled for fine pointer (mouse) — on touch devices, synthetic
+     mouseover events make the preview flicker on tap. */
+  const FINE_POINTER = matchMedia('(pointer: fine)').matches;
   let _pv = null, _pvTimer = null;
   function getPv(){
     if(_pv) return _pv;
@@ -2292,6 +2581,7 @@ setInterval(() => { if(isTodaysMonth()) renderHero(); }, 60*1000);
     requestAnimationFrame(() => pv.classList.add('in'));
   }
   document.addEventListener('mouseover', e => {
+    if(!FINE_POINTER) return;
     const cell = e.target.closest('.cell');
     if(!cell || cell.classList.contains('empty') || cell.classList.contains('skeleton')){
       clearTimeout(_pvTimer); hidePv(); return;
@@ -2300,6 +2590,7 @@ setInterval(() => { if(isTodaysMonth()) renderHero(); }, 60*1000);
     _pvTimer = setTimeout(() => showPvFor(cell), 420);
   });
   document.addEventListener('mouseout', e => {
+    if(!FINE_POINTER) return;
     const from = e.target.closest('.cell');
     const to   = e.relatedTarget && e.relatedTarget.closest && e.relatedTarget.closest('.cell');
     if(from && from !== to){
@@ -2379,27 +2670,92 @@ setInterval(() => { if(isTodaysMonth()) renderHero(); }, 60*1000);
     setTimeout(() => { if(btn.classList.contains('voted')) spawnVoteBurst(btn); }, 60);
   });
 
-  /* (5) Modal opens FROM clicked cell — set transform-origin */
+  /* (5) Modal opens FROM clicked cell — set transform-origin and run open/close
+     animations via Web Animations API. This bypasses CSS animation conflicts
+     with the tilt transition on .modal. */
   let _lastXY = null;
   document.addEventListener('click', e => {
     if(e.target.closest('.cell, .hero-row, .more-lnk, .add-btn-ghost')){
       _lastXY = { x: e.clientX, y: e.clientY };
     }
   }, true);
+  // Suppress CSS tilt while WAA owns the modal transform.
+  // Without this, the .modal { transform: perspective(...) rotateX/Y(...) }
+  // rule snaps the modal back to flat the moment WAA replaces transform.
+  function _freezeModalTilt(m){
+    if(!m) return;
+    m.style.setProperty('--tilt-x', '0deg');
+    m.style.setProperty('--tilt-y', '0deg');
+    m.style.transition = 'none';
+  }
+
   const _openModalOrig = openModal;
   openModal = function(dn){
     _openModalOrig.apply(this, arguments);
     requestAnimationFrame(() => {
       const m = document.querySelector('.modal');
-      if(m && _lastXY){
+      if(!m) return;
+      if(_lastXY){
         const r = m.getBoundingClientRect();
-        const ox = Math.max(0, Math.min(100, ((_lastXY.x - r.left) / r.width) * 100));
-        const oy = Math.max(0, Math.min(100, ((_lastXY.y - r.top)  / r.height) * 100));
-        m.style.setProperty('--modal-ox', ox + '%');
-        m.style.setProperty('--modal-oy', oy + '%');
+        const ox = _lastXY.x - r.left;
+        const oy = _lastXY.y - r.top;
+        m.style.transformOrigin = ox + 'px ' + oy + 'px';
       }
+      _freezeModalTilt(m);
+      // Open animation — small → full, with overshoot for spring feel.
+      // Keyframes carry perspective() so the WAA-driven transform doesn't
+      // visually conflict with the CSS-tilt transform on .modal.
+      m.animate([
+        { opacity: 0, transform: 'perspective(1200px) scale(0.05) translateY(8px)' },
+        { opacity: 1, transform: 'perspective(1200px) scale(1.03) translateY(-2px)', offset: 0.7 },
+        { opacity: 1, transform: 'perspective(1200px) scale(1) translateY(0)' }
+      ], {
+        duration: 480,
+        easing: 'cubic-bezier(.22, 1.2, .36, 1)'
+      });
     });
   };
+
+  const _closeModOrig = closeMod;
+  closeMod = function(ev, ov){
+    // backdrop click guard
+    if(ev && ov && ev.target !== ov) return;
+    const mw = document.getElementById('mw');
+    if(!mw) return;
+    const bd = mw.querySelector('.backdrop');
+    const m  = mw.querySelector('.modal');
+    if(!bd || !m){ return _closeModOrig.apply(this, arguments); }
+
+    bd.classList.add('closing');
+    _freezeModalTilt(m);
+    // Close animation — visible bounce up, then shrink toward origin
+    const anim = m.animate([
+      { opacity: 1, transform: 'perspective(1200px) scale(1) translateY(0)' },
+      { opacity: 1, transform: 'perspective(1200px) scale(1.06) translateY(-4px)', offset: 0.18 },
+      { opacity: 0.9, transform: 'perspective(1200px) scale(0.55) translateY(4px)', offset: 0.6 },
+      { opacity: 0, transform: 'perspective(1200px) scale(0.05) translateY(10px)' }
+    ], {
+      duration: 420,
+      easing: 'cubic-bezier(.45, .05, .55, .95)',
+      fill: 'forwards'
+    });
+    anim.onfinish = () => {
+      mw.innerHTML = '';
+      openDay = null; helpOpen = false;
+      document.body.classList.remove('modal-open');
+    };
+    // Safety net — if onfinish doesn't fire (e.g. WAA bug), clean up anyway.
+    setTimeout(() => {
+      if(mw.innerHTML){
+        mw.innerHTML = '';
+        openDay = null; helpOpen = false;
+        document.body.classList.remove('modal-open');
+      }
+    }, 560);
+  };
+
+  // Expose freeze helper so resolveConfirm (defined earlier) can reuse it.
+  window._freezeModalTilt = _freezeModalTilt;
 
   /* (6) Tip rotator — only when there are no records this month */
   const TIPS = [
@@ -2409,18 +2765,22 @@ setInterval(() => { if(isTodaysMonth()) renderHero(); }, 60*1000);
     '👥 한 사람당 항목별 1표 · 한 디바이스 = 1명',
     '📌 매달 마지막 금요일은 자동으로 공동휴무 표시',
   ];
-  let _tipIdx = 0;
+  let _tipIdx = 0, _tipTimer = null;
   function refreshTip(){
     const n = document.getElementById('notice');
     if(!n) return;
     const dat = ((D[curYear]||{})[cur])||{};
     const cnt = Object.values(dat).reduce((s,d)=>s+(d.entries||[]).length, 0);
-    if(cnt > 0) return; // leave the real count message
+    if(cnt > 0){
+      // entries exist — stop rotating; render() already showed the count.
+      if(_tipTimer){ clearInterval(_tipTimer); _tipTimer = null; }
+      return;
+    }
     n.innerHTML = '<span class="tip-rotator"><span class="tip" key="'+_tipIdx+'">'+TIPS[_tipIdx]+'</span></span>';
     _tipIdx = (_tipIdx + 1) % TIPS.length;
+    if(!_tipTimer) _tipTimer = setInterval(refreshTip, 5500);
   }
-  setInterval(refreshTip, 5500);
-  // First tick after boot
+  // First tick after boot; refreshTip itself (re)installs the interval as needed.
   setTimeout(refreshTip, 600);
 
 })();
