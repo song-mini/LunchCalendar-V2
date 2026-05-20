@@ -464,7 +464,7 @@
   .cal.slide-r { animation: monthSlideRight .34s var(--ease-out); }
   .cal.slide-l { animation: monthSlideLeft  .34s var(--ease-out); }
 
-  .dow{ padding: 4px 2px 8px; text-align:center; font-size: 11px; font-weight: 700; letter-spacing: .5px; color: var(--text-3); }
+  .dow{ padding: 6px 2px 10px; text-align:center; font-size: 13px; font-weight: 800; letter-spacing: .3px; color: var(--text-2); }
   .dow.sun{ color: var(--sun); }
   .dow.sat{ color: var(--sat); }
 
@@ -598,7 +598,7 @@
     backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
     animation: fadeIn .2s var(--ease-out);
   }
-  .backdrop.closing { animation: fadeIn .42s var(--ease-out) reverse forwards; }
+  .backdrop.closing { animation: fadeIn .6s var(--ease-out) reverse forwards; }
   [data-theme="dark"] .backdrop { background: rgba(0,0,0,.58); }
 
   .modal{
@@ -856,7 +856,7 @@
     /* Hide "+ 기록 추가" hint on mobile — cells are obvious tap targets */
     .add-hint { display: none; }
 
-    .dow { font-size: 10px; padding: 2px 0 6px; }
+    .dow { font-size: 12px; padding: 4px 0 8px; }
 
     .modal { padding: 1rem; border-radius: 20px; }
     .notice { font-size: 11px; }
@@ -1503,16 +1503,18 @@ function showConfirm(msg, confirmLabel){
       </div>`;
     cw.querySelector('.ctitle').textContent = msg;
     cw.querySelector('.btn-primary').textContent = confirmLabel || '확인';
-    // Open animation parity with the main modal
+    // Open animation parity with the main modal — slower so it doesn't feel
+    // like a flicker, and restore tilt transition once it lands.
     requestAnimationFrame(() => {
       const m = cw.querySelector('.modal');
       if(!m || typeof m.animate !== 'function') return;
       if(window._freezeModalTilt) window._freezeModalTilt(m);
-      m.animate([
+      const a = m.animate([
         { opacity: 0, transform: 'perspective(1200px) scale(0.1) translateY(8px)' },
         { opacity: 1, transform: 'perspective(1200px) scale(1.02) translateY(-2px)', offset: 0.7 },
         { opacity: 1, transform: 'perspective(1200px) scale(1) translateY(0)' }
-      ], { duration: 360, easing: 'cubic-bezier(.22, 1.2, .36, 1)' });
+      ], { duration: 560, easing: 'cubic-bezier(.22, 1.2, .36, 1)' });
+      a.onfinish = () => { m.style.transition = ''; };
     });
   });
 }
@@ -1534,16 +1536,16 @@ function resolveConfirm(ev, ov, val){
     const anim = m.animate([
       { opacity: 1, transform: 'perspective(1200px) scale(1) translateY(0)' },
       { opacity: 1, transform: 'perspective(1200px) scale(1.04) translateY(-3px)', offset: 0.2 },
-      { opacity: 0, transform: 'perspective(1200px) scale(0.1) translateY(8px)' }
+      { opacity: 0, transform: 'perspective(1200px) scale(0.1) translateY(10px)' }
     ], {
-      duration: 380,
+      duration: 520,
       easing: 'cubic-bezier(.45, .05, .55, .95)',
       fill: 'forwards'
     });
     anim.onfinish = finalize;
-    setTimeout(() => { if(cw.innerHTML) finalize(); }, 500);
+    setTimeout(() => { if(cw.innerHTML) finalize(); }, 660);
   } else {
-    setTimeout(finalize, 420);
+    setTimeout(finalize, 600);
   }
 }
 
@@ -2705,14 +2707,18 @@ setInterval(() => { if(isTodaysMonth()) renderHero(); }, 60*1000);
       // Open animation — small → full, with overshoot for spring feel.
       // Keyframes carry perspective() so the WAA-driven transform doesn't
       // visually conflict with the CSS-tilt transform on .modal.
-      m.animate([
+      const openAnim = m.animate([
         { opacity: 0, transform: 'perspective(1200px) scale(0.05) translateY(8px)' },
         { opacity: 1, transform: 'perspective(1200px) scale(1.03) translateY(-2px)', offset: 0.7 },
         { opacity: 1, transform: 'perspective(1200px) scale(1) translateY(0)' }
       ], {
-        duration: 480,
+        duration: 720,
         easing: 'cubic-bezier(.22, 1.2, .36, 1)'
       });
+      // After the open animation finishes, restore the .modal tilt transition
+      // so subsequent mousemove-driven tilt updates ease smoothly instead of
+      // snapping per-frame. (Leaving transition:none made tilt feel glitchy.)
+      openAnim.onfinish = () => { m.style.transition = ''; };
     });
   };
 
@@ -2728,14 +2734,16 @@ setInterval(() => { if(isTodaysMonth()) renderHero(); }, 60*1000);
 
     bd.classList.add('closing');
     _freezeModalTilt(m);
-    // Close animation — visible bounce up, then shrink toward origin
+    // Close animation — visible bounce up, then shrink toward origin.
+    // Slower 600ms (matched to backdrop) so the shrink is actually visible
+    // before the modal vanishes.
     const anim = m.animate([
       { opacity: 1, transform: 'perspective(1200px) scale(1) translateY(0)' },
       { opacity: 1, transform: 'perspective(1200px) scale(1.06) translateY(-4px)', offset: 0.18 },
-      { opacity: 0.9, transform: 'perspective(1200px) scale(0.55) translateY(4px)', offset: 0.6 },
-      { opacity: 0, transform: 'perspective(1200px) scale(0.05) translateY(10px)' }
+      { opacity: 0.92, transform: 'perspective(1200px) scale(0.55) translateY(6px)', offset: 0.62 },
+      { opacity: 0, transform: 'perspective(1200px) scale(0.05) translateY(14px)' }
     ], {
-      duration: 420,
+      duration: 600,
       easing: 'cubic-bezier(.45, .05, .55, .95)',
       fill: 'forwards'
     });
@@ -2751,7 +2759,7 @@ setInterval(() => { if(isTodaysMonth()) renderHero(); }, 60*1000);
         openDay = null; helpOpen = false;
         document.body.classList.remove('modal-open');
       }
-    }, 560);
+    }, 760);
   };
 
   // Expose freeze helper so resolveConfirm (defined earlier) can reuse it.
