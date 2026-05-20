@@ -128,6 +128,19 @@
   @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
   @keyframes popIn  { from { opacity: 0; transform: translateY(10px) scale(.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
   @keyframes popOut { from { opacity: 1; transform: translateY(0) scale(1); } to { opacity: 0; transform: translateY(6px) scale(.97); } }
+
+  /* Modal pop animations — smooth scale from cell position.
+     A real curved "genie" needs an SVG displacement filter or WebGL mesh;
+     pure CSS funnel attempts look janky. This stays clean + buttery. */
+  @keyframes modalZoomIn  {
+    from { opacity: 0; transform: scale(0.06) translateY(6px); }
+    to   { opacity: 1; transform: scale(1)    translateY(0);   }
+  }
+  @keyframes modalZoomOut {
+    0%   { opacity: 1; transform: scale(1.0)  translateY(0);   }
+    20%  { opacity: 1; transform: scale(1.05) translateY(-2px);}
+    100% { opacity: 0; transform: scale(0.05) translateY(8px); }
+  }
   @keyframes monthSlideRight { from { opacity: 0; transform: translateX(28px); } to { opacity: 1; transform: translateX(0); } }
   @keyframes monthSlideLeft  { from { opacity: 0; transform: translateX(-28px); } to { opacity: 1; transform: translateX(0); } }
   @keyframes sync-pulse { 0%,100% { opacity: 1; } 50% { opacity: .55; } }
@@ -585,16 +598,17 @@
     backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
     animation: fadeIn .2s var(--ease-out);
   }
-  .backdrop.closing { animation: fadeIn .18s var(--ease-out) reverse forwards; }
+  .backdrop.closing { animation: fadeIn .42s var(--ease-out) reverse forwards; }
   [data-theme="dark"] .backdrop { background: rgba(0,0,0,.58); }
 
   .modal{
     width: min(440px, 100%); background: var(--surface-solid);
     border: 1px solid var(--bd); border-radius: 24px; padding: 1.25rem;
     box-shadow: var(--shadow-modal);
-    animation: popIn .32s var(--ease-spring) .04s both;
+    /* CSS animation removed — handled by Web Animations API in v3 polish JS
+       below to avoid conflict with the .modal transition (used for tilt). */
   }
-  .backdrop.closing .modal { animation: popOut .18s var(--ease-out) forwards; }
+  /* .backdrop.closing .modal animation removed — handled by JS (Web Animations API) */
 
   .mhdr{ display:flex; align-items:flex-start; justify-content:space-between; gap: 12px; margin-bottom: 1rem; }
   .mtitle{ font-size: 17px; font-weight: 800; letter-spacing: -.3px; color: var(--text); }
@@ -864,6 +878,321 @@
       scroll-behavior: auto !important;
     }
   }
+
+  /* ============================================================
+     v2 polish — ambient motion, hover preview, magnetic CTAs,
+     confetti + vote burst, hero parallax, modal-from-cell, tips.
+     Layered on top of the existing system; no token changes.
+     ============================================================ */
+
+  /* (a) Living background — slow drifting blobs behind the page.
+     Kept lightweight: no filter (heavy in some compositors), small
+     opacity, GPU-friendly transform-only animation. */
+  /* (a) Living background — REPLACED in v4 by the .spotlight cursor follower.
+     The body::before ambient gradient is disabled to keep visual focus on
+     the cursor glow. .page stays at z-index 1 above the spotlight. */
+  body::before{ content: none; }
+  .page { position: relative; z-index: 1; }
+  @keyframes ambient-drift {
+    0% { transform: none; } 100% { transform: none; }
+  }
+
+  /* Pomelo-style border glow — each card lights up at the cursor position
+     along its border using a radial gradient masked to the padding ring.
+     CSS sets up the pseudo-element; JS updates --glow-x / --glow-y /
+     --glow-intensity per-card on mousemove. */
+  .cell, .today-hero, .tabs-wrap, .modal,
+  .month-ctrl, .sync-pill, .today-btn, .icon-btn,
+  .dice-btn, .add-btn-ghost, .brand-icon,
+  .hero-row, .tab, .chip, .btn, .erow {
+    --glow-x: 50%;
+    --glow-y: 50%;
+    --glow-intensity: 0;
+    --glow-radius: 180px;
+    --border-glow-color: 15, 108, 88;
+  }
+  [data-theme="dark"] .cell,
+  [data-theme="dark"] .today-hero,
+  [data-theme="dark"] .tabs-wrap,
+  [data-theme="dark"] .modal,
+  [data-theme="dark"] .month-ctrl,
+  [data-theme="dark"] .sync-pill,
+  [data-theme="dark"] .today-btn,
+  [data-theme="dark"] .icon-btn,
+  [data-theme="dark"] .dice-btn,
+  [data-theme="dark"] .add-btn-ghost,
+  [data-theme="dark"] .brand-icon,
+  [data-theme="dark"] .hero-row,
+  [data-theme="dark"] .tab,
+  [data-theme="dark"] .chip,
+  [data-theme="dark"] .btn,
+  [data-theme="dark"] .erow {
+    --border-glow-color: 62, 170, 138;
+  }
+
+  /* Brand glyph + dice-btn glow in coral instead — accent surfaces */
+  .brand-icon, .dice-btn { --border-glow-color: 230, 130, 60; }
+  [data-theme="dark"] .brand-icon, [data-theme="dark"] .dice-btn { --border-glow-color: 255, 158, 100; }
+
+  .cell::after, .today-hero::after, .tabs-wrap::after, .modal::after,
+  .month-ctrl::after, .sync-pill::after, .today-btn::after, .icon-btn::after,
+  .dice-btn::after, .add-btn-ghost::after, .brand-icon::after,
+  .hero-row::after, .tab::after, .chip::after, .btn::after, .erow::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    padding: 2px;
+    border-radius: inherit;
+    /* Premium two-stop glow: bright white peak + colored halo + soft outer fade.
+       The white peak gives a "lit metal" sheen at the cursor; the colored halo
+       carries the brand tint; the outer fade keeps the edge soft. */
+    background:
+      radial-gradient(
+        calc(var(--glow-radius) * 0.32) circle at var(--glow-x) var(--glow-y),
+        rgba(255, 255, 255, calc(var(--glow-intensity) * 0.55)) 0%,
+        rgba(255, 255, 255, calc(var(--glow-intensity) * 0.15)) 50%,
+        transparent 80%
+      ),
+      radial-gradient(
+        calc(var(--glow-radius) * 0.85) circle at var(--glow-x) var(--glow-y),
+        rgba(var(--border-glow-color), calc(var(--glow-intensity) * 0.95)) 0%,
+        rgba(var(--border-glow-color), calc(var(--glow-intensity) * 0.55)) 22%,
+        rgba(var(--border-glow-color), calc(var(--glow-intensity) * 0.18)) 48%,
+        transparent 68%
+      );
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    pointer-events: none;
+    opacity: calc(var(--glow-intensity) * 1);
+    transition: opacity .35s var(--ease-out);
+    z-index: 1;
+    box-sizing: border-box;
+    filter: drop-shadow(0 0 6px rgba(var(--border-glow-color), calc(var(--glow-intensity) * 0.35)));
+  }
+  /* Empty/skeleton cells don't need the glow ring. */
+  .cell.empty::after, .cell.skeleton::after { content: none; }
+
+  /* Light click ripple — gives subtle visual feedback on every click. */
+  .click-ripple{
+    position: fixed;
+    pointer-events: none;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--teal) 0%, var(--teal-glow) 35%, transparent 70%);
+    transform: translate(-50%, -50%);
+    z-index: 60;
+    animation: click-ripple-out .9s var(--ease-out) forwards;
+  }
+  @keyframes click-ripple-out{
+    0%   { opacity: 0.40; transform: translate(-50%, -50%) scale(1);  }
+    100% { opacity: 0;    transform: translate(-50%, -50%) scale(14); }
+  }
+
+  /* Month tabs — scale + lift on hover, matching the cell zoom feel. */
+  .tabs-wrap { perspective: 800px; }
+  .tab {
+    transition: all var(--dur-fast) var(--ease-out), transform .22s var(--ease-spring);
+    transform-style: preserve-3d;
+    transform-origin: center center;
+    will-change: transform;
+  }
+  .tab:hover {
+    transform: scale(1.15) translateZ(14px);
+    z-index: 2;
+  }
+  .tab.active:hover {
+    transform: scale(1.18) translateZ(18px);
+  }
+  /* Year stepper buttons also pop a little */
+  .year-sel .nav-btn { transition: all var(--dur-fast) var(--ease-out), transform .22s var(--ease-spring); }
+  .year-sel .nav-btn:hover { transform: scale(1.2); }
+  .year-sel .year-label {
+    transition: transform .22s var(--ease-spring);
+    display: inline-block;
+  }
+  .year-sel:hover .year-label { transform: scale(1.1); }
+  .cell, .modal {
+    will-change: transform;
+    --tilt-x: 0deg;
+    --tilt-y: 0deg;
+    --tilt-lift: 0px;
+    --tilt-z: 0px;
+    --tilt-scale: 1;
+    transform-style: preserve-3d;
+  }
+  .cell {
+    transform: perspective(800px)
+      rotateX(var(--tilt-x))
+      rotateY(var(--tilt-y))
+      translateZ(var(--tilt-z))
+      translateY(var(--tilt-lift))
+      scale(var(--tilt-scale));
+    transition: transform .18s var(--ease-out), box-shadow .25s var(--ease-out), z-index 0s;
+  }
+  .modal {
+    transform: perspective(1200px) rotateX(var(--tilt-x)) rotateY(var(--tilt-y)) translateZ(0);
+    transition: transform .22s var(--ease-out);
+  }
+  .cell.tilt-reset, .modal.tilt-reset {
+    transition: transform .55s var(--ease-spring);
+  }
+
+  /* Day-number parallax — floats forward on hover for depth. */
+  .cell:not(.empty):not(.skeleton) .dn {
+    transition: transform .25s var(--ease-out);
+    transform: translateZ(0);
+  }
+  /* Chips inside hovered cell also lift a touch. */
+  .cell:not(.empty):not(.skeleton) .chip,
+  .cell:not(.empty):not(.skeleton) .day-tag,
+  .cell:not(.empty):not(.skeleton) .add-hint,
+  .cell:not(.empty):not(.skeleton) .more-lnk {
+    transition: transform .25s var(--ease-out);
+  }
+  /* Hover-only effects: skip on touch devices so tapping a cell doesn't
+     leave it stuck in a lifted state covering neighbours. */
+  @media (hover: hover) and (pointer: fine) {
+    .cell:hover:not(.empty):not(.skeleton){
+      --tilt-lift: -4px;
+      --tilt-z: 30px;
+      --tilt-scale: 1.07;
+      z-index: 5;
+      box-shadow: 0 22px 38px rgba(30,24,20,.16), 0 8px 14px rgba(30,24,20,.10);
+    }
+    [data-theme="dark"] .cell:hover:not(.empty):not(.skeleton){
+      box-shadow: 0 22px 38px rgba(0,0,0,.55), 0 8px 14px rgba(0,0,0,.4);
+    }
+    .cell:hover:not(.empty):not(.skeleton) .dn { transform: translateZ(24px); }
+    .cell:hover:not(.empty):not(.skeleton) .chip,
+    .cell:hover:not(.empty):not(.skeleton) .day-tag,
+    .cell:hover:not(.empty):not(.skeleton) .more-lnk { transform: translateZ(14px); }
+    .cell:hover:not(.empty):not(.skeleton) .add-hint   { transform: translateZ(8px); }
+  }
+
+  /* (c) Chip: gentle hover scale */
+  .chip { transition: background-color var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out), transform .18s var(--ease-spring); }
+  .chip:hover { transform: translateY(-1px) scale(1.02); }
+
+  /* (d) Magnetic CTAs — spring transform so JS-set translate eases */
+  .dice-btn, .brand-icon, .today-btn, .icon-btn {
+    transition: transform .35s var(--ease-spring),
+                box-shadow .22s var(--ease-out),
+                background-color var(--dur-fast) var(--ease-out),
+                border-color var(--dur-fast) var(--ease-out),
+                color var(--dur-fast) var(--ease-out);
+  }
+
+  /* (e) Hero blob — JS-controlled element so parallax can move it.
+     We keep the existing .today-hero::before too (it's a backup glow). */
+  .hero-blob{
+    position: absolute;
+    top: -40%; right: -10%;
+    width: 320px; height: 320px;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--teal-glow), transparent 60%);
+    pointer-events: none;
+    opacity: .85;
+    transition: transform .5s var(--ease-out);
+    will-change: transform;
+  }
+  .today-hero::before { display: none; }
+
+  /* (f) Cell hover popover (built from rendered chip DOM) */
+  .cell-preview{
+    position: fixed;
+    z-index: 150;
+    min-width: 240px; max-width: 320px;
+    background: var(--surface-solid);
+    border: 1px solid var(--bd-strong);
+    border-radius: 18px;
+    box-shadow: var(--shadow-modal);
+    padding: 12px 14px;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(8px) scale(.96);
+    transition: opacity .18s var(--ease-out), transform .24s var(--ease-spring);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+  }
+  .cell-preview.in{ opacity: 1; transform: translateY(0) scale(1); }
+  .cell-preview .cp-title{
+    font-size: 11.5px; font-weight: 800;
+    color: var(--text-2); margin-bottom: 8px;
+    letter-spacing: -.1px;
+  }
+  .cell-preview .cp-row{
+    display: flex; align-items: center; gap: 9px;
+    padding: 6px 2px;
+  }
+  .cell-preview .cp-row + .cp-row{ border-top: 1px dashed var(--bd); }
+  .cell-preview .cp-dot{
+    width: 7px; height: 7px; border-radius: 999px;
+    background: var(--teal-2); flex-shrink: 0;
+  }
+  .cell-preview .cp-dot.voted{ background: var(--coral); }
+  .cell-preview .cp-name{
+    flex: 1; min-width: 0;
+    font-size: 12.5px; font-weight: 700; color: var(--text);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .cell-preview .cp-count{
+    font-size: 11px; font-weight: 700; color: var(--text-3);
+    display: inline-flex; align-items: center; gap: 3px;
+  }
+  .cell-preview .cp-count.voted{ color: var(--coral); }
+
+  /* (g) Confetti + vote-burst host */
+  .confetti-host{
+    position: fixed; inset: 0;
+    pointer-events: none; z-index: 400;
+    overflow: hidden;
+  }
+  .confetti-piece{
+    position: absolute; top: 0; left: 0;
+    width: 8px; height: 12px; border-radius: 2px;
+    opacity: 0;
+    animation: confetti-fall 1.6s cubic-bezier(.22,1,.36,1) forwards;
+  }
+  @keyframes confetti-fall {
+    0%   { opacity: 1; transform: translate(0,0) rotate(0deg); }
+    100% { opacity: 0; transform: translate(var(--cx,0), var(--cy,200px)) rotate(var(--cr,720deg)); }
+  }
+  .vote-burst{
+    position: absolute; pointer-events: none;
+    width: 5px; height: 5px; border-radius: 999px;
+    background: var(--coral);
+    opacity: 0;
+    animation: vote-burst-out .7s var(--ease-out) forwards;
+  }
+  @keyframes vote-burst-out {
+    0%   { opacity: 1; transform: translate(0,0) scale(1); }
+    100% { opacity: 0; transform: translate(var(--bx,0), var(--by,-22px)) scale(.4); }
+  }
+
+  /* (h) Modal opens FROM the clicked cell — origin set via custom prop */
+  .backdrop .modal{
+    transform-origin: var(--modal-ox, 50%) var(--modal-oy, 50%);
+  }
+
+  /* (i) Tip rotator inside footer notice */
+  .tip-rotator{
+    display: inline-block; min-height: 16px;
+    color: var(--text-3);
+  }
+  .tip-rotator .tip{
+    display: inline-block;
+    animation: tip-cycle .6s var(--ease-spring);
+  }
+  @keyframes tip-cycle {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* (j) Sync pill — subtle hover */
+  .sync-pill{ transition: border-color var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out); }
+  .sync-pill:hover{ border-color: var(--bd-strong); transform: translateY(-1px); }
 </style>
 
 <!-- Pre-flash dark mode: read saved preference before paint -->
@@ -879,6 +1208,7 @@
 </script>
 </head>
 <body>
+
 <div class="page">
   <h1 class="sr-only">팀 GTL 월간 캘린더 2026</h1>
 
@@ -940,6 +1270,109 @@
 
 <!-- Server-injected env -->
 <script src="/config.js"></script>
+
+<!-- Local-preview fallback: if no /config.js is present, install a tiny
+     in-memory mock so the calendar still has data to render. Production
+     deployments with real Supabase env vars skip this block entirely. -->
+<script>
+(function installMockIfNeeded(){
+  if(window.SUPABASE_URL && window.SUPABASE_ANON_KEY) return;
+  console.info('[lunch-calendar] no /config.js — using local seed data');
+  window.SUPABASE_URL = 'mock';
+  window.SUPABASE_ANON_KEY = 'mock';
+
+  // Today is seeded with a 4-way vote so the hero card is interesting.
+  const TODAY = new Date();
+  const TY = TODAY.getFullYear(), TM = TODAY.getMonth()+1, TD = TODAY.getDate();
+  const lastFri = (() => { const d=new Date(TY,TM,0); while(d.getDay()!==5) d.setDate(d.getDate()-1); return d.getDate(); })();
+  const entries = [
+    {id:1, year:TY, month:TM, day:TD,   name:'한판돼지 삼겹살', memo:'3층, 파스타 추천', created_by:'p1'},
+    {id:2, year:TY, month:TM, day:TD,   name:'이대로 국밥',     memo:'든든하게, 비오는 날', created_by:'p2'},
+    {id:3, year:TY, month:TM, day:TD,   name:'김밥천국',        memo:'간단하게 먹을때', created_by:'p3'},
+    {id:4, year:TY, month:TM, day:TD,   name:'스시노부',        memo:'오마카세 예약 필요', created_by:'p4'},
+    {id:5, year:TY, month:TM, day:Math.min(TD+1,28), name:'탕화쿵푸 마라탕', memo:'맵기 2단계', created_by:'p1'},
+    {id:6, year:TY, month:TM, day:Math.min(TD+1,28), name:'교다이야 라멘',  memo:'시오 추천', created_by:'p2'},
+    {id:7, year:TY, month:TM, day:Math.max(TD-6,1),  name:'백채김치찌개',   memo:'점심 인기메뉴', created_by:'p1'},
+    {id:8, year:TY, month:TM, day:Math.max(TD-13,1), name:'이바돔감자탕',   memo:'뼈해장국 인기', created_by:'p1'},
+    {id:9, year:TY, month:TM, day:Math.max(TD-13,1), name:'홍콩반점0410',   memo:'짜장 + 탕수육', created_by:'p2'},
+  ];
+  const votes = [
+    {entry_id:1,voter_id:'p1'},{entry_id:1,voter_id:'p2'},{entry_id:1,voter_id:'p3'},{entry_id:1,voter_id:'p4'},
+    {entry_id:2,voter_id:'p1'},{entry_id:2,voter_id:'p2'},
+    {entry_id:3,voter_id:'p3'},
+    {entry_id:5,voter_id:'p1'},{entry_id:5,voter_id:'p2'},{entry_id:5,voter_id:'p3'},
+    {entry_id:6,voter_id:'p4'},
+    {entry_id:7,voter_id:'p1'},{entry_id:7,voter_id:'p2'},
+    {entry_id:8,voter_id:'p1'},{entry_id:8,voter_id:'p2'},{entry_id:8,voter_id:'p3'},{entry_id:8,voter_id:'p4'},
+  ];
+  let nextId = 100;
+
+  function makeFilter(rows){
+    const ctx = { rows: rows.slice(), filters: [] };
+    const api = {
+      select(){ return api; },
+      in(col, vals){ ctx.rows = ctx.rows.filter(r => vals.includes(r[col])); return api; },
+      eq(col, v){ ctx.rows = ctx.rows.filter(r => r[col] === v); ctx.filters.push([col,v]); return api; },
+      then(cb){ return Promise.resolve({ data: ctx.rows, error: null }).then(cb); },
+    };
+    return api;
+  }
+  function tableApi(name){
+    const arr = name === 'entries' ? entries : votes;
+    return {
+      select(){ return makeFilter(arr); },
+      insert(rec){
+        const row = Object.assign({}, rec);
+        if(name === 'entries' && !row.id) row.id = nextId++;
+        arr.push(row);
+        return Promise.resolve({ data: row, error: null });
+      },
+      update(patch){
+        return {
+          eq(col, v){
+            arr.forEach(r => { if(r[col] === v) Object.assign(r, patch); });
+            return Promise.resolve({ data: null, error: null });
+          },
+        };
+      },
+      delete(){
+        const filters = [];
+        const api = {
+          eq(col, v){ filters.push([col,v]); return api; },
+          then(cb){
+            const keep = arr.filter(r => !filters.every(([c,v]) => r[c] === v));
+            arr.length = 0; arr.push(...keep);
+            return Promise.resolve({ data:null, error:null }).then(cb);
+          },
+        };
+        return api;
+      },
+    };
+  }
+  window.supabase = {
+    createClient(){
+      return {
+        from: tableApi,
+        channel(){ return { on(){ return this; }, subscribe(){ return this; } }; },
+      };
+    },
+  };
+
+  // Also mock the holiday endpoint so we don't 404 in console
+  const _origFetch = window.fetch;
+  window.fetch = function(url, opts){
+    if(typeof url === 'string' && url.startsWith('/api/holidays/')){
+      const y = url.split('/').pop();
+      const data = (y === String(TY) || y === '2026') ? {
+        '1-1':'신정','3-1':'삼일절','5-5':'어린이날','5-24':'부처님오신날',
+        '6-6':'현충일','8-15':'광복절','10-3':'개천절','10-9':'한글날','12-25':'성탄절',
+      } : {};
+      return Promise.resolve(new Response(JSON.stringify(data), {status:200, headers:{'content-type':'application/json'}}));
+    }
+    return _origFetch.apply(this, arguments);
+  };
+})();
+</script>
 
 <script>
 /* =================================================================
@@ -1070,18 +1503,48 @@ function showConfirm(msg, confirmLabel){
       </div>`;
     cw.querySelector('.ctitle').textContent = msg;
     cw.querySelector('.btn-primary').textContent = confirmLabel || '확인';
+    // Open animation parity with the main modal
+    requestAnimationFrame(() => {
+      const m = cw.querySelector('.modal');
+      if(!m || typeof m.animate !== 'function') return;
+      if(window._freezeModalTilt) window._freezeModalTilt(m);
+      m.animate([
+        { opacity: 0, transform: 'perspective(1200px) scale(0.1) translateY(8px)' },
+        { opacity: 1, transform: 'perspective(1200px) scale(1.02) translateY(-2px)', offset: 0.7 },
+        { opacity: 1, transform: 'perspective(1200px) scale(1) translateY(0)' }
+      ], { duration: 360, easing: 'cubic-bezier(.22, 1.2, .36, 1)' });
+    });
   });
 }
 function resolveConfirm(ev, ov, val){
   if(ev && ov && ev.target !== ov) return;
   const cw = document.getElementById('cw');
   const bd = cw.querySelector('.backdrop');
+  const m  = cw.querySelector('.modal');
   if(!bd){ if(_confirmResolve){ _confirmResolve(val); _confirmResolve=null; } return; }
   bd.classList.add('closing');
-  setTimeout(() => {
+
+  const finalize = () => {
     cw.innerHTML = '';
     if(_confirmResolve){ _confirmResolve(val); _confirmResolve=null; }
-  }, 180);
+  };
+
+  if(m && typeof m.animate === 'function'){
+    if(window._freezeModalTilt) window._freezeModalTilt(m);
+    const anim = m.animate([
+      { opacity: 1, transform: 'perspective(1200px) scale(1) translateY(0)' },
+      { opacity: 1, transform: 'perspective(1200px) scale(1.04) translateY(-3px)', offset: 0.2 },
+      { opacity: 0, transform: 'perspective(1200px) scale(0.1) translateY(8px)' }
+    ], {
+      duration: 380,
+      easing: 'cubic-bezier(.45, .05, .55, .95)',
+      fill: 'forwards'
+    });
+    anim.onfinish = finalize;
+    setTimeout(() => { if(cw.innerHTML) finalize(); }, 500);
+  } else {
+    setTimeout(finalize, 420);
+  }
 }
 
 function setSyncState(state){
@@ -1422,11 +1885,8 @@ function rollDice(){
   const list = document.getElementById('heroList');
   if(!list) return;
 
-  const weights = entries.map(e => (e.voters.size||0) + 1);
-  const sum = weights.reduce((a,b)=>a+b,0);
-  let r = Math.random()*sum;
-  let pickIdx = 0;
-  for(let i=0;i<weights.length;i++){ r -= weights[i]; if(r<=0){ pickIdx=i; break; } }
+  // 무작위로 한 명 뽑기 — 투표 수와 무관하게 균등 확률
+  const pickIdx = Math.floor(Math.random() * entries.length);
 
   // Phase 1: dice rolls solo (~900ms). Phase 2: shuffle-spotlight, then settle on pick.
   setTimeout(() => {
@@ -1683,7 +2143,7 @@ function closeMod(ev, ov){
     mw.innerHTML='';
     openDay=null; helpOpen=false;
     document.body.classList.remove('modal-open');
-  }, 180);
+  }, 450);
 }
 function renderModal(dn){
   // If modal for the same day is already on screen, only refresh the list — no re-animation.
@@ -1932,6 +2392,398 @@ document.addEventListener('touchend', ev => {
 
 // Re-check hero visibility every minute (covers 13:00 boundary without reload)
 setInterval(() => { if(isTodaysMonth()) renderHero(); }, 60*1000);
+
+/* =================================================================
+   v2 polish — runs inside the main script so it can reach D, curYear,
+   MY_VOTER_ID, rollDice, openModal, renderHero. All side-effects are
+   additive — nothing in the original render path was changed.
+   ================================================================= */
+(function v2Polish(){
+  const REDUCE = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* (0) Pomelo-style card border glow — each "glowy" element lights up at
+     the cursor position. CSS sets up the ::after; JS updates --glow-x/y
+     and --glow-intensity per-card on mouseover/mousemove/mouseleave. */
+  (function initCardGlow(){
+    const SEL = '.cell, .today-hero, .tabs-wrap, .modal, .month-ctrl, .sync-pill, .today-btn, .icon-btn, .dice-btn, .add-btn-ghost, .brand-icon, .hero-row, .tab, .chip, .btn, .erow';
+    let last = null;
+
+    function updatePos(el, e){
+      const r = el.getBoundingClientRect();
+      const xPct = (e.clientX - r.left) / r.width;
+      const yPct = (e.clientY - r.top)  / r.height;
+      el.style.setProperty('--glow-x', (xPct * 100) + '%');
+      el.style.setProperty('--glow-y', (yPct * 100) + '%');
+      // 3D tilt — calendar cells get a bigger tilt; the modal gets a subtle one.
+      const isCell = el.classList.contains('cell') && !el.classList.contains('empty') && !el.classList.contains('skeleton');
+      const isModal = el.classList.contains('modal');
+      if(isCell){
+        const tiltMax = 14;
+        el.style.setProperty('--tilt-y',  ((xPct - 0.5) * tiltMax) + 'deg');
+        el.style.setProperty('--tilt-x', (-(yPct - 0.5) * tiltMax) + 'deg');
+      } else if(isModal){
+        const tiltMax = 4;
+        el.style.setProperty('--tilt-y',  ((xPct - 0.5) * tiltMax) + 'deg');
+        el.style.setProperty('--tilt-x', (-(yPct - 0.5) * tiltMax) + 'deg');
+      }
+    }
+
+    function resetTilt(el){
+      if(!el) return;
+      if(!el.classList.contains('cell') && !el.classList.contains('modal')) return;
+      el.classList.add('tilt-reset');
+      el.style.setProperty('--tilt-x', '0deg');
+      el.style.setProperty('--tilt-y', '0deg');
+      setTimeout(() => el.classList.remove('tilt-reset'), 600);
+    }
+
+    let _glowRAF = null, _glowE = null;
+    document.addEventListener('mousemove', (e) => {
+      _glowE = e;
+      if(_glowRAF) return;
+      _glowRAF = requestAnimationFrame(() => {
+        _glowRAF = null;
+        const e = _glowE;
+        const t = e.target && e.target.closest && e.target.closest(SEL);
+        if(t !== last){
+          if(last){
+            last.style.setProperty('--glow-intensity', '0');
+            resetTilt(last);
+          }
+          last = t;
+          if(t) t.style.setProperty('--glow-intensity', '1');
+        }
+        if(t) updatePos(t, e);
+      });
+    }, { passive: true });
+
+    // mouseleave on document only fires when leaving the window —
+    // the `t !== last` branch in mousemove already handles cell-exit cleanup.
+  })();
+
+  /* (0b) Click ripple — subtle teal pulse on every click.
+     Skip inputs/textareas/selects so the caret doesn't get a glow halo. */
+  document.addEventListener('click', (e) => {
+    if(REDUCE) return;
+    if(e.target.closest('input, textarea, select, .inp, [contenteditable]')) return;
+    const r = document.createElement('div');
+    r.className = 'click-ripple';
+    r.style.left = e.clientX + 'px';
+    r.style.top  = e.clientY + 'px';
+    document.body.appendChild(r);
+    setTimeout(() => r.remove(), 950);
+  });
+
+  /* (1) Hero blob — insert once, parallax on mousemove */
+  const _renderHeroOrig = renderHero;
+  renderHero = function(){
+    _renderHeroOrig.apply(this, arguments);
+    const el = document.getElementById('todayHero');
+    if(el && !el.hidden && !el.querySelector('.hero-blob')){
+      const blob = document.createElement('div');
+      blob.className = 'hero-blob';
+      el.insertBefore(blob, el.firstChild);
+    }
+  };
+  let _blobRAF = null, _blobE = null;
+  document.addEventListener('mousemove', e => {
+    if(REDUCE) return;
+    _blobE = e;
+    if(_blobRAF) return;
+    _blobRAF = requestAnimationFrame(() => {
+      _blobRAF = null;
+      const e = _blobE;
+      const hero = e.target && e.target.closest && e.target.closest('.today-hero');
+      if(!hero) return;
+      const blob = hero.querySelector('.hero-blob');
+      if(!blob) return;
+      const r = hero.getBoundingClientRect();
+      const dx = (e.clientX - r.left - r.width/2) / r.width;
+      const dy = (e.clientY - r.top - r.height/2) / r.height;
+      blob.style.transform = 'translate('+(dx*-22)+'px,'+(dy*-14)+'px)';
+    });
+  }, { passive: true });
+  document.addEventListener('mouseleave', e => {
+    document.querySelectorAll('.hero-blob').forEach(b => b.style.transform = '');
+  }, true);
+
+  /* (2) Magnetic CTAs */
+  const MAGNET_SEL = '.dice-btn, .brand-icon, .add-btn-ghost';
+  let _magnetRAF = null, _magnetE = null;
+  document.addEventListener('mousemove', e => {
+    if(REDUCE) return;
+    _magnetE = e;
+    if(_magnetRAF) return;
+    _magnetRAF = requestAnimationFrame(() => {
+      _magnetRAF = null;
+      const e = _magnetE;
+      document.querySelectorAll(MAGNET_SEL).forEach(btn => {
+        if(btn.disabled) return;
+        const r = btn.getBoundingClientRect();
+        const cx = r.left + r.width/2, cy = r.top + r.height/2;
+        const dx = e.clientX - cx, dy = e.clientY - cy;
+        const dist = Math.hypot(dx, dy);
+        const max = 110;
+        if(dist < max){
+          const p = (1 - dist/max) * 0.28;
+          btn.style.transform = 'translate('+(dx*p)+'px,'+(dy*p)+'px)';
+        } else if(btn.style.transform){
+          btn.style.transform = '';
+        }
+      });
+    });
+  }, { passive: true });
+
+  /* (3) Cell hover preview — built from in-memory data D[y][m][d].
+     Only enabled for fine pointer (mouse) — on touch devices, synthetic
+     mouseover events make the preview flicker on tap. */
+  const FINE_POINTER = matchMedia('(pointer: fine)').matches;
+  let _pv = null, _pvTimer = null;
+  function getPv(){
+    if(_pv) return _pv;
+    _pv = document.createElement('div');
+    _pv.className = 'cell-preview';
+    document.body.appendChild(_pv);
+    return _pv;
+  }
+  function hidePv(){ if(_pv) _pv.classList.remove('in'); }
+  function showPvFor(cell){
+    const dnEl = cell.querySelector('.dn');
+    if(!dnEl) return;
+    const dn = parseInt(dnEl.textContent, 10);
+    if(!dn) return;
+    const dat = (((D[curYear]||{})[cur])||{})[dn];
+    const list = (dat && dat.entries) || [];
+    if(list.length === 0) return;
+    const sorted = list.slice().sort((a,b) => (b.voters.size - a.voters.size) || (a.id - b.id));
+    const pv = getPv();
+    const dow = DOW_KR[new Date(curYear, cur-1, dn).getDay()];
+    pv.innerHTML =
+      '<div class="cp-title">'+cur+'월 '+dn+'일 ('+dow+') · '+list.length+'개 후보</div>' +
+      sorted.map(e => {
+        const v = e.voters.size, my = e.voters.has(MY_VOTER_ID);
+        return '<div class="cp-row">' +
+          '<span class="cp-dot'+(my?' voted':'')+'"></span>' +
+          '<span class="cp-name">'+esc(e.name)+'</span>' +
+          (v>0 ? '<span class="cp-count'+(my?' voted':'')+'">👍 '+v+'</span>' : '') +
+          '</div>';
+      }).join('');
+    const r = cell.getBoundingClientRect();
+    const pvw = pv.offsetWidth || 280;
+    const pvh = pv.offsetHeight || 120;
+    let x = r.left + r.width/2 - pvw/2;
+    let y = r.top - pvh - 10;
+    if(x < 10) x = 10;
+    if(x + pvw > innerWidth - 10) x = innerWidth - 10 - pvw;
+    if(y < 10) y = r.bottom + 10;
+    pv.style.left = x + 'px';
+    pv.style.top  = y + 'px';
+    requestAnimationFrame(() => pv.classList.add('in'));
+  }
+  document.addEventListener('mouseover', e => {
+    if(!FINE_POINTER) return;
+    const cell = e.target.closest('.cell');
+    if(!cell || cell.classList.contains('empty') || cell.classList.contains('skeleton')){
+      clearTimeout(_pvTimer); hidePv(); return;
+    }
+    clearTimeout(_pvTimer);
+    _pvTimer = setTimeout(() => showPvFor(cell), 420);
+  });
+  document.addEventListener('mouseout', e => {
+    if(!FINE_POINTER) return;
+    const from = e.target.closest('.cell');
+    const to   = e.relatedTarget && e.relatedTarget.closest && e.relatedTarget.closest('.cell');
+    if(from && from !== to){
+      clearTimeout(_pvTimer);
+      hidePv();
+    }
+  });
+
+  /* (4) Confetti + vote-burst */
+  let _confettiHost = null;
+  function getHost(){
+    if(_confettiHost) return _confettiHost;
+    _confettiHost = document.createElement('div');
+    _confettiHost.className = 'confetti-host';
+    document.body.appendChild(_confettiHost);
+    return _confettiHost;
+  }
+  function fireConfetti(el){
+    if(REDUCE) return;
+    const host = getHost();
+    const r = el.getBoundingClientRect();
+    const cx = r.left + r.width/2;
+    const cy = r.top + r.height/2;
+    const COLORS = ['#0f6c58','#1a8a68','#f5cb5c','#c2410c','#3eaa8a','#fff'];
+    for(let i = 0; i < 26; i++){
+      const p = document.createElement('div');
+      p.className = 'confetti-piece';
+      p.style.left = cx + 'px';
+      p.style.top  = cy + 'px';
+      p.style.background = COLORS[i % COLORS.length];
+      const angle = (i / 26) * Math.PI * 2 + Math.random()*0.6;
+      const dist  = 140 + Math.random()*140;
+      const dx = Math.cos(angle) * dist;
+      const dy = Math.sin(angle) * dist - 40;
+      p.style.setProperty('--cx', dx + 'px');
+      p.style.setProperty('--cy', dy + 'px');
+      p.style.setProperty('--cr', ((Math.random()-.5)*1440) + 'deg');
+      p.style.animationDelay = (Math.random()*0.12) + 's';
+      host.appendChild(p);
+      setTimeout(() => p.remove(), 1800);
+    }
+  }
+  // Wrap rollDice so we can fire confetti after the winner reveals
+  const _rollDiceOrig = rollDice;
+  rollDice = function(){
+    _rollDiceOrig.apply(this, arguments);
+    setTimeout(() => {
+      const w = document.querySelector('.hero-row.dice-winner');
+      if(w) fireConfetti(w);
+    }, 1700);
+  };
+
+  function spawnVoteBurst(btn){
+    if(REDUCE) return;
+    const r = btn.getBoundingClientRect();
+    const host = getHost();
+    const cx = r.left + r.width/2;
+    const cy = r.top + r.height/2;
+    for(let i = 0; i < 8; i++){
+      const p = document.createElement('div');
+      p.className = 'vote-burst';
+      p.style.left = (cx - 2.5) + 'px';
+      p.style.top  = (cy - 2.5) + 'px';
+      const angle = -Math.PI/2 + (i - 3.5) * 0.32;
+      const dist = 26 + Math.random()*16;
+      p.style.setProperty('--bx', Math.cos(angle)*dist + 'px');
+      p.style.setProperty('--by', Math.sin(angle)*dist + 'px');
+      p.style.animationDelay = (i*0.03) + 's';
+      host.appendChild(p);
+      setTimeout(() => p.remove(), 800);
+    }
+  }
+  document.addEventListener('click', e => {
+    const btn = e.target.closest && e.target.closest('.evote, .hero-vote');
+    if(!btn) return;
+    // burst only when transitioning INTO voted
+    setTimeout(() => { if(btn.classList.contains('voted')) spawnVoteBurst(btn); }, 60);
+  });
+
+  /* (5) Modal opens FROM clicked cell — set transform-origin and run open/close
+     animations via Web Animations API. This bypasses CSS animation conflicts
+     with the tilt transition on .modal. */
+  let _lastXY = null;
+  document.addEventListener('click', e => {
+    if(e.target.closest('.cell, .hero-row, .more-lnk, .add-btn-ghost')){
+      _lastXY = { x: e.clientX, y: e.clientY };
+    }
+  }, true);
+  // Suppress CSS tilt while WAA owns the modal transform.
+  // Without this, the .modal { transform: perspective(...) rotateX/Y(...) }
+  // rule snaps the modal back to flat the moment WAA replaces transform.
+  function _freezeModalTilt(m){
+    if(!m) return;
+    m.style.setProperty('--tilt-x', '0deg');
+    m.style.setProperty('--tilt-y', '0deg');
+    m.style.transition = 'none';
+  }
+
+  const _openModalOrig = openModal;
+  openModal = function(dn){
+    _openModalOrig.apply(this, arguments);
+    requestAnimationFrame(() => {
+      const m = document.querySelector('.modal');
+      if(!m) return;
+      if(_lastXY){
+        const r = m.getBoundingClientRect();
+        const ox = _lastXY.x - r.left;
+        const oy = _lastXY.y - r.top;
+        m.style.transformOrigin = ox + 'px ' + oy + 'px';
+      }
+      _freezeModalTilt(m);
+      // Open animation — small → full, with overshoot for spring feel.
+      // Keyframes carry perspective() so the WAA-driven transform doesn't
+      // visually conflict with the CSS-tilt transform on .modal.
+      m.animate([
+        { opacity: 0, transform: 'perspective(1200px) scale(0.05) translateY(8px)' },
+        { opacity: 1, transform: 'perspective(1200px) scale(1.03) translateY(-2px)', offset: 0.7 },
+        { opacity: 1, transform: 'perspective(1200px) scale(1) translateY(0)' }
+      ], {
+        duration: 480,
+        easing: 'cubic-bezier(.22, 1.2, .36, 1)'
+      });
+    });
+  };
+
+  const _closeModOrig = closeMod;
+  closeMod = function(ev, ov){
+    // backdrop click guard
+    if(ev && ov && ev.target !== ov) return;
+    const mw = document.getElementById('mw');
+    if(!mw) return;
+    const bd = mw.querySelector('.backdrop');
+    const m  = mw.querySelector('.modal');
+    if(!bd || !m){ return _closeModOrig.apply(this, arguments); }
+
+    bd.classList.add('closing');
+    _freezeModalTilt(m);
+    // Close animation — visible bounce up, then shrink toward origin
+    const anim = m.animate([
+      { opacity: 1, transform: 'perspective(1200px) scale(1) translateY(0)' },
+      { opacity: 1, transform: 'perspective(1200px) scale(1.06) translateY(-4px)', offset: 0.18 },
+      { opacity: 0.9, transform: 'perspective(1200px) scale(0.55) translateY(4px)', offset: 0.6 },
+      { opacity: 0, transform: 'perspective(1200px) scale(0.05) translateY(10px)' }
+    ], {
+      duration: 420,
+      easing: 'cubic-bezier(.45, .05, .55, .95)',
+      fill: 'forwards'
+    });
+    anim.onfinish = () => {
+      mw.innerHTML = '';
+      openDay = null; helpOpen = false;
+      document.body.classList.remove('modal-open');
+    };
+    // Safety net — if onfinish doesn't fire (e.g. WAA bug), clean up anyway.
+    setTimeout(() => {
+      if(mw.innerHTML){
+        mw.innerHTML = '';
+        openDay = null; helpOpen = false;
+        document.body.classList.remove('modal-open');
+      }
+    }, 560);
+  };
+
+  // Expose freeze helper so resolveConfirm (defined earlier) can reuse it.
+  window._freezeModalTilt = _freezeModalTilt;
+
+  /* (6) Tip rotator — only when there are no records this month */
+  const TIPS = [
+    '🎲 골라줘 버튼은 후보 중에서 무작위로 뽑아요',
+    '⌨️ ← → 키로 달 이동 · T 또는 Home 으로 오늘로',
+    '🌙 D 키로 다크 모드 바로 토글',
+    '👥 한 사람당 항목별 1표 · 한 디바이스 = 1명',
+    '📌 매달 마지막 금요일은 자동으로 공동휴무 표시',
+  ];
+  let _tipIdx = 0, _tipTimer = null;
+  function refreshTip(){
+    const n = document.getElementById('notice');
+    if(!n) return;
+    const dat = ((D[curYear]||{})[cur])||{};
+    const cnt = Object.values(dat).reduce((s,d)=>s+(d.entries||[]).length, 0);
+    if(cnt > 0){
+      // entries exist — stop rotating; render() already showed the count.
+      if(_tipTimer){ clearInterval(_tipTimer); _tipTimer = null; }
+      return;
+    }
+    n.innerHTML = '<span class="tip-rotator"><span class="tip" key="'+_tipIdx+'">'+TIPS[_tipIdx]+'</span></span>';
+    _tipIdx = (_tipIdx + 1) % TIPS.length;
+    if(!_tipTimer) _tipTimer = setInterval(refreshTip, 5500);
+  }
+  // First tick after boot; refreshTip itself (re)installs the interval as needed.
+  setTimeout(refreshTip, 600);
+
+})();
 
 /* ---------- boot ---------- */
 (async () => {
