@@ -198,9 +198,38 @@
     0%   { background-position: 200% 0; }
     100% { background-position: -200% 0; }
   }
+  /* Two-layer pulse: tight glowy ring + outer soft halo. Both fade with the
+     same rhythm so it reads as one "breathing" highlight. */
   @keyframes today-ring-pulse {
-    0%, 100% { box-shadow: 0 0 0 0 var(--teal-glow); }
-    50%       { box-shadow: 0 0 0 7px var(--teal-glow); }
+    0%, 100% {
+      box-shadow:
+        0 0 0 0 var(--teal-glow),
+        0 0 0 0 rgba(15,108,88,0);
+      opacity: .82;
+    }
+    50% {
+      box-shadow:
+        0 0 0 5px var(--teal-glow),
+        0 0 22px 6px rgba(15,108,88,.22);
+      opacity: 1;
+    }
+  }
+  [data-theme="dark"] .cell.today::before {
+    animation-name: today-ring-pulse-dark;
+  }
+  @keyframes today-ring-pulse-dark {
+    0%, 100% {
+      box-shadow:
+        0 0 0 0 var(--teal-glow),
+        0 0 0 0 rgba(62,170,138,0);
+      opacity: .82;
+    }
+    50% {
+      box-shadow:
+        0 0 0 5px var(--teal-glow),
+        0 0 26px 8px rgba(62,170,138,.28);
+      opacity: 1;
+    }
   }
   @keyframes vote-roll {
     from { opacity: 0; transform: translateY(60%); }
@@ -538,7 +567,7 @@
     position: absolute; inset: -1px;
     border-radius: 17px;
     pointer-events: none;
-    animation: today-ring-pulse 2.8s ease-in-out infinite;
+    animation: today-ring-pulse 3.4s cubic-bezier(.45, .05, .55, .95) infinite;
   }
 
   .dn{ font-size: 19px; line-height: 1; font-weight: 800; letter-spacing: -.4px; color: var(--text-2); }
@@ -1524,17 +1553,17 @@ function showConfirm(msg, confirmLabel){
       </div>`;
     cw.querySelector('.ctitle').textContent = msg;
     cw.querySelector('.btn-primary').textContent = confirmLabel || '확인';
-    // Open animation parity with the main modal — slower so it doesn't feel
-    // like a flicker, and restore tilt transition once it lands.
+    // Open animation parity with the main modal — narrow scale range so
+    // the dialog stays crisp during the entire open.
     requestAnimationFrame(() => {
       const m = cw.querySelector('.modal');
       if(!m || typeof m.animate !== 'function') return;
       if(window._freezeModalTilt) window._freezeModalTilt(m);
       const a = m.animate([
-        { opacity: 0, transform: 'perspective(1200px) scale(0.1) translateY(8px)' },
-        { opacity: 1, transform: 'perspective(1200px) scale(1.02) translateY(-2px)', offset: 0.7 },
+        { opacity: 0, transform: 'perspective(1200px) scale(0.88) translateY(10px)' },
+        { opacity: 1, transform: 'perspective(1200px) scale(1.02) translateY(-2px)', offset: 0.65 },
         { opacity: 1, transform: 'perspective(1200px) scale(1) translateY(0)' }
-      ], { duration: 560, easing: 'cubic-bezier(.22, 1.2, .36, 1)' });
+      ], { duration: 700, easing: 'cubic-bezier(.22, 1.18, .32, 1)' });
       a.onfinish = () => { m.style.transition = ''; };
     });
   });
@@ -2212,7 +2241,7 @@ function buildModalShellHTML(dn){
         <div class="igrp">
           <div>
             <div class="lbl">식당 이름</div>
-            <input class="inp" type="text" id="nName" placeholder="예) 한판돼지 삼겹살"
+            <input class="inp" type="text" id="nName" placeholder=""
                    maxlength="30" value="" list="restNames" autocomplete="off"
                    oninput="es.name=this.value"
                    onkeydown="if(event.key==='Enter'){event.preventDefault();onAddClick(${dn})}" />
@@ -2220,7 +2249,7 @@ function buildModalShellHTML(dn){
           </div>
           <div>
             <div class="lbl">메모 (선택)</div>
-            <input class="inp" type="text" id="nMemo" placeholder="예) 3층, 파스타 추천"
+            <input class="inp" type="text" id="nMemo" placeholder=""
                    maxlength="40" value=""
                    oninput="es.memo=this.value"
                    onkeydown="if(event.key==='Enter'){event.preventDefault();onAddClick(${dn})}" />
@@ -2729,16 +2758,17 @@ setInterval(() => { if(isTodaysMonth()) renderHero(); }, 60*1000);
         m.style.transformOrigin = ox + 'px ' + oy + 'px';
       }
       _freezeModalTilt(m);
-      // Open animation — small → full, with overshoot for spring feel.
-      // Keyframes carry perspective() so the WAA-driven transform doesn't
-      // visually conflict with the CSS-tilt transform on .modal.
+      // Open animation — narrower scale range (.85 → 1.0) so the GPU
+      // doesn't rasterize the modal at a tiny size then upscale it (which
+      // was causing the brief "slightly blurry then crisp" handoff after
+      // open). Slower 900ms with a refined spring for a less "swoosh" feel.
       const openAnim = m.animate([
-        { opacity: 0, transform: 'perspective(1200px) scale(0.05) translateY(8px)' },
-        { opacity: 1, transform: 'perspective(1200px) scale(1.03) translateY(-2px)', offset: 0.7 },
+        { opacity: 0, transform: 'perspective(1200px) scale(0.85) translateY(14px)' },
+        { opacity: 1, transform: 'perspective(1200px) scale(1.025) translateY(-3px)', offset: 0.65 },
         { opacity: 1, transform: 'perspective(1200px) scale(1) translateY(0)' }
       ], {
-        duration: 720,
-        easing: 'cubic-bezier(.22, 1.2, .36, 1)'
+        duration: 900,
+        easing: 'cubic-bezier(.22, 1.18, .32, 1)'
       });
       // After the open animation finishes, restore the .modal tilt transition
       // so subsequent mousemove-driven tilt updates ease smoothly instead of
