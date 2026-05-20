@@ -185,6 +185,14 @@
     0%   { background-position: 200% 0; }
     100% { background-position: -200% 0; }
   }
+  @keyframes today-ring-pulse {
+    0%, 100% { box-shadow: 0 0 0 0 var(--teal-glow); }
+    50%       { box-shadow: 0 0 0 7px var(--teal-glow); }
+  }
+  @keyframes vote-roll {
+    from { opacity: 0; transform: translateY(60%); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
 
   .page{ max-width: 1280px; margin: 0 auto; padding: 1.1rem 1.25rem 1.6rem; }
 
@@ -452,7 +460,7 @@
     border-radius: 16px; border: 1px solid var(--bd);
     background: var(--surface); box-shadow: var(--shadow-soft);
     display:flex; flex-direction:column; gap: 4px;
-    cursor:pointer;
+    cursor:pointer; position: relative;
     transition: border-color .22s var(--ease-out), background-color .22s var(--ease-out);
   }
   .cal.mounting .cell {
@@ -511,6 +519,15 @@
       0 10px 24px rgba(62,170,138,.18);
   }
 
+  /* pulsing glow ring on today cell */
+  .cell.today::before {
+    content: '';
+    position: absolute; inset: -1px;
+    border-radius: 17px;
+    pointer-events: none;
+    animation: today-ring-pulse 2.8s ease-in-out infinite;
+  }
+
   .dn{ font-size: 19px; line-height: 1; font-weight: 800; letter-spacing: -.4px; color: var(--text-2); }
   .cell.today .dn{ color: var(--teal); }
   .dn.sun{ color: var(--sun); }
@@ -536,8 +553,11 @@
   .chip-dot{ width: 6px; height: 6px; border-radius: 999px; background: var(--teal-2); flex-shrink: 0; }
   .chip.voted .chip-dot { background: var(--coral); }
   .chip-txt{ min-width: 0; overflow:hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; font-size: 11.5px; color: var(--text); }
-  .chip-count { font-size: 10.5px; color: var(--text-3); font-weight: 700; flex-shrink: 0; }
+  .chip-count { font-size: 10.5px; color: var(--text-3); font-weight: 700; flex-shrink: 0; display: inline-flex; align-items: center; gap: 2px; }
   .chip-count.voted { color: var(--coral); }
+  .chip-crown { font-size: 10px; flex-shrink: 0; line-height: 1; }
+  .vote-num { display: inline-block; vertical-align: bottom; overflow: hidden; }
+  .vote-num.rolling { animation: vote-roll .28s var(--ease-spring); }
 
   .more-lnk{
     font-size: 11px; color: var(--text-3);
@@ -1265,6 +1285,14 @@ function _animateVote(entryId, becameVoted){
       btn.classList.add('popping','bumping');
       btn.addEventListener('animationend', () => btn.classList.remove('popping','bumping'), { once: true });
     });
+    document.querySelectorAll(
+      '[data-eid="'+entryId+'"] .vote-num, [data-entry-id="'+entryId+'"] .vote-num'
+    ).forEach(el => {
+      el.classList.remove('rolling');
+      void el.offsetWidth;
+      el.classList.add('rolling');
+      el.addEventListener('animationend', () => el.classList.remove('rolling'), { once: true });
+    });
   });
 }
 async function toggleVoteAsync(entryId){
@@ -1354,7 +1382,7 @@ function renderHero(){
           <button class="hero-vote${my?' voted':''}" type="button"
                   onclick="event.stopPropagation(); toggleVoteAsync(${e.id})"
                   aria-label="투표">
-            <i class="ti ti-thumb-up"></i>${v}
+            <i class="ti ti-thumb-up"></i><span class="vote-num">${v}</span>
           </button>
         </div>`;
     }).join('') + '</div>';
@@ -1600,14 +1628,16 @@ function render(animate){
     // sort by votes desc within cell display
     const sorted = entries.slice().sort((a,b) => (b.voters.size - a.voters.size) || (a.id - b.id));
 
-    sorted.slice(0,2).forEach(e=>{
+    sorted.slice(0,2).forEach((e,ci)=>{
       const v = e.voters.size;
       const my = e.voters.has(MY_VOTER_ID);
+      const isTop = ci === 0 && v > 0;
       const c=document.createElement('div');
       c.className='chip'+(my?' voted':'');
       c.dataset.eid = e.id;
-      c.innerHTML='<span class="chip-dot"></span><span class="chip-txt">'+esc(e.name)+(e.memo?' · '+esc(e.memo):'')+'</span>'+
-        (v>0 ? '<span class="chip-count'+(my?' voted':'')+'">👍 '+v+'</span>' : '');
+      c.innerHTML=(isTop ? '<span class="chip-crown">👑</span>' : '<span class="chip-dot"></span>')+
+        '<span class="chip-txt">'+esc(e.name)+(e.memo?' · '+esc(e.memo):'')+'</span>'+
+        (v>0 ? '<span class="chip-count'+(my?' voted':'')+'">👍 <span class="vote-num">'+v+'</span></span>' : '');
       c.onclick=ev=>{ ev.stopPropagation(); openModal(dn); };
       cell.appendChild(c);
     });
@@ -1761,7 +1791,7 @@ function refreshModalContent(dn, modalEl){
         ${e.memo?'<div class="ememo">'+esc(e.memo)+'</div>':''}
       </div>
       <button class="evote${my?' voted':''}" type="button" onclick="toggleVoteAsync(${e.id})">
-        <i class="ti ti-thumb-up"></i>${v}
+        <i class="ti ti-thumb-up"></i><span class="vote-num">${v}</span>
       </button>
       <button class="eedit" type="button" onclick="onEditClick(${e.id})" aria-label="수정"><i class="ti ti-pencil"></i></button>
       <button class="edel" type="button" onclick="onDeleteClick(${e.id})" aria-label="삭제">
@@ -1883,6 +1913,22 @@ document.addEventListener('keydown',(e)=>{
   else if(e.key==='Home' || e.key==='t' || e.key==='T'){ e.preventDefault(); jumpToToday(); }
   else if(e.key==='d' || e.key==='D'){ e.preventDefault(); toggleTheme(); }
 });
+
+// Touch swipe: left/right to change month
+let _touchStartX = null, _touchStartY = null;
+document.addEventListener('touchstart', ev => {
+  if(ev.touches.length !== 1 || isModalOpen()){ _touchStartX = null; return; }
+  _touchStartX = ev.touches[0].clientX;
+  _touchStartY = ev.touches[0].clientY;
+}, { passive: true });
+document.addEventListener('touchend', ev => {
+  if(_touchStartX === null || ev.changedTouches.length !== 1) return;
+  const dx = ev.changedTouches[0].clientX - _touchStartX;
+  const dy = ev.changedTouches[0].clientY - _touchStartY;
+  _touchStartX = null; _touchStartY = null;
+  if(Math.abs(dx) < 50 || Math.abs(dy) > Math.abs(dx)) return;
+  changeMonth(dx < 0 ? 1 : -1);
+}, { passive: true });
 
 // Re-check hero visibility every minute (covers 13:00 boundary without reload)
 setInterval(() => { if(isTodaysMonth()) renderHero(); }, 60*1000);
