@@ -109,6 +109,10 @@
   }
 
   html, body { height: 100%; }
+  /* Reserve scrollbar space on <html> so adding body.modal-open (which sets
+     overflow:hidden) doesn't cause the page content to shift sideways as the
+     vertical scrollbar appears/disappears. */
+  html { scrollbar-gutter: stable; }
   body{
     font-family:var(--ff);
     background: var(--page-bg);
@@ -672,7 +676,7 @@
   .mclose:hover{ background: var(--surface-3); color: var(--text); }
   .mclose:active{ transform: scale(.92) rotate(90deg); }
 
-  .elist{ display:flex; flex-direction:column; gap: 7px; max-height: 240px; overflow:auto; margin-bottom: 1rem; padding-right: 2px; }
+  .elist{ display:flex; flex-direction:column; gap: 7px; max-height: 240px; overflow-y: auto; overflow-x: hidden; margin-bottom: 1rem; padding-right: 2px; }
   .erow{
     display:flex; align-items:flex-start; gap: 10px;
     padding: 10px 12px; border-radius: 14px;
