@@ -1569,7 +1569,7 @@ function showConfirm(msg, confirmLabel){
       const a = m.animate([
         { opacity: 0, transform: 'perspective(1200px) scale(0.92) translateY(10px)' },
         { opacity: 1, transform: 'perspective(1200px) scale(1) translateY(0)' }
-      ], { duration: 620, easing: 'cubic-bezier(.22, 1, .36, 1)' });
+      ], { duration: 580, easing: 'cubic-bezier(.22, 1, .36, 1)' });
       a.onfinish = () => {
         m.style.transition = '';
         m.style.transformOrigin = '50% 50%';
@@ -2472,13 +2472,20 @@ setInterval(() => { if(isTodaysMonth()) renderHero(); }, 60*1000);
     const SEL = '.cell, .today-hero, .tabs-wrap, .modal, .month-ctrl, .sync-pill, .today-btn, .icon-btn, .dice-btn, .add-btn-ghost, .brand-icon, .hero-row, .tab, .chip, .btn, .erow';
     let last = null;
 
-    function updatePos(el, e){
+    // How far outside the modal edge the cursor can still trigger the glow.
+    const MODAL_PROXIMITY = 90;
+
+    function updatePos(el, e, opts){
+      const proximityMode = opts && opts.proximity;
       const r = el.getBoundingClientRect();
       const xPct = (e.clientX - r.left) / r.width;
       const yPct = (e.clientY - r.top)  / r.height;
       el.style.setProperty('--glow-x', (xPct * 100) + '%');
       el.style.setProperty('--glow-y', (yPct * 100) + '%');
-      // 3D tilt — calendar cells get a bigger tilt; the modal gets a subtle one.
+      // 3D tilt is only applied when the cursor is *inside* the card. When
+      // we're in proximity-glow mode (cursor outside the modal), tilting
+      // toward an off-screen cursor would feel weird, so skip it.
+      if(proximityMode) return;
       const isCell = el.classList.contains('cell') && !el.classList.contains('empty') && !el.classList.contains('skeleton');
       const isModal = el.classList.contains('modal');
       if(isCell){
@@ -2502,6 +2509,15 @@ setInterval(() => { if(isTodaysMonth()) renderHero(); }, 60*1000);
       setTimeout(() => el.classList.remove('tilt-reset'), 600);
     }
 
+    // Distance from cursor to the nearest edge of an element's bounding box.
+    // 0 when the cursor is inside the box.
+    function distToBox(e, el){
+      const r = el.getBoundingClientRect();
+      const dx = e.clientX < r.left ? r.left - e.clientX : Math.max(0, e.clientX - r.right);
+      const dy = e.clientY < r.top  ? r.top  - e.clientY : Math.max(0, e.clientY - r.bottom);
+      return Math.hypot(dx, dy);
+    }
+
     let _glowRAF = null, _glowE = null;
     document.addEventListener('mousemove', (e) => {
       _glowE = e;
@@ -2509,16 +2525,38 @@ setInterval(() => { if(isTodaysMonth()) renderHero(); }, 60*1000);
       _glowRAF = requestAnimationFrame(() => {
         _glowRAF = null;
         const e = _glowE;
-        const t = e.target && e.target.closest && e.target.closest(SEL);
+
+        // Standard hit-test first.
+        let t = e.target && e.target.closest && e.target.closest(SEL);
+        let proximity = false;
+        let intensity = 1;
+
+        // Proximity fallback for the modal — the user wants the corner glow
+        // to also fire when the cursor is hovering just outside the modal.
+        // Intensity ramps from 1 (right at the edge) down to 0 (90px away).
+        if(!t){
+          const modal = document.querySelector('.modal');
+          if(modal){
+            const d = distToBox(e, modal);
+            if(d <= MODAL_PROXIMITY){
+              t = modal;
+              proximity = true;
+              intensity = 1 - (d / MODAL_PROXIMITY);
+            }
+          }
+        }
+
         if(t !== last){
           if(last){
             last.style.setProperty('--glow-intensity', '0');
             resetTilt(last);
           }
           last = t;
-          if(t) t.style.setProperty('--glow-intensity', '1');
         }
-        if(t) updatePos(t, e);
+        if(t){
+          t.style.setProperty('--glow-intensity', String(intensity));
+          updatePos(t, e, { proximity });
+        }
       });
     }, { passive: true });
 
@@ -2777,7 +2815,7 @@ setInterval(() => { if(isTodaysMonth()) renderHero(); }, 60*1000);
         { opacity: 0, transform: 'perspective(1200px) scale(0.9) translateY(14px)' },
         { opacity: 1, transform: 'perspective(1200px) scale(1) translateY(0)' }
       ], {
-        duration: 820,
+        duration: 760,
         easing: 'cubic-bezier(.22, 1, .36, 1)'
       });
       // After the open animation finishes:
