@@ -1087,7 +1087,11 @@
   }
   .modal {
     transform: perspective(1200px) rotateX(var(--tilt-x)) rotateY(var(--tilt-y)) translateZ(0);
-    transition: transform .22s var(--ease-out);
+    /* Snappier than .22s so the tilt actually tracks the cursor instead of
+       feeling like it's catching up. rAF coalescing in initCardGlow already
+       caps mousemove updates at one per frame, so this won't jitter. */
+    transition: transform .14s var(--ease-out);
+    transform-origin: 50% 50%;
   }
   .cell.tilt-reset, .modal.tilt-reset {
     transition: transform .55s var(--ease-spring);
@@ -1557,18 +1561,19 @@ function showConfirm(msg, confirmLabel){
       </div>`;
     cw.querySelector('.ctitle').textContent = msg;
     cw.querySelector('.btn-primary').textContent = confirmLabel || '확인';
-    // Open animation parity with the main modal — narrow scale range so
-    // the dialog stays crisp during the entire open.
+    // Open animation parity with the main modal — monotonic, no overshoot.
     requestAnimationFrame(() => {
       const m = cw.querySelector('.modal');
       if(!m || typeof m.animate !== 'function') return;
       if(window._freezeModalTilt) window._freezeModalTilt(m);
       const a = m.animate([
-        { opacity: 0, transform: 'perspective(1200px) scale(0.88) translateY(10px)' },
-        { opacity: 1, transform: 'perspective(1200px) scale(1.02) translateY(-2px)', offset: 0.65 },
+        { opacity: 0, transform: 'perspective(1200px) scale(0.92) translateY(10px)' },
         { opacity: 1, transform: 'perspective(1200px) scale(1) translateY(0)' }
-      ], { duration: 700, easing: 'cubic-bezier(.22, 1.18, .32, 1)' });
-      a.onfinish = () => { m.style.transition = ''; };
+      ], { duration: 620, easing: 'cubic-bezier(.22, 1, .36, 1)' });
+      a.onfinish = () => {
+        m.style.transition = '';
+        m.style.transformOrigin = '50% 50%';
+      };
     });
   });
 }
@@ -2762,22 +2767,31 @@ setInterval(() => { if(isTodaysMonth()) renderHero(); }, 60*1000);
         m.style.transformOrigin = ox + 'px ' + oy + 'px';
       }
       _freezeModalTilt(m);
-      // Open animation — narrower scale range (.85 → 1.0) so the GPU
-      // doesn't rasterize the modal at a tiny size then upscale it (which
-      // was causing the brief "slightly blurry then crisp" handoff after
-      // open). Slower 900ms with a refined spring for a less "swoosh" feel.
+      // Open animation — monotonic .9 → 1.0 with no overshoot. The earlier
+      // 1.025 overshoot made elements anchored to the modal's right edge
+      // (the row's X / cancel / save buttons) briefly poke out past their
+      // settled position, which read as a "flashing X" on the right side.
+      // Narrower scale range also keeps rasterization close to final size
+      // so the modal stays crisp the whole way through.
       const openAnim = m.animate([
-        { opacity: 0, transform: 'perspective(1200px) scale(0.85) translateY(14px)' },
-        { opacity: 1, transform: 'perspective(1200px) scale(1.025) translateY(-3px)', offset: 0.65 },
+        { opacity: 0, transform: 'perspective(1200px) scale(0.9) translateY(14px)' },
         { opacity: 1, transform: 'perspective(1200px) scale(1) translateY(0)' }
       ], {
-        duration: 900,
-        easing: 'cubic-bezier(.22, 1.18, .32, 1)'
+        duration: 820,
+        easing: 'cubic-bezier(.22, 1, .36, 1)'
       });
-      // After the open animation finishes, restore the .modal tilt transition
-      // so subsequent mousemove-driven tilt updates ease smoothly instead of
-      // snapping per-frame. (Leaving transition:none made tilt feel glitchy.)
-      openAnim.onfinish = () => { m.style.transition = ''; };
+      // After the open animation finishes:
+      //  1) restore the .modal tilt transition so subsequent mousemove
+      //     tilt updates ease smoothly instead of snapping per-frame
+      //  2) reset transform-origin back to centre — the open animation
+      //     set it to the click point so the modal grew out of where the
+      //     user clicked, but leaving that origin in place after open made
+      //     subsequent tilt rotate around the click point too, which is
+      //     why one side felt "stuck" while the other side swung wildly.
+      openAnim.onfinish = () => {
+        m.style.transition = '';
+        m.style.transformOrigin = '50% 50%';
+      };
     });
   };
 
