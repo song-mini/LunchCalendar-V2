@@ -6,7 +6,10 @@
 <meta name="theme-color" content="#f4f2ed" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#1a1612" media="(prefers-color-scheme: dark)">
 <title>팀 GTL · 캘린더 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:wght@500;600;700;800&family=Space+Grotesk:wght@500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.7.0/dist/tabler-icons.min.css">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -21,92 +24,226 @@
     --dur:      .28s;
     --dur-slow: .55s;
 
-    --bg:#f4f2ed;
-    --bg-2:#ede8df;
-    --surface:rgba(255,255,255,.86);
-    --surface-solid:#fff;
-    --surface-2:#f7f4ef;
-    --surface-3:#efebe4;
-    --bd:rgba(28,25,23,.08);
-    --bd-strong:rgba(28,25,23,.16);
-    --text:#1f1b18;
-    --text-2:#5f5852;
-    --text-3:#7c736a;
+    /* === Buttercream (default palette) — warm beige + terracotta + sage === */
+    --bg:#efe9dd;
+    --bg-2:#e7decd;
+    --bg-grain:#faf6ec;
+    --surface:rgba(255,252,245,.82);
+    --surface-solid:#fffaf0;
+    --surface-2:#f7f1e2;
+    --surface-3:#eee5d2;
+    --bd:rgba(58,42,22,.10);
+    --bd-strong:rgba(58,42,22,.20);
+    --text:#2a2620;
+    --text-2:#5b524a;
+    --text-3:#8a7e72;
 
-    --teal:#0f6c58;
-    --teal-2:#1a8a68;
-    --teal-3:#e9f7f1;
-    --teal-glow: rgba(15,108,88,.18);
-    --coral:#c2410c;
-    --coral-2:#fff5eb;
+    --teal:#588157;            /* sage green (was forest teal) */
+    --teal-2:#6a9468;
+    --teal-3:#e6efde;
+    --teal-glow: rgba(88,129,87,.22);
+    --coral:#C8553D;           /* terracotta (was coral) */
+    --coral-2:#fde2da;
+    --accent: var(--coral);
+    --accent-soft: var(--coral-2);
+    --secondary: var(--teal);
+    --secondary-soft: var(--teal-3);
+    --highlight:#F2B441;
+    --highlight-soft:#fcebcd;
+    --glow-rgb: 200, 85, 61;   /* terracotta — palette-aware glow */
 
-    --sat:#2563eb;
-    --sun:#dc2626;
+    --sat:#3650D8;
+    --sun:#C8553D;
 
-    --hol-bg:#fff1f3; --hol-bd:#f6c7cf; --hol-t:#b4234f;
-    --off-bg:#fff8e7; --off-bd:#f2d28b; --off-t:#9a5b11;
-    --wk-bg:#eef5ff;  --wk-bd:#c2d9ff;
-    --today-bg:#eefaf5;
+    --hol-bg:#fde2da; --hol-bd:#f0bcae; --hol-t:#A03A26;
+    --off-bg:#fcebcd; --off-bd:#e8c98b; --off-t:#8a5b1b;
+    --wk-bg:#e3e8f7;  --wk-bd:#c4cce6;
+    --today-bg:#e6efde;
 
-    --shadow:0 18px 42px rgba(30,24,20,.08);
-    --shadow-soft:0 8px 22px rgba(30,24,20,.06);
-    --shadow-lift:0 16px 30px rgba(30,24,20,.10);
-    --shadow-modal:0 28px 60px rgba(16,12,10,.18);
+    --shadow:0 30px 80px -20px rgba(50,40,28,.22), 0 8px 24px -8px rgba(50,40,28,.10);
+    --shadow-soft:0 10px 28px -10px rgba(50,40,28,.16), 0 2px 6px -2px rgba(50,40,28,.06);
+    --shadow-lift:0 16px 30px rgba(50,40,28,.14);
+    --shadow-modal:0 40px 90px -20px rgba(40,30,20,.40), 0 12px 32px -8px rgba(40,30,20,.18);
+    --shadow-window:0 30px 80px -20px rgba(50,40,28,.26), 0 8px 24px -8px rgba(50,40,28,.12), inset 0 0 0 1px rgba(255,255,255,.55);
 
     --page-bg:
-      radial-gradient(1000px 500px at 15% -10%, rgba(15,108,88,.11), transparent 56%),
-      radial-gradient(800px 500px at 95% 8%, rgba(194,65,12,.08), transparent 50%),
-      linear-gradient(180deg, #f7f4ef 0%, var(--bg) 52%, #f2eee7 100%);
+      radial-gradient(1200px 600px at 12% -10%, color-mix(in oklch, var(--accent) 18%, transparent), transparent 55%),
+      radial-gradient(800px 500px at 95% 8%, color-mix(in oklch, var(--secondary) 14%, transparent), transparent 50%),
+      radial-gradient(700px 400px at 50% 100%, color-mix(in oklch, var(--highlight) 12%, transparent), transparent 60%),
+      linear-gradient(180deg, var(--bg-grain) 0%, var(--bg) 55%, var(--bg-2) 100%);
 
     --hero-bg:
-      linear-gradient(135deg, rgba(15,108,88,.06) 0%, rgba(194,65,12,.04) 100%),
-      linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,255,255,.88));
+      radial-gradient(180px 100px at 30% 50%, color-mix(in oklch, var(--highlight) 55%, white), transparent 70%),
+      radial-gradient(220px 130px at 80% 60%, color-mix(in oklch, var(--accent) 45%, white), transparent 70%),
+      linear-gradient(180deg, color-mix(in oklch, var(--accent-soft) 60%, white), color-mix(in oklch, var(--highlight-soft) 50%, var(--surface-solid)));
 
     --ff:'Pretendard Variable',Pretendard,-apple-system,'Apple SD Gothic Neo','Noto Sans KR',sans-serif;
+    --ff-display: 'Pretendard Variable', Pretendard, -apple-system, 'Apple SD Gothic Neo', system-ui, sans-serif;
+    --ff-numeric: 'Inter', 'Pretendard Variable', sans-serif;
   }
+
+  /* === Palette: Mango (orange + magenta + amber) === */
+  [data-palette="mango"] {
+    --bg:#ffe9d6; --bg-2:#ffd9b8; --bg-grain:#fff4e6;
+    --surface:rgba(255,250,244,.82); --surface-solid:#fff4e6;
+    --surface-2:#ffeed7; --surface-3:#ffe2c2;
+    --bd:rgba(58,31,12,.10); --bd-strong:rgba(58,31,12,.20);
+    --text:#3a1f0c; --text-2:#6b4023; --text-3:#9a7150;
+    --teal:#B83A6E; --teal-2:#cb497d; --teal-3:#ffd0e2; --teal-glow: rgba(184,58,110,.22);
+    --coral:#E84A26; --coral-2:#ffd6c9;
+    --accent: var(--coral); --accent-soft: var(--coral-2);
+    --secondary: var(--teal); --secondary-soft: var(--teal-3);
+    --highlight:#FFB000; --highlight-soft:#ffe8b0;
+    --glow-rgb: 232, 74, 38;
+    --hol-bg:#ffd6c9; --hol-bd:#f5b9a4; --hol-t:#A53620;
+    --off-bg:#ffe8b0; --off-bd:#e5c071; --off-t:#7a4d10;
+    --wk-bg:#fde8d7; --wk-bd:#f0c9a3;
+    --today-bg:#ffd0e2;
+    --sun:#E84A26; --sat:#B83A6E;
+  }
+
+  /* === Palette: Linen (cream + indigo + amber) === */
+  [data-palette="linen"] {
+    --bg:#e8e5dc; --bg-2:#d8d4c8; --bg-grain:#f1efe8;
+    --surface:rgba(252,251,247,.84); --surface-solid:#f8f6ee;
+    --surface-2:#f3f1e8; --surface-3:#ebe7da;
+    --bd:rgba(31,31,44,.08); --bd-strong:rgba(31,31,44,.20);
+    --text:#1f1f2c; --text-2:#4d4d5e; --text-3:#7a7a8b;
+    --teal:#E78A4C; --teal-2:#f29658; --teal-3:#fadcc7; --teal-glow: rgba(231,138,76,.24);
+    --coral:#4F46E5; --coral-2:#e1dffc;
+    --accent: var(--coral); --accent-soft: var(--coral-2);
+    --secondary: var(--teal); --secondary-soft: var(--teal-3);
+    --highlight:#F2D34F; --highlight-soft:#fdf1c3;
+    --glow-rgb: 79, 70, 229;
+    --hol-bg:#fadcc7; --hol-bd:#ecb789; --hol-t:#9a4f1a;
+    --off-bg:#fdf1c3; --off-bd:#ddc26a; --off-t:#7a5e0e;
+    --wk-bg:#e6e3f7; --wk-bd:#c8c2eb;
+    --today-bg:#e1dffc;
+    --sun:#C44A26; --sat:#4F46E5;
+  }
+
+  /* === Palette: Forest (olive + deep green + ochre) === */
+  [data-palette="forest"] {
+    --bg:#d9e0c9; --bg-2:#c4cfb1; --bg-grain:#e8edd9;
+    --surface:rgba(247,250,240,.84); --surface-solid:#f0f4e3;
+    --surface-2:#e7edd5; --surface-3:#dfe6cb;
+    --bd:rgba(31,42,24,.10); --bd-strong:rgba(31,42,24,.22);
+    --text:#1f2a18; --text-2:#4c5640; --text-3:#7a836d;
+    --teal:#C66B3D; --teal-2:#d27a4d; --teal-3:#f4d2bf; --teal-glow: rgba(198,107,61,.24);
+    --coral:#2E5D3A; --coral-2:#cce0c8;
+    --accent: var(--coral); --accent-soft: var(--coral-2);
+    --secondary: var(--teal); --secondary-soft: var(--teal-3);
+    --highlight:#E5B335; --highlight-soft:#fae6b3;
+    --glow-rgb: 46, 93, 58;
+    --hol-bg:#f4d2bf; --hol-bd:#e0b193; --hol-t:#8a4318;
+    --off-bg:#fae6b3; --off-bd:#dec873; --off-t:#7a5b12;
+    --wk-bg:#dfe8f0; --wk-bd:#bbc7d4;
+    --today-bg:#cce0c8;
+    --sun:#C66B3D; --sat:#2E5D3A;
+  }
+
+  /* === Palette: Midnight (slate + indigo + teal) === */
+  [data-palette="midnight"] {
+    --bg:#cfd5e3; --bg-2:#b9c0d2; --bg-grain:#e1e5ee;
+    --surface:rgba(248,250,254,.86); --surface-solid:#eef1f7;
+    --surface-2:#e3e7f0; --surface-3:#dde2ec;
+    --bd:rgba(15,23,56,.10); --bd-strong:rgba(15,23,56,.24);
+    --text:#0f1738; --text-2:#3a4266; --text-3:#6c739c;
+    --teal:#0EA5A0; --teal-2:#22b5b0; --teal-3:#c6f1ee; --teal-glow: rgba(14,165,160,.22);
+    --coral:#3650D8; --coral-2:#d6dcff;
+    --accent: var(--coral); --accent-soft: var(--coral-2);
+    --secondary: var(--teal); --secondary-soft: var(--teal-3);
+    --highlight:#6366F1; --highlight-soft:#e2e4ff;
+    --glow-rgb: 54, 80, 216;
+    --hol-bg:#d6dcff; --hol-bd:#a8b3ee; --hol-t:#1f2d8a;
+    --off-bg:#e2e4ff; --off-bd:#b0b3ef; --off-t:#3232a4;
+    --wk-bg:#dbe5ee; --wk-bd:#b8c5d6;
+    --today-bg:#c6f1ee;
+    --sun:#3650D8; --sat:#0EA5A0;
+  }
+
+  /* === Palette: Sakura (blush pink + sage) === */
+  [data-palette="sakura"] {
+    --bg:#f7dee2; --bg-2:#efc7cf; --bg-grain:#fcebee;
+    --surface:rgba(253,246,248,.88); --surface-solid:#fbeff2;
+    --surface-2:#f7e4e9; --surface-3:#f4e0e5;
+    --bd:rgba(58,28,43,.10); --bd-strong:rgba(58,28,43,.24);
+    --text:#3a1c2b; --text-2:#6e3e54; --text-3:#a07683;
+    --teal:#5C8775; --teal-2:#6f9786; --teal-3:#d6e5dc; --teal-glow: rgba(92,135,117,.22);
+    --coral:#D04A6E; --coral-2:#fcd6e0;
+    --accent: var(--coral); --accent-soft: var(--coral-2);
+    --secondary: var(--teal); --secondary-soft: var(--teal-3);
+    --highlight:#F2A56A; --highlight-soft:#fde2cc;
+    --glow-rgb: 208, 74, 110;
+    --hol-bg:#fcd6e0; --hol-bd:#ecb1c3; --hol-t:#8e2d4a;
+    --off-bg:#fde2cc; --off-bd:#ecc096; --off-t:#7d4818;
+    --wk-bg:#e6e0f0; --wk-bd:#c9c0d8;
+    --today-bg:#d6e5dc;
+    --sun:#D04A6E; --sat:#5C8775;
+  }
+
+  /* === Font pairings — swap display font, body stays Pretendard for KR === */
+  [data-font="editorial"] { --ff-display: 'Fraunces', 'Pretendard Variable', serif; }
+  [data-font="modern"]    { --ff-display: 'Space Grotesk', 'Pretendard Variable', sans-serif; }
+  [data-font="warm"]      { --ff-display: 'DM Serif Display', 'Pretendard Variable', serif; }
 
   [data-theme="dark"] {
-    --bg:#1a1612;
-    --bg-2:#221d18;
-    --surface:rgba(38,32,27,.72);
-    --surface-solid:#2a2421;
-    --surface-2:#332b26;
-    --surface-3:#3d342e;
-    --bd:rgba(255,245,235,.08);
-    --bd-strong:rgba(255,245,235,.18);
-    --text:#f4ede5;
-    --text-2:#b0a499;
-    --text-3:#7a6f66;
+    --bg:#14110d;
+    --bg-2:#1c1814;
+    --bg-grain:#221d18;
+    --surface:rgba(36,31,26,.80);
+    --surface-solid:#2a241f;
+    --surface-2:#332c25;
+    --surface-3:#3d352d;
+    --bd:rgba(255,240,220,.08);
+    --bd-strong:rgba(255,240,220,.20);
+    --text:#f3ebdc;
+    --text-2:#b9ac98;
+    --text-3:#80735f;
 
-    --teal:#3eaa8a;
-    --teal-2:#52c6a0;
-    --teal-3:rgba(62,170,138,.14);
-    --teal-glow: rgba(62,170,138,.24);
-    --coral:#ff8a55;
-    --coral-2:rgba(255,138,85,.14);
+    --teal:#88C97A;
+    --teal-2:#a0db94;
+    --teal-3:rgba(136,201,122,.18);
+    --teal-glow: rgba(136,201,122,.26);
+    --coral:#FF7755;
+    --coral-2:rgba(255,119,85,.20);
+    --accent: var(--coral); --accent-soft: var(--coral-2);
+    --secondary: var(--teal); --secondary-soft: var(--teal-3);
+    --highlight:#FFC85B; --highlight-soft:rgba(255,200,91,.20);
+    --glow-rgb: 255, 119, 85;
 
     --sat:#5a8fff;
-    --sun:#ff6b6b;
+    --sun:#FF7755;
 
-    --hol-bg:rgba(255,107,107,.10); --hol-bd:rgba(255,107,107,.28); --hol-t:#ff8e8e;
-    --off-bg:rgba(255,191,75,.08);  --off-bd:rgba(255,191,75,.26);  --off-t:#e8b65a;
-    --wk-bg:rgba(90,143,255,.07);   --wk-bd:rgba(90,143,255,.22);
-    --today-bg:rgba(62,170,138,.14);
+    --hol-bg:rgba(255,119,85,.12); --hol-bd:rgba(255,119,85,.30); --hol-t:#ff9a7c;
+    --off-bg:rgba(255,200,91,.10);  --off-bd:rgba(255,200,91,.28);  --off-t:#e8b65a;
+    --wk-bg:rgba(90,143,255,.08);   --wk-bd:rgba(90,143,255,.24);
+    --today-bg:rgba(136,201,122,.16);
 
-    --shadow:0 18px 42px rgba(0,0,0,.45);
-    --shadow-soft:0 8px 22px rgba(0,0,0,.28);
-    --shadow-lift:0 16px 30px rgba(0,0,0,.40);
-    --shadow-modal:0 28px 60px rgba(0,0,0,.55);
+    --shadow:0 30px 80px -20px rgba(0,0,0,.70), 0 8px 24px -8px rgba(0,0,0,.40);
+    --shadow-soft:0 10px 28px -10px rgba(0,0,0,.55), 0 2px 6px -2px rgba(0,0,0,.30);
+    --shadow-lift:0 16px 30px rgba(0,0,0,.55);
+    --shadow-modal:0 40px 90px -20px rgba(0,0,0,.78), 0 12px 32px -8px rgba(0,0,0,.50);
+    --shadow-window:0 30px 80px -20px rgba(0,0,0,.70), inset 0 0 0 1px rgba(255,255,255,.04);
 
     --page-bg:
-      radial-gradient(1000px 500px at 15% -10%, rgba(62,170,138,.10), transparent 56%),
-      radial-gradient(800px 500px at 95% 8%, rgba(255,138,85,.07), transparent 50%),
-      linear-gradient(180deg, #1f1a16 0%, var(--bg) 52%, #181410 100%);
+      radial-gradient(1200px 600px at 12% -10%, rgba(255,119,85,.12), transparent 55%),
+      radial-gradient(800px 500px at 95% 8%, rgba(136,201,122,.10), transparent 50%),
+      radial-gradient(700px 400px at 50% 100%, rgba(255,200,91,.07), transparent 60%),
+      linear-gradient(180deg, #1f1a16 0%, var(--bg) 55%, #181410 100%);
 
     --hero-bg:
-      linear-gradient(135deg, rgba(62,170,138,.10) 0%, rgba(255,138,85,.06) 100%),
-      linear-gradient(180deg, rgba(50,42,36,.65), rgba(40,34,29,.55));
+      radial-gradient(180px 100px at 30% 50%, rgba(255,200,91,.14), transparent 70%),
+      radial-gradient(220px 130px at 80% 60%, rgba(255,119,85,.18), transparent 70%),
+      linear-gradient(180deg, rgba(50,42,36,.70), rgba(40,34,29,.60));
   }
+
+  /* === Per-palette dark-mode glow tints === */
+  [data-theme="dark"][data-palette="mango"]   { --glow-rgb: 255, 119, 85; }
+  [data-theme="dark"][data-palette="linen"]   { --glow-rgb: 180, 174, 255; }
+  [data-theme="dark"][data-palette="forest"]  { --glow-rgb: 200, 130, 80; }
+  [data-theme="dark"][data-palette="midnight"]{ --glow-rgb: 110, 138, 255; }
+  [data-theme="dark"][data-palette="sakura"]  { --glow-rgb: 240, 130, 165; }
 
   html, body { height: 100%; }
   /* Reserve scrollbar space on <html> so adding body.modal-open (which sets
@@ -122,7 +259,29 @@
     line-height:1.45;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
+    overflow-x: hidden;
     transition: background-color .6s var(--ease-out), color .4s var(--ease-out);
+  }
+
+  /* Subtle film-grain texture overlay — gives a tactile, paper-like quality
+     to the surface that distinguishes V3 from generic flat web UI. */
+  body::after {
+    content: '';
+    position: fixed; inset: 0;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.10 0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+    opacity: 0.40;
+    mix-blend-mode: multiply;
+    z-index: 0;
+  }
+  [data-theme="dark"] body::after { mix-blend-mode: screen; opacity: 0.28; }
+
+  /* Disable entry animations when the iframe is hidden — otherwise they stay
+     paused at currentTime:0 and the content is invisible. Real users always
+     see the animations. */
+  html.no-anim *, html.no-anim *::before, html.no-anim *::after {
+    animation: none !important;
+    transition: none !important;
   }
 
   *:focus-visible{ outline: 3px solid var(--teal-glow); outline-offset: 2px; }
@@ -240,36 +399,321 @@
     to   { opacity: 1; transform: translateY(0); }
   }
 
-  .page{ max-width: 1280px; margin: 0 auto; padding: 1.1rem 1.25rem 1.6rem; }
+  /* === stage + window — desktop-widget shell wrapping the entire app === */
+  .stage {
+    position: relative;
+    z-index: 2;
+    padding: 28px 24px 80px;
+    min-height: 100vh;
+  }
+  .window {
+    max-width: 1280px;
+    margin: 0 auto;
+    background: var(--surface);
+    backdrop-filter: blur(40px) saturate(140%);
+    -webkit-backdrop-filter: blur(40px) saturate(140%);
+    border-radius: 22px;
+    box-shadow: var(--shadow-window);
+    border: 1px solid var(--bd);
+    overflow: hidden;
+    animation: window-in .7s var(--ease-out) both;
+    position: relative;
+  }
+  @keyframes window-in {
+    from { opacity: 0; transform: translateY(16px) scale(.98); }
+    to   { opacity: 1; transform: translateY(0)    scale(1); }
+  }
 
-  /* === topbar === */
+  /* Body section inside the window — holds hero, tabs, calendar */
+  .window-body {
+    padding: 18px 22px 24px;
+  }
+
+  /* Legacy .page class is kept (some JS / selectors may still touch it) */
+  .page { position: relative; z-index: 1; }
+
+  /* === title-bar (top row inside window) === */
+  .title-bar {
+    display: flex; align-items: center; gap: 12px;
+    padding: 13px 16px;
+    border-bottom: 1px solid var(--bd);
+    background: linear-gradient(180deg, color-mix(in oklch, var(--surface-2) 60%, transparent), transparent);
+    position: relative;
+  }
+  .title-spacer { flex: 1; }
+  .title-controls { display: flex; align-items: center; gap: 6px; }
+
+  /* "grip" handle — macOS-style traffic-light dots, opens settings */
+  .title-grip {
+    position: relative;
+    display: flex; gap: 6px; align-items: center;
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: color-mix(in oklch, var(--text) 5%, transparent);
+    border: 0;
+    cursor: pointer;
+    transition: background .25s var(--ease-out), transform .18s var(--ease-out);
+  }
+  .title-grip:hover { background: color-mix(in oklch, var(--text) 9%, transparent); }
+  .title-grip:active { transform: scale(.95); }
+  .title-grip span {
+    display: block; width: 8px; height: 8px; border-radius: 50%;
+    background: color-mix(in oklch, var(--text) 25%, transparent);
+    transition: background .25s var(--ease-out), box-shadow .25s var(--ease-out);
+  }
+  .title-grip:hover span:nth-child(1) { background: #ff5f57; box-shadow: 0 0 0 0.5px rgba(0,0,0,.12), inset 0 -1px 1px rgba(0,0,0,.15); }
+  .title-grip:hover span:nth-child(2) { background: #febc2e; box-shadow: 0 0 0 0.5px rgba(0,0,0,.12), inset 0 -1px 1px rgba(0,0,0,.15); }
+  .title-grip:hover span:nth-child(3) { background: #28c840; box-shadow: 0 0 0 0.5px rgba(0,0,0,.12), inset 0 -1px 1px rgba(0,0,0,.15); }
+
+  /* === toolbar (second row inside window) === */
+  .toolbar {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 22px;
+    border-bottom: 1px solid var(--bd);
+    background: linear-gradient(180deg, color-mix(in oklch, var(--surface-2) 30%, transparent), transparent);
+    flex-wrap: wrap;
+  }
+  .toolbar-spacer { flex: 1; }
+  .legend {
+    display: inline-flex; align-items: center; gap: 12px;
+    font-size: 11.5px; color: var(--text-3);
+    font-weight: 600;
+  }
+  .legend-item { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
+  .legend-dot {
+    width: 9px; height: 9px; border-radius: 50%;
+    box-shadow: 0 0 0 1px var(--bd);
+  }
+
+  /* === Settings FAB — bottom-right floating gear === */
+  .settings-fab {
+    position: fixed;
+    right: 22px; bottom: 22px;
+    z-index: 95;
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    background: linear-gradient(180deg, var(--surface-solid), var(--surface-2));
+    border: 1px solid var(--bd);
+    box-shadow: var(--shadow-lift);
+    color: var(--text-2);
+    display: grid; place-items: center;
+    cursor: pointer;
+    transition: all .25s var(--ease-spring);
+  }
+  .settings-fab:hover { transform: translateY(-3px) rotate(35deg); color: var(--accent); border-color: var(--bd-strong); box-shadow: 0 18px 36px -12px rgba(40,30,20,.30); }
+  .settings-fab:active { transform: translateY(-1px) scale(.94); }
+  .settings-fab .ti { font-size: 22px; }
+  @media (max-width: 720px) {
+    .settings-fab { right: 16px; bottom: 16px; width: 44px; height: 44px; }
+    .settings-fab .ti { font-size: 20px; }
+  }
+
+  /* === Tweaks panel === */
+  .twk-panel {
+    position: fixed;
+    right: 22px; bottom: 22px;
+    z-index: 100;
+    width: min(340px, calc(100vw - 28px));
+    max-height: min(640px, calc(100vh - 44px));
+    background: var(--surface-solid);
+    border: 1px solid var(--bd);
+    border-radius: 18px;
+    box-shadow: var(--shadow-modal);
+    overflow: hidden;
+    display: flex; flex-direction: column;
+    animation: twk-in .26s var(--ease-spring) both;
+    transform-origin: bottom right;
+  }
+  .twk-panel.closing { animation: twk-out .18s var(--ease-out) forwards; }
+  @keyframes twk-in {
+    from { opacity: 0; transform: translateY(12px) scale(.94); }
+    to   { opacity: 1; transform: translateY(0)    scale(1); }
+  }
+  @keyframes twk-out {
+    from { opacity: 1; transform: translateY(0)    scale(1); }
+    to   { opacity: 0; transform: translateY(8px)  scale(.96); }
+  }
+  .twk-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 16px 10px;
+    border-bottom: 1px solid var(--bd);
+  }
+  .twk-title {
+    font-family: var(--ff-display);
+    font-size: 15px; font-weight: 800; letter-spacing: -.3px;
+    color: var(--text);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .twk-title .ti { font-size: 16px; color: var(--accent); }
+  .twk-close {
+    width: 28px; height: 28px; border-radius: 8px;
+    border: 0; background: transparent; cursor: pointer;
+    color: var(--text-3); display: grid; place-items: center;
+    transition: all .18s var(--ease-out);
+  }
+  .twk-close:hover { background: var(--surface-2); color: var(--text); }
+  .twk-body {
+    padding: 12px 16px 16px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  .twk-section {
+    margin-bottom: 14px;
+  }
+  .twk-section-title {
+    font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--text-3); font-weight: 800;
+    margin-bottom: 8px;
+  }
+  .twk-row {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 8px;
+  }
+  .twk-radio {
+    display: flex; gap: 4px;
+    padding: 3px;
+    background: var(--surface-2); border: 1px solid var(--bd);
+    border-radius: 10px;
+    width: 100%;
+  }
+  .twk-radio button {
+    flex: 1;
+    padding: 6px 8px;
+    border-radius: 7px;
+    background: transparent;
+    color: var(--text-2);
+    font-size: 12px; font-weight: 600;
+    cursor: pointer;
+    transition: all .18s var(--ease-out);
+  }
+  .twk-radio button:hover { color: var(--text); }
+  .twk-radio button.on {
+    background: var(--surface-solid);
+    color: var(--text);
+    box-shadow: 0 2px 6px rgba(0,0,0,.06);
+  }
+  [data-theme="dark"] .twk-radio button.on { box-shadow: 0 2px 6px rgba(0,0,0,.40); }
+
+  .twk-toggle {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 12px;
+    background: var(--surface-2); border: 1px solid var(--bd);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all .18s var(--ease-out);
+  }
+  .twk-toggle:hover { background: var(--surface-3); }
+  .twk-toggle .label {
+    font-size: 13px; font-weight: 600; color: var(--text);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .twk-toggle .label .ti { font-size: 16px; color: var(--text-2); }
+  .twk-switch {
+    width: 36px; height: 20px;
+    background: var(--bd-strong);
+    border-radius: 999px;
+    position: relative;
+    transition: background .2s var(--ease-out);
+  }
+  .twk-switch::after {
+    content: '';
+    position: absolute;
+    top: 2px; left: 2px;
+    width: 16px; height: 16px;
+    background: white;
+    border-radius: 50%;
+    box-shadow: 0 1px 3px rgba(0,0,0,.2);
+    transition: transform .2s var(--ease-out);
+  }
+  .twk-toggle.on .twk-switch { background: var(--accent); }
+  .twk-toggle.on .twk-switch::after { transform: translateX(16px); }
+
+  /* Palette chips */
+  .palette-chips {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+  }
+  .palette-chip {
+    position: relative;
+    padding: 8px;
+    background: var(--surface-2);
+    border: 1px solid var(--bd);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all .18s var(--ease-out);
+    text-align: center;
+    overflow: hidden;
+  }
+  .palette-chip:hover { transform: translateY(-1px); border-color: var(--bd-strong); }
+  .palette-chip.on { border-color: var(--accent); box-shadow: 0 0 0 2px color-mix(in oklch, var(--accent) 30%, transparent); }
+  .palette-chip .pc-stripes {
+    display: flex; height: 22px;
+    border-radius: 6px; overflow: hidden;
+    margin-bottom: 6px;
+    box-shadow: 0 2px 4px rgba(0,0,0,.08);
+  }
+  .palette-chip .pc-stripes span { flex: 1; }
+  .palette-chip .pc-label {
+    font-size: 10.5px; font-weight: 700; color: var(--text-2);
+    letter-spacing: -.2px;
+  }
+  .palette-chip.on .pc-label { color: var(--text); }
+  .palette-chip .pc-check {
+    position: absolute; top: 4px; right: 4px;
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: var(--accent);
+    display: grid; place-items: center;
+  }
+  .palette-chip .pc-check svg { display: block; }
+
+  /* === topbar (legacy — only used if title-bar/toolbar markup absent) === */
   .topbar{
     display:flex; align-items:center; justify-content:space-between;
     gap: 12px; flex-wrap:wrap; margin-bottom: .9rem;
     animation: fadeUp .45s var(--ease-out);
   }
-  .brand{ display:flex; align-items:center; gap: 12px; min-width: 0; }
+  .brand{ display:flex; align-items:center; gap: 10px; min-width: 0; }
   .brand-icon{
-    width: 42px; height: 42px; border-radius: 14px;
+    width: 36px; height: 36px; border-radius: 11px;
     display:flex; align-items:center; justify-content:center;
-    color:#fff; font-size: 13px; font-weight: 800; letter-spacing: .2px;
-    background: linear-gradient(135deg, var(--teal) 0%, #146f5a 42%, #1b8f6d 100%);
-    box-shadow: 0 10px 20px var(--teal-glow);
+    color:#fff; font-size: 12px; font-weight: 800; letter-spacing: .2px;
+    background:
+      radial-gradient(circle at 30% 30%, color-mix(in oklch, var(--highlight) 80%, white), var(--accent));
+    box-shadow:
+      0 4px 12px -2px color-mix(in oklch, var(--accent) 50%, transparent),
+      inset 0 -2px 4px rgba(0,0,0,.10),
+      inset 0 1px 1px rgba(255,255,255,.5);
     cursor: pointer; user-select: none; border: 0;
+    position: relative;
     transition: transform .25s var(--ease-spring), box-shadow .2s var(--ease-out);
   }
-  .brand-icon:hover { transform: rotate(-4deg) scale(1.04); box-shadow: 0 14px 26px var(--teal-glow); }
+  .brand-icon::after {
+    content: '';
+    position: absolute; inset: 4px;
+    border-radius: 7px;
+    background: radial-gradient(circle at 35% 30%, rgba(255,255,255,.5), transparent 40%);
+    pointer-events: none;
+  }
+  .brand-icon:hover { transform: rotate(-8deg) scale(1.05); }
   .brand-icon:active { transform: scale(.96); }
   .brand-text{
-    border: 0; background: transparent; padding: 4px 6px; margin: -4px -6px;
+    border: 0; background: transparent; padding: 4px 8px; margin: -4px -8px;
     border-radius: 10px; text-align: left; cursor: pointer; font-family: var(--ff);
-    display: flex; flex-direction: column;
+    display: flex; flex-direction: column; line-height: 1.1;
     transition: background-color var(--dur-fast) var(--ease-out);
   }
-  .brand-text:hover { background: var(--surface-2); }
+  .brand-text:hover { background: color-mix(in oklch, var(--text) 5%, transparent); }
   .brand-text:active { transform: scale(.98); }
-  .brand-text .name{ font-size: 18px; font-weight: 800; letter-spacing: -.4px; color: var(--text); }
-  .brand-text .sub{ margin-top: 2px; font-size: 12px; color: var(--text-3); }
+  .brand-text .name{
+    font-family: var(--ff-display);
+    font-size: 15px; font-weight: 700; letter-spacing: -.3px; color: var(--text);
+  }
+  .brand-text .sub{
+    margin-top: 2px; font-size: 11px; color: var(--text-3);
+    font-variant-numeric: tabular-nums;
+    font-family: var(--ff-numeric);
+    letter-spacing: .04em;
+  }
 
   .topbar-right{ display:flex; align-items:center; gap: 8px; flex-wrap:wrap; }
 
@@ -339,7 +783,7 @@
   /* === today hero === */
   .today-hero{
     position: relative;
-    border-radius: 22px;
+    border-radius: 18px;
     border: 1px solid var(--bd);
     background: var(--hero-bg);
     box-shadow: var(--shadow-soft);
@@ -349,38 +793,61 @@
     overflow: hidden;
     animation: fadeUp .55s var(--ease-out) .04s both;
   }
+  /* Soft grain on the hero background — adds tactile depth */
   .today-hero::before {
     content: '';
-    position: absolute;
-    top: -40%; right: -10%; width: 320px; height: 320px;
-    border-radius: 50%;
-    background: radial-gradient(circle, var(--teal-glow), transparent 60%);
+    position: absolute; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='80'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='0.7' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.15 0'/%3E%3C/filter%3E%3Crect width='200' height='80' filter='url(%23n)'/%3E%3C/svg%3E");
+    mix-blend-mode: overlay;
+    opacity: 0.35;
     pointer-events: none;
-    opacity: .8;
   }
   .hero-head {
     display:flex; align-items:flex-end; justify-content:space-between; gap: 18px;
     margin-bottom: 16px; position: relative;
   }
   .hero-title-wrap { min-width: 0; }
-  .hero-title { font-size: 26px; font-weight: 800; letter-spacing: -.8px; color: var(--text); line-height: 1.1; }
-  .hero-sub { margin-top: 6px; font-size: 13px; color: var(--text-2); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .hero-eyebrow {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-family: var(--ff-numeric);
+    font-size: 10.5px; letter-spacing: .22em; text-transform: uppercase;
+    font-weight: 700; color: var(--accent); opacity: .85;
+    margin-bottom: 6px;
+  }
+  .hero-eyebrow .ti { font-size: 13px; }
+  .hero-title { font-family: var(--ff-display); font-size: 28px; font-weight: 800; letter-spacing: -.8px; color: var(--text); line-height: 1.05; text-wrap: balance; }
+  .hero-sub { margin-top: 8px; font-size: 13px; color: var(--text-2); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
   .hero-sub b { font-weight: 700; color: var(--text); }
-  .hero-count-pill { display:inline-flex; align-items: center; gap:5px; padding: 3px 10px; border-radius: 999px; background: var(--teal-3); color: var(--teal); font-weight: 700; font-size: 11.5px; }
+  .hero-count-pill { display:inline-flex; align-items: center; gap:5px; padding: 3px 10px; border-radius: 999px; background: color-mix(in oklch, var(--secondary) 18%, transparent); color: var(--secondary); font-weight: 700; font-size: 11.5px; }
+  .hero-count-pill .ti { font-size: 12px; }
 
   .hero-actions { display:flex; align-items:center; gap: 8px; flex-shrink: 0; }
   .dice-btn{
-    display:flex; align-items:center; gap: 8px;
+    display:flex; align-items:center; gap: 9px;
     padding: 11px 18px; border-radius: 14px;
-    border: 0; color: #fff; font-family: var(--ff); font-size: 14px; font-weight: 700;
-    background: linear-gradient(135deg, var(--teal) 0%, #0d7a61 100%);
-    box-shadow: 0 12px 24px var(--teal-glow);
+    border: 0;
+    color: var(--bg-grain);
+    font-family: var(--ff-display); font-size: 14px; font-weight: 700; letter-spacing: -.2px;
+    background: linear-gradient(180deg, var(--text) 0%, color-mix(in oklch, var(--text) 85%, black) 100%);
+    box-shadow:
+      0 12px 26px -8px rgba(0,0,0,.28),
+      inset 0 1px 0 rgba(255,255,255,.10),
+      inset 0 -2px 4px rgba(0,0,0,.20);
     cursor: pointer; position: relative; overflow: hidden;
     transition: all var(--dur-fast) var(--ease-out);
   }
-  .dice-btn:hover { transform: translateY(-2px); box-shadow: 0 16px 30px var(--teal-glow); }
+  .dice-btn:hover { transform: translateY(-2px); box-shadow: 0 16px 32px -8px rgba(0,0,0,.36), inset 0 1px 0 rgba(255,255,255,.12); }
   .dice-btn:active { transform: translateY(0) scale(.97); }
-  .dice-btn .dice { font-size: 18px; display: inline-block; }
+  .dice-btn[disabled] { opacity: .55; cursor: not-allowed; }
+  .dice-btn .dice {
+    display: inline-grid; place-items: center;
+    width: 22px; height: 22px;
+    background: var(--highlight);
+    color: var(--text);
+    border-radius: 6px;
+    font-size: 14px;
+    box-shadow: inset 0 -1px 2px rgba(0,0,0,.2), inset 0 1px 0 rgba(255,255,255,.5);
+  }
   .dice-btn.rolling .dice { animation: dice-roll .9s var(--ease-spring); }
   .add-btn-ghost {
     display:flex; align-items:center; gap: 6px;
@@ -830,28 +1297,40 @@
 
   /* === RESPONSIVE === */
   @media (max-width: 960px){
-    .page{ padding: .9rem .85rem 1.15rem; }
-    .brand-text .name{ font-size: 17px; }
+    .stage { padding: 18px 14px 80px; }
+    .window-body { padding: 16px 16px 22px; }
+    .brand-text .name{ font-size: 14px; }
     .cell{ min-height: 106px; }
     .hero-title { font-size: 22px; }
+    .legend { gap: 8px; font-size: 10.5px; }
   }
 
   @media (max-width: 720px){
-    .page { padding: .75rem .7rem 1.1rem; }
+    .stage { padding: 12px 10px 80px; }
+    .window-body { padding: 14px 12px 20px; }
+    .window { border-radius: 18px; }
 
-    /* Topbar reflows: brand top, controls stacked below */
-    .topbar { gap: 8px; }
-    .brand { flex: 1; }
-    .brand-icon { width: 38px; height: 38px; border-radius: 12px; }
-    .brand-text .name { font-size: 16px; }
-    .brand-text .sub { font-size: 11px; }
-    .topbar-right { width: 100%; gap: 6px; }
+    /* Title bar reflows: keep grip + brand on top, controls wrap */
+    .title-bar { padding: 11px 12px; gap: 8px; flex-wrap: wrap; }
+    .title-grip { padding: 5px 8px; gap: 5px; }
+    .title-grip span { width: 7px; height: 7px; }
+    .brand { gap: 8px; flex: 1; min-width: 0; }
+    .brand-icon { width: 32px; height: 32px; border-radius: 10px; font-size: 11px; }
+    .brand-text { padding: 3px 5px; margin: -3px -5px; }
+    .brand-text .name { font-size: 13.5px; }
+    .brand-text .sub { font-size: 10.5px; }
+    .title-controls { gap: 4px; }
+    .sync-pill { font-size: 10.5px; padding: 5px 9px; }
+    .sync-pill span:last-child { display: none; }
+    .sync-pill .sync-dot { margin: 0; }
+
+    /* Toolbar wraps and tightens */
+    .toolbar { padding: 10px 12px; gap: 8px; }
     .month-ctrl { flex: 1; justify-content: space-between; }
     .month-label { min-width: 0; flex: 1; font-size: 13px; }
-    .today-btn { padding: 0 10px; font-size: 12px; }
-    .today-btn span { display: none; }
     .today-btn { width: 36px; padding: 0; justify-content: center; }
-    .sync-pill { flex: 1; justify-content: center; font-size: 11px; padding: 6px 10px; }
+    .today-btn span { display: none; }
+    .legend { display: none; }
 
     /* Hero stays prominent */
     .today-hero { padding: 18px 16px 16px; border-radius: 18px; }
@@ -963,30 +1442,10 @@
     --glow-y: 50%;
     --glow-intensity: 0;
     --glow-radius: 180px;
-    --border-glow-color: 15, 108, 88;
+    /* --border-glow-color reads from the active palette's --glow-rgb so the
+       hover glow auto-tints with the chosen theme. */
+    --border-glow-color: var(--glow-rgb, 200, 85, 61);
   }
-  [data-theme="dark"] .cell,
-  [data-theme="dark"] .today-hero,
-  [data-theme="dark"] .tabs-wrap,
-  [data-theme="dark"] .modal,
-  [data-theme="dark"] .month-ctrl,
-  [data-theme="dark"] .sync-pill,
-  [data-theme="dark"] .today-btn,
-  [data-theme="dark"] .icon-btn,
-  [data-theme="dark"] .dice-btn,
-  [data-theme="dark"] .add-btn-ghost,
-  [data-theme="dark"] .brand-icon,
-  [data-theme="dark"] .hero-row,
-  [data-theme="dark"] .tab,
-  [data-theme="dark"] .chip,
-  [data-theme="dark"] .btn,
-  [data-theme="dark"] .erow {
-    --border-glow-color: 62, 170, 138;
-  }
-
-  /* Brand glyph + dice-btn glow in coral instead — accent surfaces */
-  .brand-icon, .dice-btn { --border-glow-color: 230, 130, 60; }
-  [data-theme="dark"] .brand-icon, [data-theme="dark"] .dice-btn { --border-glow-color: 255, 158, 100; }
 
   .cell::after, .today-hero::after, .tabs-wrap::after, .modal::after,
   .month-ctrl::after, .sync-pill::after, .today-btn::after, .icon-btn::after,
@@ -1154,8 +1613,8 @@
     opacity: .85;
     transition: transform .5s var(--ease-out);
     will-change: transform;
+    z-index: 0;
   }
-  .today-hero::before { display: none; }
 
   /* (f) Cell hover popover (built from rendered chip DOM) */
   .cell-preview{
@@ -1253,7 +1712,7 @@
   .sync-pill:hover{ border-color: var(--bd-strong); transform: translateY(-1px); }
 </style>
 
-<!-- Pre-flash dark mode: read saved preference before paint -->
+<!-- Pre-flash theme + palette + font: read saved preferences before paint -->
 <script>
 (function() {
   try {
@@ -1261,25 +1720,59 @@
     var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
     var theme = saved || (prefersDark ? 'dark' : 'light');
     document.documentElement.setAttribute('data-theme', theme);
+    var pal = localStorage.getItem('gtl-palette') || 'buttercream';
+    document.documentElement.setAttribute('data-palette', pal);
+    var fnt = localStorage.getItem('gtl-font') || 'default';
+    document.documentElement.setAttribute('data-font', fnt);
   } catch(e) {}
 })();
 </script>
 </head>
 <body>
 
-<div class="page">
-  <h1 class="sr-only">팀 GTL 월간 캘린더 2026</h1>
+<!-- Skip entry animations when the iframe is hidden (otherwise they stay
+     paused at currentTime:0 and the content is invisible). Real users always
+     see the animations. -->
+<script>
+  if (document.hidden) document.documentElement.classList.add('no-anim');
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) document.documentElement.classList.remove('no-anim');
+  });
+</script>
 
-  <header class="topbar">
-    <div class="brand">
-      <button class="brand-icon" type="button" onclick="location.reload()" aria-label="새로고침" title="새로고침">GTL</button>
-      <button class="brand-text" type="button" onclick="location.reload()" aria-label="새로고침" title="새로고침">
-        <span class="name">팀 GTL 캘린더</span>
-        <span class="sub">2026 – 2030</span>
+<div class="stage">
+  <div class="window">
+    <h1 class="sr-only">팀 GTL 월간 캘린더 2026</h1>
+
+    <!-- === Title bar (top row): brand + sync + theme + help === -->
+    <header class="title-bar">
+      <button class="title-grip" type="button" onclick="openTweaks()" title="설정" aria-label="설정 열기">
+        <span></span><span></span><span></span>
       </button>
-    </div>
+      <div class="brand">
+        <button class="brand-icon" type="button" onclick="location.reload()" aria-label="새로고침" title="새로고침">GTL</button>
+        <button class="brand-text" type="button" onclick="location.reload()" aria-label="새로고침" title="새로고침">
+          <span class="name">팀 GTL 캘린더</span>
+          <span class="sub">2026 – 2030</span>
+        </button>
+      </div>
+      <div class="title-spacer"></div>
+      <div class="title-controls">
+        <div class="sync-pill" aria-live="polite">
+          <span class="sync-dot" id="syncDot"></span>
+          <span id="syncText">불러오는 중…</span>
+        </div>
+        <button class="icon-btn theme-btn" type="button" onclick="toggleTheme()" aria-label="다크 모드 전환" title="다크 모드">
+          <i class="ti" id="themeIcon"></i>
+        </button>
+        <button class="icon-btn" type="button" onclick="openHelp()" aria-label="도움말" title="도움말">
+          <i class="ti ti-help"></i>
+        </button>
+      </div>
+    </header>
 
-    <div class="topbar-right">
+    <!-- === Toolbar (controls row): month nav + today + legend === -->
+    <div class="toolbar">
       <div class="month-ctrl" aria-label="월 이동">
         <button class="nav-btn" type="button" onclick="changeMonth(-1)" aria-label="이전 달">
           <i class="ti ti-chevron-left"></i>
@@ -1289,35 +1782,44 @@
           <i class="ti ti-chevron-right"></i>
         </button>
       </div>
-
       <button class="today-btn" type="button" onclick="jumpToToday()" aria-label="오늘로 이동" title="오늘로 이동">
-        <i class="ti ti-calendar-event"></i><span>오늘</span>
+        <i class="ti ti-circle-dot"></i><span>오늘</span>
       </button>
-
-      <div class="sync-pill" aria-live="polite">
-        <span class="sync-dot" id="syncDot"></span>
-        <span id="syncText">불러오는 중…</span>
+      <div class="toolbar-spacer"></div>
+      <div class="legend" aria-hidden="true">
+        <span class="legend-item">
+          <span class="legend-dot" style="background:var(--accent)"></span>1순위
+        </span>
+        <span class="legend-item">
+          <span class="legend-dot" style="background:var(--secondary)"></span>후보
+        </span>
+        <span class="legend-item">
+          <span class="legend-dot" style="background:var(--hol-t)"></span>공휴일
+        </span>
       </div>
-
-      <button class="icon-btn theme-btn" type="button" onclick="toggleTheme()" aria-label="다크 모드 전환" title="다크 모드">
-        <i class="ti" id="themeIcon"></i>
-      </button>
-
-      <button class="icon-btn" type="button" onclick="openHelp()" aria-label="도움말">
-        <i class="ti ti-help"></i>
-      </button>
     </div>
-  </header>
 
-  <!-- Today hero (hidden after 13:00 or when not viewing today's month) -->
-  <section class="today-hero" id="todayHero" hidden></section>
+    <!-- === Body (hero + tabs + calendar + notice) === -->
+    <div class="window-body">
+      <!-- Today hero (hidden after 13:00 or when not viewing today's month) -->
+      <section class="today-hero" id="todayHero" hidden></section>
 
-  <div class="tabs-wrap" id="monthTabs" role="tablist"></div>
+      <div class="tabs-wrap" id="monthTabs" role="tablist"></div>
 
-  <div class="cal" id="calGrid" role="grid" aria-label="월간 캘린더"></div>
+      <div class="cal" id="calGrid" role="grid" aria-label="월간 캘린더"></div>
 
-  <p class="notice" id="notice"></p>
+      <p class="notice" id="notice"></p>
+    </div>
+  </div>
 </div>
+
+<!-- Floating settings button — auto-hides while the panel is open -->
+<button id="settingsFab" class="settings-fab" type="button" onclick="openTweaks()" title="설정" aria-label="설정 열기">
+  <i class="ti ti-settings"></i>
+</button>
+
+<!-- Tweaks panel container — populated by JS when opened -->
+<div id="tweaksRoot"></div>
 
 <div id="mw"></div>
 <div id="cw"></div>
@@ -2717,7 +3219,14 @@ setInterval(() => { if(isTodaysMonth()) renderHero(); }, 60*1000);
     const r = el.getBoundingClientRect();
     const cx = r.left + r.width/2;
     const cy = r.top + r.height/2;
-    const COLORS = ['#0f6c58','#1a8a68','#f5cb5c','#c2410c','#3eaa8a','#fff'];
+    // Pull live theme colors from CSS vars so confetti tints with the palette.
+    const cs = getComputedStyle(document.documentElement);
+    const COLORS = [
+      cs.getPropertyValue('--accent').trim()    || '#C8553D',
+      cs.getPropertyValue('--secondary').trim() || '#588157',
+      cs.getPropertyValue('--highlight').trim() || '#F2B441',
+      '#D17A8D', '#8E5A8C', '#7C9EF2',
+    ];
     for(let i = 0; i < 26; i++){
       const p = document.createElement('div');
       p.className = 'confetti-piece';
@@ -2908,6 +3417,173 @@ setInterval(() => { if(isTodaysMonth()) renderHero(); }, 60*1000);
   // First tick after boot; refreshTip itself (re)installs the interval as needed.
   setTimeout(refreshTip, 600);
 
+})();
+
+/* ============================================================
+   Tweaks panel — palette / font / dark mode picker (bottom-right)
+   The pre-paint script at the top of <head> already restored saved
+   prefs to <html data-palette> / data-font / data-theme. This block
+   just renders the live picker UI.
+   ============================================================ */
+(function tweaksInit(){
+  const PALETTES = [
+    { id: 'buttercream', label: 'Buttercream', colors: ['#C8553D', '#588157', '#F2B441', '#efe9dd'] },
+    { id: 'midnight',    label: 'Midnight',    colors: ['#3650D8', '#0EA5A0', '#6366F1', '#dde2ec'] },
+    { id: 'mango',       label: 'Mango',       colors: ['#E84A26', '#B83A6E', '#FFB000', '#ffe9d6'] },
+    { id: 'forest',      label: 'Forest',      colors: ['#2E5D3A', '#C66B3D', '#E5B335', '#d9e0c9'] },
+    { id: 'linen',       label: 'Linen',       colors: ['#4F46E5', '#E78A4C', '#F2D34F', '#e8e5dc'] },
+    { id: 'sakura',      label: 'Sakura',      colors: ['#D04A6E', '#5C8775', '#F2A56A', '#f7dee2'] },
+  ];
+  const FONTS = [
+    { id: 'default',   label: '기본' },
+    { id: 'editorial', label: '에디토리얼' },
+    { id: 'modern',    label: '모던' },
+    { id: 'warm',      label: '따뜻한' },
+  ];
+
+  function getState(){
+    const root = document.documentElement;
+    return {
+      palette: root.getAttribute('data-palette') || 'buttercream',
+      font:    root.getAttribute('data-font')    || 'default',
+      dark:    (root.getAttribute('data-theme') === 'dark'),
+    };
+  }
+  function setState(part){
+    const root = document.documentElement;
+    if(part.palette){
+      root.setAttribute('data-palette', part.palette);
+      try { localStorage.setItem('gtl-palette', part.palette); } catch(e){}
+    }
+    if(part.font){
+      root.setAttribute('data-font', part.font);
+      try { localStorage.setItem('gtl-font', part.font); } catch(e){}
+    }
+    if(typeof part.dark === 'boolean'){
+      const t = part.dark ? 'dark' : 'light';
+      try { localStorage.setItem('gtl-theme', t); } catch(e){}
+      document.documentElement.classList.add('theme-switching');
+      applyTheme(t);
+      setTimeout(() => document.documentElement.classList.remove('theme-switching'), 600);
+    }
+    renderTweaks();
+  }
+
+  function renderTweaks(){
+    const root = document.getElementById('tweaksRoot');
+    if(!root) return;
+    const panel = root.querySelector('.twk-panel');
+    if(!panel) return;
+    panel.innerHTML = panelHTML(getState());
+    bindPanel();
+  }
+
+  function panelHTML(s){
+    return ''+
+      '<div class="twk-head">'+
+        '<div class="twk-title"><i class="ti ti-palette"></i>꾸미기</div>'+
+        '<button class="twk-close" type="button" data-twk-act="close" aria-label="닫기"><i class="ti ti-x" style="font-size:16px"></i></button>'+
+      '</div>'+
+      '<div class="twk-body">'+
+        '<div class="twk-section">'+
+          '<div class="twk-section-title">컬러 팔레트</div>'+
+          '<div class="palette-chips">'+
+            PALETTES.map(function(p){
+              return '<button class="palette-chip'+(s.palette===p.id?' on':'')+'" type="button" data-twk-pal="'+p.id+'" title="'+p.label+'">'+
+                '<div class="pc-stripes">'+
+                  p.colors.map(function(c){ return '<span style="background:'+c+'"></span>'; }).join('')+
+                '</div>'+
+                '<div class="pc-label">'+p.label+'</div>'+
+                (s.palette===p.id ? '<div class="pc-check"><svg viewBox="0 0 12 12" width="9" height="9"><path d="M2.5 6.2 5 8.4 9.5 3.6" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>' : '')+
+              '</button>';
+            }).join('')+
+          '</div>'+
+        '</div>'+
+        '<div class="twk-section">'+
+          '<div class="twk-section-title">제목 폰트</div>'+
+          '<div class="twk-radio">'+
+            FONTS.map(function(f){
+              return '<button type="button" class="'+(s.font===f.id?'on':'')+'" data-twk-font="'+f.id+'">'+f.label+'</button>';
+            }).join('')+
+          '</div>'+
+        '</div>'+
+        '<div class="twk-section">'+
+          '<div class="twk-section-title">모드</div>'+
+          '<div class="twk-toggle'+(s.dark?' on':'')+'" data-twk-act="dark" role="button" tabindex="0">'+
+            '<div class="label"><i class="ti '+(s.dark?'ti-moon':'ti-sun')+'"></i>다크 모드</div>'+
+            '<div class="twk-switch"></div>'+
+          '</div>'+
+        '</div>'+
+      '</div>';
+  }
+
+  function bindPanel(){
+    const root = document.getElementById('tweaksRoot');
+    if(!root) return;
+    const panel = root.querySelector('.twk-panel');
+    if(!panel) return;
+    panel.querySelectorAll('[data-twk-pal]').forEach(function(btn){
+      btn.addEventListener('click', function(){ setState({ palette: btn.getAttribute('data-twk-pal') }); });
+    });
+    panel.querySelectorAll('[data-twk-font]').forEach(function(btn){
+      btn.addEventListener('click', function(){ setState({ font: btn.getAttribute('data-twk-font') }); });
+    });
+    panel.querySelectorAll('[data-twk-act="dark"]').forEach(function(el){
+      el.addEventListener('click', function(){ setState({ dark: !getState().dark }); });
+      el.addEventListener('keydown', function(e){
+        if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); setState({ dark: !getState().dark }); }
+      });
+    });
+    panel.querySelectorAll('[data-twk-act="close"]').forEach(function(el){
+      el.addEventListener('click', closeTweaks);
+    });
+  }
+
+  function openTweaks(){
+    const root = document.getElementById('tweaksRoot');
+    if(!root || root.querySelector('.twk-panel')) return;
+    const panel = document.createElement('div');
+    panel.className = 'twk-panel';
+    panel.innerHTML = panelHTML(getState());
+    // Stop clicks inside the panel from bubbling to outsideClick. Without this,
+    // re-rendering the panel HTML on a chip click removes the original target
+    // from the DOM, breaking the `.closest('.twk-panel')` guard in outsideClick
+    // and causing the panel to close on every selection.
+    panel.addEventListener('click', function(e){ e.stopPropagation(); });
+    root.appendChild(panel);
+    bindPanel();
+    const fab = document.getElementById('settingsFab');
+    if(fab) fab.style.display = 'none';
+    // Outside click + ESC close (deferred so the opening click itself doesn't close)
+    setTimeout(function(){
+      document.addEventListener('click', outsideClick);
+      document.addEventListener('keydown', escClose);
+    }, 0);
+  }
+  function closeTweaks(){
+    const root = document.getElementById('tweaksRoot');
+    const panel = root && root.querySelector('.twk-panel');
+    if(!panel) return;
+    panel.classList.add('closing');
+    document.removeEventListener('click', outsideClick);
+    document.removeEventListener('keydown', escClose);
+    setTimeout(function(){
+      panel.remove();
+      const fab = document.getElementById('settingsFab');
+      if(fab) fab.style.display = '';
+    }, 180);
+  }
+  function outsideClick(e){
+    if(e.target.closest('.twk-panel')) return;
+    if(e.target.closest('#settingsFab') || e.target.closest('.title-grip')) return;
+    closeTweaks();
+  }
+  function escClose(e){
+    if(e.key === 'Escape') closeTweaks();
+  }
+
+  window.openTweaks = openTweaks;
+  window.closeTweaks = closeTweaks;
 })();
 
 /* ---------- boot ---------- */
