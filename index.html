@@ -66,13 +66,12 @@
     --shadow-modal:0 40px 90px -20px rgba(40,30,20,.40), 0 12px 32px -8px rgba(40,30,20,.18);
     --shadow-window:0 30px 80px -20px rgba(50,40,28,.26), 0 8px 24px -8px rgba(50,40,28,.12), inset 0 0 0 1px rgba(255,255,255,.55);
 
-    /* Smooth single-tone base with soft atmospheric blobs — no visible
-       split between the gradient stops. The bg base color anchors the page,
-       large diffuse radial gradients add warm highlights in the corners. */
+    /* Single uniform tone — no multi-stop linear/radial overlap (which
+       was reading as two-tone banding). One very large, very diffuse
+       radial wash from above-center keeps the page from being dead flat,
+       but it's subtle enough that there's no visible boundary anywhere. */
     --page-bg:
-      radial-gradient(1400px 900px at 8% -20%, color-mix(in oklch, var(--accent) 14%, transparent), transparent 60%),
-      radial-gradient(1100px 800px at 100% 10%, color-mix(in oklch, var(--secondary) 11%, transparent), transparent 60%),
-      radial-gradient(1300px 1000px at 50% 120%, color-mix(in oklch, var(--highlight) 10%, transparent), transparent 65%),
+      radial-gradient(2200px 1500px at 50% -40%, color-mix(in oklch, var(--accent) 7%, transparent), transparent 75%),
       var(--bg);
 
     --hero-bg:
@@ -165,30 +164,47 @@
     --sun:#3650D8; --sat:#0EA5A0;
   }
 
-  /* === Palette: Sakura (raspberry + plum + champagne — monochromatic warm) === */
+  /* === Palette: Lavender (vibrant violet + teal + amber — modern, distinct) === */
   [data-palette="sakura"] {
-    --bg:#f1dde6; --bg-2:#e5c6d4; --bg-grain:#f8e7ee;
-    --surface:rgba(252,244,248,.88); --surface-solid:#faecf2;
-    --surface-2:#f4e1e9; --surface-3:#ecd5df;
-    --bd:rgba(76,30,52,.10); --bd-strong:rgba(76,30,52,.24);
-    --text:#3a1a2b; --text-2:#6a3a52; --text-3:#9a6f82;
-    --teal:#8E5A8C; --teal-2:#a070a0; --teal-3:#e6d5e6; --teal-glow: rgba(142,90,140,.22);
-    --coral:#C8395C; --coral-2:#fad4df;
+    --bg:#e9e2f1; --bg-2:#d4c4e6; --bg-grain:#f1ebf7;
+    --surface:rgba(252,250,255,.86); --surface-solid:#f8f4fc;
+    --surface-2:#ede5f5; --surface-3:#e2d6ee;
+    --bd:rgba(40,30,70,.10); --bd-strong:rgba(40,30,70,.22);
+    --text:#281f44; --text-2:#4f4570; --text-3:#7d75a0;
+    --teal:#14B8A6; --teal-2:#2ec9b8; --teal-3:#c4ede8; --teal-glow: rgba(20,184,166,.22);
+    --coral:#7C3AED; --coral-2:#e3d6fb;
     --accent: var(--coral); --accent-soft: var(--coral-2);
     --secondary: var(--teal); --secondary-soft: var(--teal-3);
-    --highlight:#E8B27A; --highlight-soft:#f8e2c8;
-    --glow-rgb: 200, 57, 92;
-    --hol-bg:#fad4df; --hol-bd:#ecb0c2; --hol-t:#8e2342;
-    --off-bg:#f8e2c8; --off-bd:#e2c194; --off-t:#7a5018;
-    --wk-bg:#e6d5e6; --wk-bd:#cbb4cb;
-    --today-bg:#f3dce5;
-    --sun:#C8395C; --sat:#8E5A8C;
+    --highlight:#F59E0B; --highlight-soft:#fde7be;
+    --glow-rgb: 124, 58, 237;
+    --hol-bg:#e3d6fb; --hol-bd:#bea7ea; --hol-t:#5421b8;
+    --off-bg:#fde7be; --off-bd:#ecca7a; --off-t:#7a4e08;
+    --wk-bg:#dde6f1; --wk-bd:#bdcadf;
+    --today-bg:#c4ede8;
+    --sun:#7C3AED; --sat:#14B8A6;
   }
 
-  /* === Font pairings — swap display font, body stays Pretendard for KR === */
-  [data-font="editorial"] { --ff-display: 'Fraunces', 'Pretendard Variable', serif; }
-  [data-font="modern"]    { --ff-display: 'Space Grotesk', 'Pretendard Variable', sans-serif; }
-  [data-font="warm"]      { --ff-display: 'DM Serif Display', 'Pretendard Variable', serif; }
+  /* === Font pairings — chosen font applied to display + body + numeric.
+         Korean glyphs auto-fall-back to Pretendard via the font-family chain,
+         so picking a Latin-only font (e.g. Fraunces) still keeps Korean
+         text readable. DM Serif Display is display-only so its body stays
+         on Pretendard to avoid an over-decorated body. === */
+  [data-font="editorial"] {
+    --ff-display: 'Fraunces', 'Pretendard Variable', serif;
+    --ff:         'Fraunces', 'Pretendard Variable', Pretendard, -apple-system, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+    --ff-numeric: 'Fraunces', 'Inter', 'Pretendard Variable', sans-serif;
+  }
+  [data-font="modern"] {
+    --ff-display: 'Space Grotesk', 'Pretendard Variable', sans-serif;
+    --ff:         'Space Grotesk', 'Pretendard Variable', Pretendard, -apple-system, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+    --ff-numeric: 'Space Grotesk', 'Inter', 'Pretendard Variable', sans-serif;
+  }
+  [data-font="warm"] {
+    --ff-display: 'DM Serif Display', 'Pretendard Variable', serif;
+    --ff-numeric: 'DM Serif Display', 'Inter', 'Pretendard Variable', serif;
+    /* DM Serif Display has no body weight — leave --ff on Pretendard so the
+       body remains comfortable. Numbers + headings still pick up the change. */
+  }
 
   [data-theme="dark"] {
     --bg:#14110d;
@@ -230,9 +246,7 @@
     --shadow-window:0 30px 80px -20px rgba(0,0,0,.70), inset 0 0 0 1px rgba(255,255,255,.04);
 
     --page-bg:
-      radial-gradient(1400px 900px at 8% -20%, rgba(255,119,85,.10), transparent 60%),
-      radial-gradient(1100px 800px at 100% 10%, rgba(136,201,122,.08), transparent 60%),
-      radial-gradient(1300px 1000px at 50% 120%, rgba(255,200,91,.07), transparent 65%),
+      radial-gradient(2200px 1500px at 50% -40%, rgba(255,119,85,.07), transparent 75%),
       var(--bg);
 
     --hero-bg:
@@ -435,9 +449,11 @@
   .window-body[data-layout="sidebar"] {
     display: grid;
     grid-template-columns: 320px 1fr;
-    gap: 20px;
+    gap: 22px;
     padding-top: 14px;
   }
+  /* Layout transition — fade the today widgets while the grid reshapes */
+  .today-card, .today-hero { transition: opacity .25s var(--ease-out); }
   .window-body[data-layout="sidebar"] #todayHero { display: none !important; }
   .window-body[data-layout="sidebar"] .today-card { display: flex; }
   .window-body[data-layout="sidebar"] .sidebar-col {
@@ -456,7 +472,7 @@
   /* === Sidebar today card (V3 big-date variant) === */
   .today-card {
     position: relative;
-    border-radius: 18px;
+    border-radius: 20px;
     background: var(--surface-solid);
     box-shadow: var(--shadow-soft);
     border: 1px solid var(--bd);
@@ -467,11 +483,11 @@
   }
   .today-card .swatch {
     position: absolute; top: 0; left: 0; right: 0;
-    height: 170px;
+    height: 175px;
     background:
-      radial-gradient(180px 100px at 30% 50%, color-mix(in oklch, var(--highlight) 75%, white), transparent 70%),
-      radial-gradient(220px 130px at 80% 60%, color-mix(in oklch, var(--accent) 65%, white), transparent 70%),
-      linear-gradient(180deg, color-mix(in oklch, var(--accent-soft) 80%, white), color-mix(in oklch, var(--highlight-soft) 70%, var(--surface-2)));
+      radial-gradient(200px 110px at 28% 45%, color-mix(in oklch, var(--highlight) 75%, white), transparent 72%),
+      radial-gradient(240px 140px at 80% 60%, color-mix(in oklch, var(--accent) 60%, white), transparent 72%),
+      linear-gradient(165deg, color-mix(in oklch, var(--accent-soft) 75%, white) 0%, color-mix(in oklch, var(--highlight-soft) 65%, var(--surface-2)) 100%);
     pointer-events: none;
   }
   .today-card .swatch::after {
@@ -484,7 +500,7 @@
   /* Big today date */
   .big-date {
     position: relative;
-    padding: 18px 20px 8px;
+    padding: 20px 22px 12px;
     color: #2a2620;
   }
   [data-theme="dark"] .big-date { color: #1a1410; }
@@ -493,49 +509,76 @@
     font-size: 11px; letter-spacing: .22em;
     font-weight: 700; text-transform: uppercase;
     opacity: .72;
-    margin-bottom: 2px;
+    margin-bottom: 4px;
   }
   .big-date .bd-num {
     font-family: var(--ff-display);
-    font-size: 88px; font-weight: 800;
+    font-size: 92px; font-weight: 800;
     line-height: .85; letter-spacing: -4px;
     font-variant-numeric: tabular-nums;
     text-shadow: 0 2px 0 rgba(255,255,255,.45);
   }
   .big-date .bd-holiday {
     display: inline-flex; align-items: center; gap: 4px;
-    margin-top: 8px;
-    padding: 3px 8px;
-    background: rgba(255,255,255,.7);
+    margin-top: 10px;
+    padding: 3px 9px;
+    background: rgba(255,255,255,.75);
     border-radius: 999px;
-    font-size: 11px; font-weight: 600;
+    font-size: 11px; font-weight: 700;
     color: var(--accent);
+    letter-spacing: -.1px;
   }
   .big-date .bd-holiday .ti { font-size: 11px; }
 
   .today-card .body-inner {
     position: relative;
-    padding: 8px 18px 18px;
+    padding: 10px 20px 20px;
   }
+  .today-card .ti-head {
+    display: flex; align-items: flex-end; justify-content: space-between;
+    gap: 8px; margin-bottom: 12px;
+  }
+  .today-card .ti-head .ti-titles { min-width: 0; }
   .today-card .eyebrow {
-    font-size: 11px; letter-spacing: .18em;
+    font-family: var(--ff-numeric);
+    font-size: 10.5px; letter-spacing: .2em;
     text-transform: uppercase;
-    color: var(--text-3);
+    color: var(--accent);
     font-weight: 700;
     margin-bottom: 4px;
+    opacity: .9;
   }
   .today-card h2 {
     font-family: var(--ff-display);
     font-weight: 700; font-size: 22px;
     letter-spacing: -.5px;
     color: var(--text);
-    margin-bottom: 12px;
+    line-height: 1.1;
   }
   .today-card h2 .emoji {
     display: inline-block;
     transform: translateY(2px);
     margin-right: 4px;
   }
+  .today-card .ti-add {
+    flex-shrink: 0;
+    width: 32px; height: 32px;
+    border-radius: 10px;
+    background: var(--surface-2);
+    border: 1px solid var(--bd);
+    color: var(--accent);
+    display: grid; place-items: center;
+    cursor: pointer;
+    transition: all .18s var(--ease-out);
+  }
+  .today-card .ti-add:hover {
+    background: var(--accent);
+    color: white;
+    transform: translateY(-1px) rotate(90deg);
+    border-color: var(--accent);
+    box-shadow: 0 6px 14px -4px color-mix(in oklch, var(--accent) 50%, transparent);
+  }
+  .today-card .ti-add .ti { font-size: 16px; }
 
   .today-leader {
     position: relative;
@@ -658,7 +701,7 @@
     display: flex; align-items: center; gap: 12px;
     padding: 13px 16px;
     border-bottom: 1px solid var(--bd);
-    background: linear-gradient(180deg, color-mix(in oklch, var(--surface-2) 60%, transparent), transparent);
+    background: linear-gradient(180deg, color-mix(in oklch, var(--surface-2) 25%, transparent), transparent);
     position: relative;
   }
   .title-spacer { flex: 1; }
@@ -691,7 +734,7 @@
     display: flex; align-items: center; gap: 12px;
     padding: 12px 22px;
     border-bottom: 1px solid var(--bd);
-    background: linear-gradient(180deg, color-mix(in oklch, var(--surface-2) 30%, transparent), transparent);
+    background: transparent;
     flex-wrap: wrap;
   }
   .toolbar-spacer { flex: 1; }
@@ -799,11 +842,16 @@
   }
   .twk-radio button {
     flex: 1;
-    padding: 6px 8px;
+    min-width: 0;
+    padding: 6px 6px;
     border-radius: 7px;
     background: transparent;
     color: var(--text-2);
     font-size: 12px; font-weight: 600;
+    letter-spacing: -.2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
     cursor: pointer;
     transition: all .18s var(--ease-out);
   }
@@ -1955,7 +2003,7 @@
     document.documentElement.setAttribute('data-font', fnt);
     // Layout is applied later (window-body lives in <body>), but stash on
     // <html> so the body markup can read it via getAttribute on load.
-    var lay = localStorage.getItem('gtl-layout') || 'stacked';
+    var lay = localStorage.getItem('gtl-layout') || 'sidebar';
     document.documentElement.setAttribute('data-layout', lay);
   } catch(e) {}
 })();
@@ -2037,7 +2085,7 @@
          "sidebar" (big-date today card on the left). The layout is set on
          page load from localStorage by the pre-paint script and can be
          changed via the Tweaks panel. -->
-    <div class="window-body" id="windowBody" data-layout="stacked">
+    <div class="window-body" id="windowBody" data-layout="sidebar">
       <!-- Sidebar column: only visible in sidebar layout -->
       <div class="sidebar-col">
         <aside class="today-card" id="todaySidebar" hidden></aside>
@@ -2627,6 +2675,12 @@ function getTodayEntries(){
 function renderHero(){
   const el = document.getElementById('todayHero');
   if(!el) return;
+  // Sidebar layout owns the today widget — skip the horizontal hero entirely
+  // so no stale DOM, no hero-blob insertion, no flash on layout swap.
+  const wb = document.getElementById('windowBody');
+  if(wb && wb.getAttribute('data-layout') === 'sidebar'){
+    el.hidden = true; el.innerHTML = ''; return;
+  }
   if(!_loaded || !shouldShowHero()){ el.hidden = true; el.innerHTML=''; return; }
   el.hidden = false;
 
@@ -2691,11 +2745,9 @@ function renderSidebarHero(){
   const el = document.getElementById('todaySidebar');
   if(!el) return;
   if(!_loaded){ el.hidden = true; el.innerHTML=''; return; }
-  // Sidebar layout: the today card IS the sidebar's purpose, so we keep it
-  // visible regardless of the 13:00 hide rule (which only applies to the
-  // horizontal hero on top). When viewing a non-today month, fall back to
-  // a small "go to today" placeholder so the reserved column doesn't look
-  // empty.
+  // Sidebar widget is always shown when this layout is active. The 13:00
+  // hide rule only governs the horizontal hero (stacked layout). When
+  // viewing a non-today month, fall back to a friendlier placeholder.
   if(!isTodaysMonth()){
     const t = todayInfo();
     el.hidden = false;
@@ -2706,9 +2758,13 @@ function renderSidebarHero(){
         '<div class="bd-num">' + t.d + '</div>' +
       '</div>' +
       '<div class="body-inner">' +
-        '<div class="eyebrow">오늘로 이동</div>' +
-        '<h2><span class="emoji">📅</span>다른 달을 보고 있어요</h2>' +
-        '<button class="dice-btn" type="button" onclick="jumpToToday()" style="margin-top:0">' +
+        '<div class="eyebrow">탐색 중</div>' +
+        '<h2><span class="emoji">🗓️</span>다른 달이에요</h2>' +
+        '<div class="today-empty" style="margin-top:0;line-height:1.55">' +
+          '지금은 오늘이 아닌 달을 보고 있어요.<br/>' +
+          '<span style="font-size:11.5px;color:var(--text-3)">아래 버튼으로 오늘로 돌아갈 수 있어요.</span>' +
+        '</div>' +
+        '<button class="dice-btn" type="button" onclick="jumpToToday()">' +
           '<span class="dice"><i class="ti ti-circle-dot"></i></span>오늘로 가기' +
         '</button>' +
       '</div>';
@@ -2734,8 +2790,9 @@ function renderSidebarHero(){
     </div>
   ` : `
     <div class="today-empty">
-      오늘은 아직 후보가 없어요.<br/>
-      <span style="font-size:11.5px;opacity:.75;">첫번째로 추천해볼까요?</span>
+      <i class="ti ti-tools-kitchen-2" style="display:block;font-size:24px;opacity:.4;margin-bottom:6px;color:var(--text-2)"></i>
+      아직 후보가 없어요<br/>
+      <span style="font-size:11.5px;opacity:.75;">우상단 + 버튼으로 첫 메뉴를 올려보세요</span>
     </div>
   `;
 
@@ -2759,15 +2816,22 @@ function renderSidebarHero(){
       ${holName ? '<div class="bd-holiday"><i class="ti ti-flag-filled"></i>'+esc(holName)+'</div>' : ''}
     </div>
     <div class="body-inner">
-      <div class="eyebrow">Today's Pick</div>
-      <h2><span class="emoji">🍱</span>오늘의 점심</h2>
+      <div class="ti-head">
+        <div class="ti-titles">
+          <div class="eyebrow">Today's Pick</div>
+          <h2><span class="emoji">🍱</span>오늘의 점심</h2>
+        </div>
+        <button class="ti-add" type="button" onclick="openModalForToday(${t.d})" aria-label="메뉴 추가" title="메뉴 추가">
+          <i class="ti ti-plus"></i>
+        </button>
+      </div>
       ${leaderHTML}
       ${listHTML}
       ${entries.length >= 2
         ? '<button class="dice-btn" id="diceBtnSide" type="button" onclick="rollDice()" aria-label="랜덤 추첨"><span class="dice"><i class="ti ti-dice-5"></i></span>메뉴 정해줘!</button>'
         : (entries.length === 0
-            ? '<button class="dice-btn" type="button" disabled aria-disabled="true" style="opacity:.55;cursor:not-allowed"><span class="dice"><i class="ti ti-dice-5"></i></span>메뉴를 추가해주세요</button>'
-            : '<button class="dice-btn" type="button" disabled aria-disabled="true" style="opacity:.55;cursor:not-allowed"><span class="dice"><i class="ti ti-dice-5"></i></span>2개 이상이면 굴려요</button>')}
+            ? '<button class="dice-btn" type="button" disabled aria-disabled="true" style="opacity:.55;cursor:not-allowed"><span class="dice"><i class="ti ti-dice-5"></i></span>먼저 후보를 추가하세요</button>'
+            : '<button class="dice-btn" type="button" disabled aria-disabled="true" style="opacity:.55;cursor:not-allowed"><span class="dice"><i class="ti ti-dice-5"></i></span>후보가 2개 이상일 때 굴려요</button>')}
     </div>
   `;
 }
@@ -3779,13 +3843,13 @@ setInterval(() => { if(isTodaysMonth()){ renderHero(); renderSidebarHero(); } },
     { id: 'mango',       label: 'Mango',       colors: ['#E84A26', '#B83A6E', '#FFB000', '#ffe9d6'] },
     { id: 'forest',      label: 'Forest',      colors: ['#2E5D3A', '#C66B3D', '#E5B335', '#d9e0c9'] },
     { id: 'linen',       label: 'Linen',       colors: ['#4F46E5', '#E78A4C', '#F2D34F', '#e8e5dc'] },
-    { id: 'sakura',      label: 'Sakura',      colors: ['#C8395C', '#8E5A8C', '#E8B27A', '#f1dde6'] },
+    { id: 'sakura',      label: 'Lavender',    colors: ['#7C3AED', '#14B8A6', '#F59E0B', '#e9e2f1'] },
   ];
   const FONTS = [
     { id: 'default',   label: '기본' },
-    { id: 'editorial', label: '에디토리얼' },
+    { id: 'editorial', label: '세리프' },
     { id: 'modern',    label: '모던' },
-    { id: 'warm',      label: '따뜻한' },
+    { id: 'warm',      label: '우아' },
   ];
   const LAYOUTS = [
     { id: 'stacked', label: '상단 카드' },
@@ -3798,7 +3862,7 @@ setInterval(() => { if(isTodaysMonth()){ renderHero(); renderSidebarHero(); } },
     return {
       palette: root.getAttribute('data-palette') || 'buttercream',
       font:    root.getAttribute('data-font')    || 'default',
-      layout:  (body && body.getAttribute('data-layout')) || 'stacked',
+      layout:  (body && body.getAttribute('data-layout')) || 'sidebar',
       dark:    (root.getAttribute('data-theme') === 'dark'),
     };
   }
@@ -3960,7 +4024,7 @@ setInterval(() => { if(isTodaysMonth()){ renderHero(); renderSidebarHero(); } },
   // theme: render theme icon based on the already-applied attribute
   applyTheme(document.documentElement.getAttribute('data-theme') || 'light');
   // Apply the saved layout to .window-body (pre-paint stashed it on <html>)
-  const savedLayout = document.documentElement.getAttribute('data-layout') || 'stacked';
+  const savedLayout = document.documentElement.getAttribute('data-layout') || 'sidebar';
   applyLayout(savedLayout);
 
   MY_VOTER_ID = getOrMakeVoterId();
