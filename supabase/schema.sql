@@ -47,6 +47,15 @@ END $$;
 ALTER TABLE public.entries ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.votes   ENABLE ROW LEVEL SECURITY;
 
+-- 5) Explicit Data API grants.
+--    Supabase는 2026-05-30 부터 public 스키마의 새 테이블에 대해 anon/authenticated/
+--    service_role 자동 GRANT를 중단합니다 (Discussion #45329). 기존 테이블은 영향
+--    없지만, 마이그레이션이나 새 환경에 schema.sql 을 그대로 돌릴 때 API 접근이
+--    막히지 않도록 명시적으로 GRANT 를 적어둡니다. GRANT 는 idempotent.
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.entries TO anon, authenticated, service_role;
+GRANT SELECT, INSERT,         DELETE ON public.votes   TO anon, authenticated, service_role;
+GRANT USAGE, SELECT ON SEQUENCE public.entries_id_seq TO anon, authenticated, service_role;
+
 -- Drop-then-create so re-runs reset to known policies.
 DROP POLICY IF EXISTS "anyone reads entries"   ON public.entries;
 DROP POLICY IF EXISTS "anyone inserts entries" ON public.entries;
