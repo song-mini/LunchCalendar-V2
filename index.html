@@ -968,7 +968,9 @@
   .brand-text{
     border: 0; background: transparent; padding: 4px 8px; margin: -4px -8px;
     border-radius: 10px; text-align: left; cursor: pointer; font-family: var(--ff);
-    display: flex; flex-direction: column; line-height: 1.1;
+    display: flex; flex-direction: column; line-height: 1.15;
+    min-width: 0;
+    overflow: hidden;
     transition: background-color var(--dur-fast) var(--ease-out);
   }
   .brand-text:hover { background: color-mix(in oklch, var(--text) 5%, transparent); }
@@ -976,12 +978,20 @@
   .brand-text .name{
     font-family: var(--ff-display);
     font-size: 15px; font-weight: 700; letter-spacing: -.3px; color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
   }
   .brand-text .sub{
     margin-top: 2px; font-size: 11px; color: var(--text-3);
     font-variant-numeric: tabular-nums;
     font-family: var(--ff-numeric);
     letter-spacing: .04em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
   }
 
   .topbar-right{ display:flex; align-items:center; gap: 8px; flex-wrap:wrap; }
@@ -1048,6 +1058,11 @@
   .icon-btn:active { transform: scale(.92); }
   .icon-btn .ti { transition: transform .4s var(--ease-spring); }
   .theme-btn:hover .ti { transform: rotate(180deg); }
+  .settings-icon-btn:hover .ti { transform: rotate(60deg); }
+  /* Settings icon is the mobile-only fallback for the FAB (which gets hidden
+     on small screens to avoid covering calendar content). Stays out of the
+     way on desktop where the grip + FAB already cover it. */
+  .settings-icon-btn { display: none; }
 
   /* === today hero === */
   .today-hero{
@@ -1575,7 +1590,7 @@
   }
 
   @media (max-width: 720px){
-    .stage { padding: 12px 10px 80px; }
+    .stage { padding: 12px 10px 32px; }
     .window-body { padding: 14px 12px 20px; }
     .window { border-radius: 18px; }
 
@@ -1585,21 +1600,62 @@
       grid-template-columns: 1fr;
       gap: 14px;
     }
-    .today-card .big-date .bd-num { font-size: 72px; }
 
-    /* Title bar reflows: keep grip + brand on top, controls wrap */
-    .title-bar { padding: 11px 12px; gap: 8px; flex-wrap: wrap; }
-    .title-grip { padding: 5px 8px; gap: 5px; }
-    .title-grip span { width: 7px; height: 7px; }
-    .brand { gap: 8px; flex: 1; min-width: 0; }
-    .brand-icon { width: 32px; height: 32px; border-radius: 10px; font-size: 11px; }
-    .brand-text { padding: 3px 5px; margin: -3px -5px; }
-    .brand-text .name { font-size: 13.5px; }
-    .brand-text .sub { font-size: 10.5px; }
-    .title-controls { gap: 4px; }
-    .sync-pill { font-size: 10.5px; padding: 5px 9px; }
+    /* Today card compacts so the calendar gets vertical room */
+    .today-card { border-radius: 16px; }
+    .today-card .swatch { height: 110px; }
+    .big-date { padding: 14px 16px 6px; }
+    .big-date .bd-month { font-size: 10px; letter-spacing: .2em; }
+    .big-date .bd-num { font-size: 64px; letter-spacing: -2px; line-height: .9; }
+    .big-date .bd-holiday { margin-top: 6px; font-size: 10.5px; padding: 2px 8px; }
+    .today-card .body-inner { padding: 8px 16px 14px; }
+    .today-card .ti-head { margin-bottom: 10px; }
+    .today-card h2 { font-size: 18px; }
+    .today-card .ti-add { width: 30px; height: 30px; border-radius: 9px; }
+    .today-card .ti-add .ti { font-size: 14px; }
+    .today-card .today-leader { padding: 12px; margin-bottom: 8px; }
+    .today-card .today-leader .name { font-size: 15.5px; }
+    .today-card .today-empty { padding: 12px; font-size: 12.5px; line-height: 1.5; }
+    .today-card .dice-btn { height: 42px; margin-top: 10px; font-size: 13px; }
+
+    /* Title-bar compacts and stays single row on mobile.
+       Grip dots + help icon + FAB are hidden — settings-icon-btn takes over. */
+    .title-bar {
+      padding: 10px 10px;
+      gap: 6px;
+      flex-wrap: nowrap;
+    }
+    /* Title-spacer (flex:1) was halving free space with .brand. On mobile
+       we hide it so brand takes all remaining width and the name fits
+       without ellipsis. */
+    .title-spacer { display: none; }
+    .title-grip { display: none; }
+    .help-btn { display: none; }
+    .settings-icon-btn { display: flex; }
+    .brand { gap: 7px; flex: 1; min-width: 0; }
+    .brand-icon { width: 30px; height: 30px; border-radius: 9px; font-size: 10.5px; flex-shrink: 0; }
+    .brand-text { padding: 2px 4px; margin: -2px -4px; }
+    .brand-text .name { font-size: 13px; letter-spacing: -.4px; }
+    .brand-text .sub { font-size: 10px; margin-top: 1px; }
+    .title-controls {
+      gap: 3px;
+      flex-shrink: 0;
+    }
+    .title-controls .icon-btn { width: 30px; height: 30px; border-radius: 9px; }
+    .title-controls .icon-btn .ti { font-size: 14.5px; }
+    .sync-pill {
+      width: 26px; height: 26px;
+      padding: 0;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+    }
     .sync-pill span:last-child { display: none; }
-    .sync-pill .sync-dot { margin: 0; }
+    .sync-pill .sync-dot { margin: 0; width: 7px; height: 7px; box-shadow: 0 0 0 3px color-mix(in oklch, currentColor 20%, transparent); }
+
+    /* Floating settings button is hidden on mobile — would cover calendar.
+       Settings is now in title-controls via .settings-icon-btn. */
+    .settings-fab { display: none !important; }
 
     /* Toolbar wraps and tightens */
     .toolbar { padding: 10px 12px; gap: 8px; }
@@ -2046,7 +2102,11 @@
         <button class="icon-btn theme-btn" type="button" onclick="toggleTheme()" aria-label="다크 모드 전환" title="다크 모드">
           <i class="ti" id="themeIcon"></i>
         </button>
-        <button class="icon-btn" type="button" onclick="openHelp()" aria-label="도움말" title="도움말">
+        <!-- Settings icon — visible on mobile only (FAB hides on small screens) -->
+        <button class="icon-btn settings-icon-btn" type="button" onclick="openTweaks()" aria-label="설정" title="설정">
+          <i class="ti ti-settings"></i>
+        </button>
+        <button class="icon-btn help-btn" type="button" onclick="openHelp()" aria-label="도움말" title="도움말">
           <i class="ti ti-help"></i>
         </button>
       </div>
