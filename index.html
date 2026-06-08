@@ -1122,17 +1122,46 @@
   }
   .dice-btn:hover { transform: translateY(-2px); box-shadow: 0 16px 32px -8px rgba(0,0,0,.36), inset 0 1px 0 rgba(255,255,255,.12); }
   .dice-btn:active { transform: translateY(0) scale(.97); }
-  .dice-btn[disabled] { opacity: .55; cursor: not-allowed; }
+  .dice-btn[disabled] { opacity: .55; cursor: not-allowed; animation: none !important; }
+  /* Subtle idle wiggle to draw attention when there's something to pick.
+     Pauses on hover/focus/active so it never fights the user's intent. */
+  .dice-btn:not([disabled]):not(.rolling) .dice { animation: dice-idle 3.6s var(--ease-spring) infinite; transform-origin: 50% 60%; }
+  .dice-btn:hover .dice,
+  .dice-btn:focus-visible .dice,
+  .dice-btn:active .dice { animation: none; }
   .dice-btn .dice {
     display: inline-grid; place-items: center;
     width: 22px; height: 22px;
-    background: var(--highlight);
+    background: linear-gradient(180deg, color-mix(in oklch, var(--highlight) 88%, white), var(--highlight));
     color: var(--text);
     border-radius: 6px;
     font-size: 14px;
-    box-shadow: inset 0 -1px 2px rgba(0,0,0,.2), inset 0 1px 0 rgba(255,255,255,.5);
+    box-shadow: inset 0 -1px 2px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.55), 0 1px 0 rgba(0,0,0,.08);
   }
   .dice-btn.rolling .dice { animation: dice-roll .9s var(--ease-spring); }
+  /* Tactile click ripple on the dice button — radial flare from cursor that
+     fades during the press. JS sets --rx/--ry on click; CSS animates :active. */
+  .dice-btn::before {
+    content: ""; position: absolute;
+    left: var(--rx, 50%); top: var(--ry, 50%);
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,255,255,.55) 0%, rgba(255,255,255,0) 65%);
+    transform: translate(-50%,-50%) scale(0);
+    opacity: 0;
+    pointer-events: none;
+  }
+  .dice-btn.ripple::before { animation: dice-ripple .55s var(--ease-out); }
+  @keyframes dice-ripple {
+    0%   { transform: translate(-50%,-50%) scale(0);  opacity: .85; }
+    100% { transform: translate(-50%,-50%) scale(16); opacity: 0;   }
+  }
+  @keyframes dice-idle {
+    0%, 78%, 100% { transform: rotate(0deg)   scale(1);    }
+    84%           { transform: rotate(-9deg)  scale(1.06); }
+    90%           { transform: rotate(9deg)   scale(1.06); }
+    96%           { transform: rotate(-3deg)  scale(1.02); }
+  }
   .add-btn-ghost {
     display:flex; align-items:center; gap: 6px;
     padding: 11px 16px; border-radius: 14px;
@@ -1528,6 +1557,12 @@
   .hero-row.flash, .erow.flash { animation: flash-ring 1.2s var(--ease-out); }
   .chip.flash { animation: flash-ring 1s var(--ease-out); }
   .hero-row.dice-winner { animation: dice-winner 1.6s var(--ease-spring); border-color: var(--teal); }
+  /* Sidebar layout reuses the same dice spotlight/winner effect on its
+     leader card and rows so rollDice() looks consistent across layouts. */
+  .today-leader.spotlight,
+  .today-row.spotlight { animation: spotlight 1.4s var(--ease-spring); border-color: var(--teal); }
+  .today-leader.dice-winner,
+  .today-row.dice-winner { animation: dice-winner 1.6s var(--ease-spring); border-color: var(--teal); }
   .evote.popping i, .hero-vote.popping i { animation: vote-pop .55s var(--ease-spring); display: inline-block; }
   .evote.bumping, .hero-vote.bumping { animation: count-bump .4s var(--ease-spring); }
   .erow.removing {
@@ -2915,19 +2950,33 @@ function openModalForToday(day){
 function rollDice(){
   const entries = getTodayEntries();
   if(entries.length < 2) return;
-  const btn = document.getElementById('diceBtn');
+  const btn = document.getElementById('diceBtn') || document.getElementById('diceBtnSide');
   if(btn){ btn.classList.add('rolling'); btn.disabled = true; }
-  const list = document.getElementById('heroList');
-  if(!list) return;
 
-  // 무작위로 한 명 뽑기 — 투표 수와 무관하게 균등 확률
-  const pickIdx = Math.floor(Math.random() * entries.length);
+  // Stacked layout uses #heroList with .hero-row. Sidebar layout uses
+  // .today-leader (rank 1) + .today-list .today-row (rank 2+). Pick whichever
+  // exists in the current DOM so the animation works in both layouts.
+  let rows = [];
+  const heroList = document.getElementById('heroList');
+  if(heroList){
+    rows = Array.from(heroList.querySelectorAll('.hero-row'));
+  } else {
+    const sidebar = document.getElementById('todaySidebar');
+    if(sidebar){
+      const leader = sidebar.querySelector('.today-leader');
+      if(leader) rows.push(leader);
+      rows.push(...sidebar.querySelectorAll('.today-row'));
+    }
+  }
+  if(!rows.length){ if(btn){ btn.classList.remove('rolling'); btn.disabled = false; } return; }
+
+  // 무작위로 한 명 뽑기 — 투표 수와 무관하게 균등 확률 (rows.length로 고정해서
+  // 사이드바가 4개만 노출해도 표시된 후보 안에서만 뽑히도록).
+  const pickIdx = Math.floor(Math.random() * rows.length);
 
   // Phase 1: dice rolls solo (~900ms). Phase 2: shuffle-spotlight, then settle on pick.
   setTimeout(() => {
     if(btn){ btn.classList.remove('rolling'); btn.disabled = false; }
-    const rows = list.querySelectorAll('.hero-row');
-    if(!rows.length) return;
     let i = 0;
     const shuffleCount = 8;
     const id = setInterval(() => {
@@ -3721,7 +3770,7 @@ setInterval(() => { if(isTodaysMonth()){ renderHero(); renderSidebarHero(); } },
   rollDice = function(){
     _rollDiceOrig.apply(this, arguments);
     setTimeout(() => {
-      const w = document.querySelector('.hero-row.dice-winner');
+      const w = document.querySelector('.hero-row.dice-winner, .today-leader.dice-winner, .today-row.dice-winner');
       if(w) fireConfetti(w);
     }, 1700);
   };
@@ -3751,6 +3800,20 @@ setInterval(() => { if(isTodaysMonth()){ renderHero(); renderSidebarHero(); } },
     if(!btn) return;
     // burst only when transitioning INTO voted
     setTimeout(() => { if(btn.classList.contains('voted')) spawnVoteBurst(btn); }, 60);
+  });
+
+  // Click ripple on the dice button — radial flare originating from the
+  // cursor. Respects reduced motion via the global keyframes override.
+  document.addEventListener('pointerdown', e => {
+    const btn = e.target.closest && e.target.closest('.dice-btn');
+    if(!btn || btn.disabled) return;
+    const r = btn.getBoundingClientRect();
+    btn.style.setProperty('--rx', (e.clientX - r.left) + 'px');
+    btn.style.setProperty('--ry', (e.clientY - r.top)  + 'px');
+    btn.classList.remove('ripple');
+    void btn.offsetWidth; // restart animation
+    btn.classList.add('ripple');
+    setTimeout(() => btn.classList.remove('ripple'), 600);
   });
 
   /* (5) Modal opens FROM clicked cell — set transform-origin and run open/close
