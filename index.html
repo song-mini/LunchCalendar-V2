@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta name="theme-color" content="#f4f2ed" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#1a1612" media="(prefers-color-scheme: dark)">
-<title>팀 GTL · 캘린더 2026</title>
+<title>팀 GTL · 캘린더</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
@@ -384,13 +384,13 @@
     0%, 100% {
       box-shadow:
         0 0 0 0 var(--teal-glow),
-        0 0 0 0 rgba(15,108,88,0);
+        0 0 0 0 transparent;
       opacity: .82;
     }
     50% {
       box-shadow:
         0 0 0 5px var(--teal-glow),
-        0 0 22px 6px rgba(15,108,88,.22);
+        0 0 22px 6px color-mix(in oklch, var(--teal) 22%, transparent);
       opacity: 1;
     }
   }
@@ -401,13 +401,13 @@
     0%, 100% {
       box-shadow:
         0 0 0 0 var(--teal-glow),
-        0 0 0 0 rgba(62,170,138,0);
+        0 0 0 0 transparent;
       opacity: .82;
     }
     50% {
       box-shadow:
         0 0 0 5px var(--teal-glow),
-        0 0 26px 8px rgba(62,170,138,.28);
+        0 0 26px 8px color-mix(in oklch, var(--teal) 28%, transparent);
       opacity: 1;
     }
   }
@@ -1293,8 +1293,8 @@
     animation: popIn .4s var(--ease-out) both;
     animation-delay: calc(var(--cell-i, 0) * 14ms);
   }
-  .cell:hover{ border-color: rgba(15,108,88,.32); }
-  [data-theme="dark"] .cell:hover { border-color: rgba(62,170,138,.42); }
+  .cell:hover{ border-color: color-mix(in oklch, var(--teal) 35%, transparent); }
+  [data-theme="dark"] .cell:hover { border-color: color-mix(in oklch, var(--teal) 45%, transparent); }
   .cell.empty{ background: transparent; box-shadow: none; border: none; min-height: 48px; pointer-events: none; padding: 0; animation: none; }
   .cell.wknd{ background: linear-gradient(180deg, var(--wk-bg) 0%, var(--surface) 100%); border-color: var(--wk-bd); }
   .cell.hol{ background: linear-gradient(180deg, var(--hol-bg) 0%, var(--surface) 100%); border-color: var(--hol-bd); }
@@ -1516,7 +1516,9 @@
   .btn-ghost:hover{ background: var(--surface-2); border-color: var(--bd-strong); }
   .btn-primary{
     border: 1px solid transparent; color: #fff;
-    background: linear-gradient(135deg, var(--teal) 0%, #0d7a61 100%);
+    /* second stop derives from --teal so the gradient follows the palette
+       (was a fixed deep green that clashed with Berry/Ink palettes) */
+    background: linear-gradient(135deg, var(--teal) 0%, color-mix(in oklch, var(--teal) 72%, black) 100%);
     box-shadow: 0 10px 18px var(--teal-glow);
   }
   .btn-primary:hover{ box-shadow: 0 14px 22px var(--teal-glow); transform: translateY(-1px); }
@@ -1560,9 +1562,11 @@
   /* Sidebar layout reuses the same dice spotlight/winner effect on its
      leader card and rows so rollDice() looks consistent across layouts. */
   .today-leader.spotlight,
-  .today-row.spotlight { animation: spotlight 1.4s var(--ease-spring); border-color: var(--teal); }
+  .today-row.spotlight,
+  .erow.spotlight { animation: spotlight 1.4s var(--ease-spring); border-color: var(--teal); }
   .today-leader.dice-winner,
-  .today-row.dice-winner { animation: dice-winner 1.6s var(--ease-spring); border-color: var(--teal); }
+  .today-row.dice-winner,
+  .erow.dice-winner { animation: dice-winner 1.6s var(--ease-spring); border-color: var(--teal); }
   .evote.popping i, .hero-vote.popping i { animation: vote-pop .55s var(--ease-spring); display: inline-block; }
   .evote.bumping, .hero-vote.bumping { animation: count-bump .4s var(--ease-spring); }
   .erow.removing {
@@ -1601,6 +1605,107 @@
   .esave { background: var(--teal-3); color: var(--teal); width: auto; padding: 0 10px; font-family: var(--ff); font-size: 12px; font-weight: 700; height: 28px; }
   .esave:hover { background: var(--teal); color: #fff; }
   .ecancel:hover { background: var(--surface-2); color: var(--text-2); }
+
+  /* === 회식 (team dinner) === */
+  /* In-cell badge on the dinner date — clickable, palette-aware gradient */
+  .dinner-tag{
+    color:#fff; border:1px solid transparent; cursor:pointer; gap:4px;
+    background: linear-gradient(135deg, var(--accent), color-mix(in oklch, var(--highlight) 60%, var(--accent)));
+    box-shadow: 0 3px 8px -2px color-mix(in oklch, var(--accent) 55%, transparent);
+    transition: transform var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast) var(--ease-out);
+  }
+  .dinner-tag:hover{
+    transform: translateY(-1px) scale(1.04);
+    box-shadow: 0 6px 14px -3px color-mix(in oklch, var(--accent) 60%, transparent);
+  }
+  .cell.dinner:not(.today){ border-color: color-mix(in oklch, var(--accent) 38%, transparent); }
+  [data-theme="dark"] .cell.dinner:not(.today){ border-color: color-mix(in oklch, var(--accent) 45%, transparent); }
+
+  /* Upcoming-dinner banner above the month tabs */
+  .dinner-banner{
+    width: 100%; display: flex; align-items: center; gap: 12px; text-align: left;
+    padding: 12px 16px; margin-bottom: .9rem; border-radius: 18px; cursor: pointer;
+    border: 1px solid color-mix(in oklch, var(--accent) 30%, transparent);
+    background:
+      linear-gradient(120deg,
+        color-mix(in oklch, var(--accent-soft) 80%, white),
+        color-mix(in oklch, var(--highlight-soft) 70%, var(--surface-solid)));
+    box-shadow: var(--shadow-soft);
+    font-family: var(--ff);
+    position: relative; overflow: hidden;
+    animation: fadeUp .5s var(--ease-out) .06s both;
+    transition: transform var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out);
+  }
+  [data-theme="dark"] .dinner-banner{
+    background: linear-gradient(120deg, color-mix(in oklch, var(--accent) 18%, transparent), color-mix(in oklch, var(--highlight) 10%, transparent));
+    border-color: color-mix(in oklch, var(--accent) 32%, transparent);
+  }
+  .dinner-banner:hover{ transform: translateY(-2px); box-shadow: var(--shadow-lift); border-color: color-mix(in oklch, var(--accent) 50%, transparent); }
+  .dinner-banner:active{ transform: scale(.99); }
+  .db-emoji{ font-size: 24px; flex-shrink: 0; filter: drop-shadow(0 2px 3px rgba(0,0,0,.12)); }
+  .db-main{ flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+  .db-title{
+    font-family: var(--ff-display); font-weight: 800; font-size: 14.5px; color: var(--text);
+    display: flex; align-items: center; gap: 8px; letter-spacing: -.2px;
+  }
+  .db-dday{
+    font-family: var(--ff-numeric); font-size: 10.5px; font-weight: 800; letter-spacing: .06em;
+    padding: 2px 8px; border-radius: 999px; background: var(--accent); color: #fff;
+    box-shadow: 0 3px 8px -2px color-mix(in oklch, var(--accent) 60%, transparent);
+    flex-shrink: 0;
+  }
+  .db-sub{ font-size: 12px; color: var(--text-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .db-cta{ flex-shrink: 0; display: inline-flex; align-items: center; gap: 4px; font-size: 12.5px; font-weight: 700; color: var(--accent); }
+  .db-cta .ti{ font-size: 14px; transition: transform .2s var(--ease-out); }
+  .dinner-banner:hover .db-cta .ti{ transform: translateX(3px); }
+
+  /* Winner row inside the dinner-place list */
+  .erow.winner{ background: color-mix(in oklch, var(--highlight-soft) 55%, var(--surface-2)); border-color: var(--off-bd); }
+  [data-theme="dark"] .erow.winner{ background: color-mix(in oklch, var(--highlight) 10%, transparent); border-color: color-mix(in oklch, var(--highlight) 30%, transparent); }
+  .erow .chip-crown{ flex-shrink: 0; margin-top: 3px; font-size: 12px; }
+
+  .btn-danger-ghost{ border: 1px solid var(--hol-bd); color: var(--hol-t); background: var(--surface-solid); }
+  .btn-danger-ghost:hover{ background: var(--hol-bg); }
+
+  /* Sync pill — clickable retry affordance in error state */
+  .sync-pill.err{ cursor: pointer; border-color: var(--hol-bd); color: var(--hol-t); }
+
+  /* Dinner section inside the settings panel */
+  .twk-dinner-list{ display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px; }
+  .twk-dinner-row{
+    display: flex; align-items: center; gap: 7px;
+    padding: 8px 10px; background: var(--surface-2);
+    border: 1px solid var(--bd); border-radius: 10px;
+  }
+  .twk-dinner-row .tdr-date{
+    font-size: 12.5px; font-weight: 700; color: var(--text);
+    flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .twk-dinner-row .tdr-btn{
+    height: 26px; padding: 0 9px; border-radius: 8px; flex-shrink: 0;
+    border: 1px solid var(--bd); background: var(--surface-solid); color: var(--text-2);
+    font-family: var(--ff); font-size: 11.5px; font-weight: 700; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 4px;
+    transition: all .18s var(--ease-out);
+  }
+  .twk-dinner-row .tdr-btn:hover{ border-color: var(--bd-strong); color: var(--text); transform: translateY(-1px); }
+  .twk-dinner-row .tdr-btn.primary{ background: var(--accent); border-color: var(--accent); color: #fff; }
+  .twk-dinner-row .tdr-btn.primary:hover{ filter: brightness(1.06); }
+  .twk-dinner-row .tdr-btn.danger:hover{ background: var(--hol-bg); color: var(--hol-t); border-color: var(--hol-bd); }
+  .twk-dinner-form{ display: flex; flex-direction: column; gap: 6px; }
+  .twk-dinner-form .inp{ padding: 8px 10px; font-size: 12.5px; border-radius: 10px; }
+  .twk-dinner-form input[type="date"].inp{ appearance: none; -webkit-appearance: none; min-height: 35px; }
+  .twk-btn-wide{
+    width: 100%; height: 35px; border-radius: 10px; border: 1px solid transparent;
+    background: var(--accent); color: #fff;
+    font-family: var(--ff); font-size: 12.5px; font-weight: 700; cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    box-shadow: 0 6px 14px -6px color-mix(in oklch, var(--accent) 60%, transparent);
+    transition: all .18s var(--ease-out);
+  }
+  .twk-btn-wide:hover{ transform: translateY(-1px); filter: brightness(1.05); }
+  .twk-btn-wide:active{ transform: scale(.97); }
+  .twk-hint{ font-size: 11px; color: var(--text-3); line-height: 1.55; }
 
   /* === theme transition (only active during toggle) === */
   html.theme-switching,
@@ -1761,6 +1866,13 @@
 
     .modal { padding: 1rem; border-radius: 20px; }
     .notice { font-size: 11px; }
+
+    /* Dinner banner compacts — CTA text hidden, arrow stays */
+    .dinner-banner { padding: 10px 12px; border-radius: 14px; gap: 9px; }
+    .db-emoji { font-size: 20px; }
+    .db-title { font-size: 13.5px; }
+    .db-sub { font-size: 11px; }
+    .db-cta span { display: none; }
   }
 
   @media (max-width: 420px) {
@@ -2144,7 +2256,7 @@
 
 <div class="stage">
   <div class="window">
-    <h1 class="sr-only">팀 GTL 월간 캘린더 2026</h1>
+    <h1 class="sr-only">팀 GTL 월간 캘린더 2026–2030</h1>
 
     <!-- === Title bar (top row): brand + sync + theme + help === -->
     <header class="title-bar">
@@ -2160,7 +2272,7 @@
       </div>
       <div class="title-spacer"></div>
       <div class="title-controls">
-        <div class="sync-pill" aria-live="polite">
+        <div class="sync-pill" aria-live="polite" onclick="retrySync()">
           <span class="sync-dot" id="syncDot"></span>
           <span id="syncText">불러오는 중…</span>
         </div>
@@ -2202,6 +2314,9 @@
         <span class="legend-item">
           <span class="legend-dot" style="background:var(--hol-t)"></span>공휴일
         </span>
+        <span class="legend-item">
+          <span class="legend-dot" style="background:linear-gradient(135deg,var(--accent),var(--highlight))"></span>회식
+        </span>
       </div>
     </div>
 
@@ -2221,6 +2336,9 @@
       <div class="main-col">
         <!-- Today hero (horizontal, used in stacked layout) -->
         <section class="today-hero" id="todayHero" hidden></section>
+
+        <!-- Upcoming 회식 banner — shows the nearest scheduled team dinner -->
+        <div id="dinnerBanner" hidden></div>
 
         <div class="tabs-wrap" id="monthTabs" role="tablist"></div>
 
@@ -2284,7 +2402,21 @@
     {entry_id:7,voter_id:'p1'},{entry_id:7,voter_id:'p2'},
     {entry_id:8,voter_id:'p1'},{entry_id:8,voter_id:'p2'},{entry_id:8,voter_id:'p3'},{entry_id:8,voter_id:'p4'},
   ];
-  let nextId = 100;
+
+  // 회식 seed — 9일 뒤에 하나 잡아두고 장소 후보 3곳 + 투표
+  const DDATE = new Date(TY, TM-1, TD + 9);
+  const dinners = [
+    {id:1, year:DDATE.getFullYear(), month:DDATE.getMonth()+1, day:DDATE.getDate(), title:'분기 회식'},
+  ];
+  const dinner_places = [
+    {id:1, dinner_id:1, name:'무한리필 삼겹살집', memo:'단체석 가능 · 회식 단골'},
+    {id:2, dinner_id:1, name:'홍콩포차',          memo:'2차로 좋아요'},
+    {id:3, dinner_id:1, name:'스시 오마카세',     memo:'예산 초과일지도…'},
+  ];
+  const dinner_votes = [
+    {place_id:1, voter_id:'p1'},{place_id:1, voter_id:'p2'},{place_id:1, voter_id:'p3'},
+    {place_id:2, voter_id:'p4'},
+  ];
 
   function makeFilter(rows){
     const ctx = { rows: rows.slice(), filters: [] };
@@ -2296,20 +2428,56 @@
     };
     return api;
   }
+  const tables = { entries, votes, dinners, dinner_places, dinner_votes };
+  const idCounters = { entries: 100, dinners: 50, dinner_places: 500 };
+
+  // Mock realtime — mirrors Supabase postgres_changes so the app code path
+  // (mutate -> realtime echo -> rerender) works identically in local preview.
+  // Without this, additions never appeared until reload in mock mode.
+  const rtListeners = [];
+  function rtEmit(table, eventType, n, o){
+    rtListeners.forEach(l => {
+      if(l.table !== table) return;
+      setTimeout(() => { try { l.cb({ eventType, new: n || {}, old: o || {} }); } catch(e){} }, 0);
+    });
+  }
+  function filterInPlace(arr, keep){
+    const kept = arr.filter(keep);
+    arr.length = 0; arr.push(...kept);
+  }
+  // FK ON DELETE CASCADE 에뮬레이션 (클라이언트는 부모 DELETE 이벤트만으로 정리함)
+  const childPurge = {
+    entries(removed){
+      const ids = removed.map(r => r.id);
+      filterInPlace(votes, v => !ids.includes(v.entry_id));
+    },
+    dinners(removed){
+      const ids = removed.map(r => r.id);
+      const pids = dinner_places.filter(p => ids.includes(p.dinner_id)).map(p => p.id);
+      filterInPlace(dinner_places, p => !ids.includes(p.dinner_id));
+      filterInPlace(dinner_votes, v => !pids.includes(v.place_id));
+    },
+    dinner_places(removed){
+      const pids = removed.map(r => r.id);
+      filterInPlace(dinner_votes, v => !pids.includes(v.place_id));
+    },
+  };
+
   function tableApi(name){
-    const arr = name === 'entries' ? entries : votes;
+    const arr = tables[name] || [];
     return {
       select(){ return makeFilter(arr); },
       insert(rec){
         const row = Object.assign({}, rec);
-        if(name === 'entries' && !row.id) row.id = nextId++;
+        if(idCounters[name] != null && !row.id) row.id = idCounters[name]++;
         arr.push(row);
+        rtEmit(name, 'INSERT', row, null);
         return Promise.resolve({ data: row, error: null });
       },
       update(patch){
         return {
           eq(col, v){
-            arr.forEach(r => { if(r[col] === v) Object.assign(r, patch); });
+            arr.forEach(r => { if(r[col] === v){ Object.assign(r, patch); rtEmit(name, 'UPDATE', r, r); } });
             return Promise.resolve({ data: null, error: null });
           },
         };
@@ -2319,8 +2487,10 @@
         const api = {
           eq(col, v){ filters.push([col,v]); return api; },
           then(cb){
-            const keep = arr.filter(r => !filters.every(([c,v]) => r[c] === v));
-            arr.length = 0; arr.push(...keep);
+            const removed = arr.filter(r => filters.every(([c,v]) => r[c] === v));
+            filterInPlace(arr, r => !filters.every(([c,v]) => r[c] === v));
+            if(childPurge[name]) childPurge[name](removed);
+            removed.forEach(r => rtEmit(name, 'DELETE', null, r));
             return Promise.resolve({ data:null, error:null }).then(cb);
           },
         };
@@ -2332,7 +2502,15 @@
     createClient(){
       return {
         from: tableApi,
-        channel(){ return { on(){ return this; }, subscribe(){ return this; } }; },
+        channel(){
+          return {
+            on(_type, filter, cb){
+              rtListeners.push({ table: filter && filter.table, cb });
+              return this;
+            },
+            subscribe(){ return this; },
+          };
+        },
       };
     },
   };
@@ -2390,6 +2568,13 @@ let sb = null, MY_VOTER_ID = '';
 let _loaded = false;          // turns true after first loadAll() resolves
 let _editingId = null;        // entry id currently in edit mode in modal
 let _editDraft = { name:'', memo:'' };
+
+// 회식 — [{id, year, month, day, title, places:[{id, name, memo, voters:Set}]}]
+let DINNERS = [];
+let _dinnerReady = false;       // dinner tables loaded OK (schema present)
+let _dinnerSubscribed = false;  // realtime channel for dinner tables active
+let openDinnerId = null;        // dinner id whose modal is on screen
+let ds = { name:'', memo:'' };  // dinner-place input draft
 
 /* ---------- helpers ---------- */
 function getHolidayName(y,m,d){ return (HOLIDAYS[y]||{})[m+'-'+d] || null; }
@@ -2532,21 +2717,45 @@ function resolveConfirm(ev, ov, val){
   }
 }
 
+let _syncState = 'load';
 function setSyncState(state){
+  _syncState = state;
   const dot=document.getElementById('syncDot'), txt=document.getElementById('syncText');
   if(!dot||!txt) return;
   dot.className='sync-dot'+(state==='sv'?' saving':state==='err'?' error':'');
   txt.textContent =
     state==='sv'?'저장 중…':
-    state==='err'?'서버 연결 오류':
+    state==='err'?'연결 오류 · 재시도':
     state==='load'?'불러오는 중…':'서버에 저장됨';
+  const pill = dot.closest('.sync-pill');
+  if(pill){
+    pill.classList.toggle('err', state==='err');
+    pill.title = state==='err' ? '클릭하면 다시 연결을 시도해요' : '';
+  }
+}
+// 에러 상태의 동기화 표시를 클릭하면 재시도 (실패 시 스켈레톤에 갇히지 않도록)
+async function retrySync(){
+  if(_syncState !== 'err' || !sb) return;
+  showToast('다시 연결하는 중…');
+  await loadAll();
+  if(_dinnerReady) subscribeDinners();
 }
 
 /* ---------- theme ---------- */
+// Keep the browser-chrome color (mobile address bar etc.) in sync with the
+// active palette/theme instead of the hardcoded default apricot.
+function syncThemeColor(){
+  try{
+    const bg = getComputedStyle(document.body).backgroundColor;
+    if(!bg) return;
+    document.querySelectorAll('meta[name="theme-color"]').forEach(m => m.setAttribute('content', bg));
+  }catch(e){}
+}
 function applyTheme(theme){
   document.documentElement.setAttribute('data-theme', theme);
   const ic = document.getElementById('themeIcon');
   if(ic) ic.className = 'ti ' + (theme==='dark' ? 'ti-sun' : 'ti-moon');
+  syncThemeColor();
 }
 function toggleTheme(){
   const cur = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
@@ -2573,10 +2782,11 @@ async function loadAll(){
   setSyncState('load');
   YEARS.forEach(y => { D[y] = {}; MONTHS.forEach(m => { D[y][m] = {}; }); });
 
-  // entries + votes from supabase, and holidays from server proxy — in parallel
+  // entries + votes + dinners from supabase, holidays from server proxy — in parallel
   const [entriesRes] = await Promise.all([
     sb.from('entries').select('id,year,month,day,name,memo').in('year', YEARS),
-    loadAllHolidays()
+    loadAllHolidays(),
+    loadDinners()
   ]);
   const { data: entries, error: e1 } = entriesRes;
   if(e1){ setSyncState('err'); console.error(e1); return; }
@@ -2614,6 +2824,136 @@ function subscribe(){
     .on('postgres_changes',{event:'*',schema:'public',table:'entries'}, onEntryChange)
     .on('postgres_changes',{event:'*',schema:'public',table:'votes'},   onVoteChange)
     .subscribe();
+}
+
+/* ---------- 회식: load + realtime ---------- */
+async function loadDinners(){
+  try{
+    const { data: rows, error } = await sb.from('dinners')
+      .select('id,year,month,day,title').in('year', YEARS);
+    if(error) throw error;
+    const list = (rows||[]).map(r => ({
+      id:r.id, year:r.year, month:r.month, day:r.day, title:r.title||'', places:[]
+    }));
+    const ids = list.map(d => d.id);
+    if(ids.length){
+      const { data: pls, error: e2 } = await sb.from('dinner_places')
+        .select('id,dinner_id,name,memo').in('dinner_id', ids);
+      if(e2) throw e2;
+      const pids = (pls||[]).map(p => p.id);
+      let dvs = [];
+      if(pids.length){
+        const { data: vr, error: e3 } = await sb.from('dinner_votes')
+          .select('place_id,voter_id').in('place_id', pids);
+        if(e3) throw e3;
+        dvs = vr || [];
+      }
+      const byPlace = {};
+      dvs.forEach(v => (byPlace[v.place_id] = byPlace[v.place_id]||new Set()).add(v.voter_id));
+      (pls||[]).forEach(p => {
+        const d = list.find(x => x.id === p.dinner_id);
+        if(d) d.places.push({ id:p.id, name:p.name, memo:p.memo||'', voters: byPlace[p.id]||new Set() });
+      });
+    }
+    list.forEach(d => d.places.sort((a,b)=>a.id-b.id));
+    DINNERS = list;
+    sortDinners();
+    _dinnerReady = true;
+  }catch(e){
+    // 테이블이 아직 없으면 (schema.sql 미적용) 회식 기능만 끄고 점심 캘린더는 그대로
+    console.warn('[회식] 데이터 로드 실패 — supabase/schema.sql 재실행이 필요할 수 있어요:', e && e.message);
+    DINNERS = [];
+    _dinnerReady = false;
+  }
+}
+
+// 회식 테이블은 별도 채널 — 스키마 미적용 환경에서 메인 채널(entries/votes)을
+// 끌어내리지 않도록 분리하고, 로드 성공 시에만 구독한다.
+function subscribeDinners(){
+  if(_dinnerSubscribed || !_dinnerReady || !sb) return;
+  _dinnerSubscribed = true;
+  sb.channel('gtl-dinner')
+    .on('postgres_changes',{event:'*',schema:'public',table:'dinners'},       onDinnerChange)
+    .on('postgres_changes',{event:'*',schema:'public',table:'dinner_places'}, onDinnerPlaceChange)
+    .on('postgres_changes',{event:'*',schema:'public',table:'dinner_votes'},  onDinnerVoteChange)
+    .subscribe();
+}
+
+function sortDinners(){
+  DINNERS.sort((a,b) =>
+    (a.year*10000 + a.month*100 + a.day) - (b.year*10000 + b.month*100 + b.day) || (a.id - b.id));
+}
+function findDinner(id){ return DINNERS.find(d => d.id === id) || null; }
+function findDinnerPlace(pid){
+  for(const d of DINNERS){
+    const i = d.places.findIndex(p => p.id === pid);
+    if(i >= 0) return { dinner: d, idx: i, place: d.places[i] };
+  }
+  return null;
+}
+function getDinnerOn(y, m, dd){
+  return DINNERS.find(x => x.year === y && x.month === m && x.day === dd) || null;
+}
+function getUpcomingDinners(){
+  const t = new Date();
+  const t0 = new Date(t.getFullYear(), t.getMonth(), t.getDate()).getTime();
+  return DINNERS.filter(d => new Date(d.year, d.month-1, d.day).getTime() >= t0);
+}
+function dinnerDday(d){
+  const t = new Date();
+  const t0 = new Date(t.getFullYear(), t.getMonth(), t.getDate());
+  const diff = Math.round((new Date(d.year, d.month-1, d.day) - t0) / 86400000);
+  if(diff < 0) return '';
+  return diff === 0 ? 'D-Day' : 'D-' + diff;
+}
+function getAllDinnerPlaceNames(){
+  const s = new Set();
+  DINNERS.forEach(d => d.places.forEach(p => { if(p.name) s.add(p.name); }));
+  return Array.from(s).sort((a,b)=>a.localeCompare(b,'ko'));
+}
+
+function onDinnerChange(p){
+  if(p.eventType === 'INSERT'){
+    if(findDinner(p.new.id)) return;
+    DINNERS.push({ id:p.new.id, year:p.new.year, month:p.new.month, day:p.new.day, title:p.new.title||'', places:[] });
+    sortDinners();
+  } else if(p.eventType === 'UPDATE'){
+    const d = findDinner(p.new.id); if(!d) return;
+    d.year = p.new.year; d.month = p.new.month; d.day = p.new.day; d.title = p.new.title||'';
+    sortDinners();
+  } else if(p.eventType === 'DELETE'){
+    const i = DINNERS.findIndex(d => d.id === p.old.id);
+    if(i >= 0) DINNERS.splice(i, 1);
+    if(openDinnerId === p.old.id) closeMod();
+  }
+  rerender();
+  if(window._refreshTweaks) window._refreshTweaks();
+}
+function onDinnerPlaceChange(p){
+  if(p.eventType === 'INSERT'){
+    const d = findDinner(p.new.dinner_id); if(!d) return;
+    if(d.places.some(x => x.id === p.new.id)) return;
+    d.places.push({ id:p.new.id, name:p.new.name, memo:p.new.memo||'', voters:new Set() });
+    d.places.sort((a,b)=>a.id-b.id);
+    rerender();
+    if(p.new.created_by !== MY_VOTER_ID) flashEntry('d'+p.new.id);
+  } else if(p.eventType === 'UPDATE'){
+    const f = findDinnerPlace(p.new.id); if(!f) return;
+    f.place.name = p.new.name; f.place.memo = p.new.memo||'';
+    rerender();
+  } else if(p.eventType === 'DELETE'){
+    const f = findDinnerPlace(p.old.id);
+    if(f) f.dinner.places.splice(f.idx, 1);
+    rerender();
+  }
+}
+function onDinnerVoteChange(p){
+  const v = p.eventType === 'DELETE' ? p.old : p.new;
+  const f = findDinnerPlace(v.place_id); if(!f) return;
+  if(p.eventType === 'INSERT') f.place.voters.add(v.voter_id);
+  else if(p.eventType === 'DELETE') f.place.voters.delete(v.voter_id);
+  rerender();
+  if(v.voter_id !== MY_VOTER_ID) flashEntry('d'+v.place_id);
 }
 function flashEntry(id){
   requestAnimationFrame(() => {
@@ -2835,7 +3175,7 @@ function renderHero(){
           </div>
           <button class="hero-vote${my?' voted':''}" type="button"
                   onclick="event.stopPropagation(); toggleVoteAsync(${e.id})"
-                  aria-label="투표">
+                  aria-pressed="${my}" aria-label="투표">
             <i class="ti ti-thumb-up"></i><span class="vote-num">${v}</span>
           </button>
         </div>`;
@@ -3026,11 +3366,320 @@ function rollDice(){
   }, 900);
 }
 
+/* =================================================================
+   회식 — 설정 패널에서 날짜를 잡으면 달력 🍻 배지 + 상단 배너가 생기고,
+   전용 모달에서 장소 후보를 올리고 투표/랜덤으로 정한다.
+================================================================== */
+
+/* ----- mutations ----- */
+async function onCreateDinnerClick(){
+  const dEl = document.getElementById('twkDinnerDate');
+  const tEl = document.getElementById('twkDinnerTitle');
+  const val = dEl && dEl.value;
+  if(!val){ _shakeInput('twkDinnerDate'); return; }
+  const parts = val.split('-').map(Number);
+  const y = parts[0], m = parts[1], dd = parts[2];
+  if(!YEARS.includes(y) || !MONTHS.includes(m)){
+    _shakeInput('twkDinnerDate');
+    showToast(YEAR_START + '–' + YEAR_END + ' 사이 날짜만 가능해요', 'err');
+    return;
+  }
+  const t = new Date();
+  const t0 = new Date(t.getFullYear(), t.getMonth(), t.getDate()).getTime();
+  if(new Date(y, m-1, dd).getTime() < t0){
+    _shakeInput('twkDinnerDate');
+    showToast('지난 날짜에는 잡을 수 없어요', 'err');
+    return;
+  }
+  if(getDinnerOn(y, m, dd)){
+    _shakeInput('twkDinnerDate');
+    showToast('그 날엔 이미 회식이 있어요', 'err');
+    return;
+  }
+  const title = ((tEl && tEl.value) || '').trim();
+  setSyncState('sv');
+  const { error } = await sb.from('dinners').insert({
+    year:y, month:m, day:dd, title, created_by:MY_VOTER_ID
+  });
+  setSyncState(error ? 'err' : 'ok');
+  if(error){ showToast('회식 저장 실패: ' + error.message, 'err'); return; }
+  showToast('🍻 회식이 잡혔어요! 배너에서 장소를 정해보세요', 'ok');
+}
+
+async function onDeleteDinnerClick(id){
+  const ok = await showConfirm('이 회식을 취소할까요? 장소 후보와 투표도 함께 삭제돼요.', '회식 취소');
+  if(!ok) return;
+  const i = DINNERS.findIndex(d => d.id === id);
+  let backup = null;
+  if(i >= 0){ backup = DINNERS[i]; DINNERS.splice(i, 1); }
+  if(openDinnerId === id) closeMod();
+  rerender();
+  if(window._refreshTweaks) window._refreshTweaks();
+  setSyncState('sv');
+  const { error } = await sb.from('dinners').delete().eq('id', id);
+  if(error){
+    if(backup){ DINNERS.push(backup); sortDinners(); }
+    rerender();
+    if(window._refreshTweaks) window._refreshTweaks();
+    setSyncState('err'); showToast('취소 실패: ' + error.message, 'err');
+    return;
+  }
+  setSyncState('ok');
+  showToast('회식을 취소했어요', 'ok');
+}
+
+async function onAddDinnerPlaceClick(dinnerId){
+  const name = (ds.name||'').trim();
+  const memo = (ds.memo||'').trim();
+  if(!name){ _shakeInput('dpName'); return; }
+  const d = findDinner(dinnerId); if(!d) return;
+  const norm = normalizeName(name);
+  if(d.places.some(p => normalizeName(p.name) === norm)){
+    _shakeInput('dpName');
+    showToast('이미 같은 장소가 있어요', 'err');
+    return;
+  }
+  setSyncState('sv');
+  const { error } = await sb.from('dinner_places').insert({
+    dinner_id: dinnerId, name, memo, created_by: MY_VOTER_ID
+  });
+  setSyncState(error ? 'err' : 'ok');
+  if(error){ showToast('저장 실패: ' + error.message, 'err'); return; }
+  // 후보는 보통 연달아 올리니 모달을 열어둔 채 입력만 비운다
+  ds = { name:'', memo:'' };
+  const n = document.getElementById('dpName'), m = document.getElementById('dpMemo');
+  if(n) n.value = '';
+  if(m) m.value = '';
+  if(n) n.focus();
+}
+
+async function onDeleteDinnerPlaceClick(placeId){
+  const ok = await showConfirm('이 장소 후보를 삭제할까요?', '삭제');
+  if(!ok) return;
+  const els = document.querySelectorAll('[data-eid="d'+placeId+'"]');
+  els.forEach(el => el.classList.add('removing'));
+  if(els.length){ await new Promise(r => setTimeout(r, 240)); }
+  const f = findDinnerPlace(placeId);
+  let restore = null;
+  if(f){
+    restore = { dinner: f.dinner, idx: f.idx, place: f.place };
+    f.dinner.places.splice(f.idx, 1);
+    rerender();
+  }
+  setSyncState('sv');
+  const { error } = await sb.from('dinner_places').delete().eq('id', placeId);
+  if(error){
+    if(restore) restore.dinner.places.splice(restore.idx, 0, restore.place);
+    rerender(); setSyncState('err'); showToast('삭제 실패: ' + error.message, 'err');
+    return;
+  }
+  setSyncState('ok');
+}
+
+const _dinnerVotingIds = new Set();
+async function toggleDinnerVoteAsync(placeId){
+  if(_dinnerVotingIds.has(placeId)) return;
+  _dinnerVotingIds.add(placeId);
+  try{
+    const f = findDinnerPlace(placeId); if(!f) return;
+    const was = f.place.voters.has(MY_VOTER_ID);
+    if(was) f.place.voters.delete(MY_VOTER_ID); else f.place.voters.add(MY_VOTER_ID);
+    rerender();
+    _animateVote('d'+placeId, !was);
+    setSyncState('sv');
+    const { error } = was
+      ? await sb.from('dinner_votes').delete().eq('place_id', placeId).eq('voter_id', MY_VOTER_ID)
+      : await sb.from('dinner_votes').insert({ place_id: placeId, voter_id: MY_VOTER_ID });
+    if(error){
+      if(was) f.place.voters.add(MY_VOTER_ID); else f.place.voters.delete(MY_VOTER_ID);
+      rerender(); setSyncState('err'); showToast('투표 처리 실패', 'err');
+      return;
+    }
+    setSyncState('ok');
+  } finally {
+    _dinnerVotingIds.delete(placeId);
+  }
+}
+
+/* ----- upcoming banner ----- */
+function renderDinnerBanner(){
+  const el = document.getElementById('dinnerBanner');
+  if(!el) return;
+  const ups = _loaded ? getUpcomingDinners() : [];
+  if(!ups.length){ el.hidden = true; el.innerHTML = ''; return; }
+  const d = ups[0];
+  const dow = DOW_KR[new Date(d.year, d.month-1, d.day).getDay()];
+  const dd = dinnerDday(d);
+  const top = d.places.slice().sort((a,b)=>b.voters.size-a.voters.size)[0];
+  const sub = d.places.length === 0
+    ? '아직 장소 후보가 없어요 — 눌러서 첫 후보를 올려보세요'
+    : (top && top.voters.size > 0
+        ? '현재 1위 · ' + esc(top.name) + ' (' + top.voters.size + '표)'
+        : '후보 ' + d.places.length + '곳 · 투표를 기다리는 중');
+  el.hidden = false;
+  el.innerHTML =
+    '<button class="dinner-banner" type="button" onclick="openDinnerModal('+d.id+')" aria-label="회식 장소 정하기">' +
+      '<span class="db-emoji">🍻</span>' +
+      '<span class="db-main">' +
+        '<span class="db-title">' + (d.title ? esc(d.title) : '팀 회식') +
+          (dd ? '<span class="db-dday">' + dd + '</span>' : '') +
+        '</span>' +
+        '<span class="db-sub">' + d.month + '월 ' + d.day + '일 (' + dow + ') · ' + sub + '</span>' +
+      '</span>' +
+      '<span class="db-cta"><span>장소 정하기</span><i class="ti ti-chevron-right"></i></span>' +
+    '</button>';
+}
+
+/* ----- dinner modal (장소 정하기 화면) ----- */
+function openDinnerModal(id){
+  const d = findDinner(id); if(!d) return;
+  if(window.closeTweaks) closeTweaks();
+  ds = { name:'', memo:'' };
+  openDinnerId = id;
+  openDay = null; helpOpen = false;
+  document.getElementById('mw').innerHTML = buildDinnerModalShellHTML(d);
+  refreshDinnerModalContent(d);
+  document.body.classList.add('modal-open');
+  setTimeout(() => { const el = document.getElementById('dpName'); if(el) el.focus(); }, 30);
+}
+
+function buildDinnerModalShellHTML(d){
+  const dow = DOW_KR[new Date(d.year, d.month-1, d.day).getDay()];
+  const dd = dinnerDday(d);
+  const sub = d.year + '년 ' + MN[d.month] + ' ' + d.day + '일 (' + dow + ')' + (dd ? ' · ' + dd : ' · 지난 회식');
+  const names = getAllDinnerPlaceNames();
+  const dataListHTML = names.length
+    ? '<datalist id="dinnerPlaceNames">' + names.map(n => '<option value="'+esc(n)+'"></option>').join('') + '</datalist>'
+    : '';
+  return `
+    <div class="backdrop" onclick="closeMod(event,this)">
+      <div class="modal" data-dinner-id="${d.id}" onclick="event.stopPropagation()" role="dialog" aria-modal="true">
+        <div class="mhdr">
+          <div>
+            <div class="mtitle">🍻 ${d.title ? esc(d.title) : '팀 회식'} · 장소 정하기</div>
+            <div class="msub">${esc(sub)}</div>
+          </div>
+          <button class="mclose" type="button" onclick="closeMod()" aria-label="닫기"><i class="ti ti-x"></i></button>
+        </div>
+
+        <div class="elist" id="dinnerList"></div>
+        <hr class="hr" />
+
+        <div class="igrp">
+          <div>
+            <div class="lbl">장소 이름</div>
+            <input class="inp" type="text" id="dpName" placeholder="예: 역전할머니맥주 2호점"
+                   maxlength="30" list="dinnerPlaceNames" autocomplete="off"
+                   oninput="ds.name=this.value"
+                   onkeydown="if(event.key==='Enter'){event.preventDefault();onAddDinnerPlaceClick(${d.id})}" />
+            ${dataListHTML}
+          </div>
+          <div>
+            <div class="lbl">메모 (선택)</div>
+            <input class="inp" type="text" id="dpMemo" placeholder="예: 단체석 · 예약 필요"
+                   maxlength="40"
+                   oninput="ds.memo=this.value"
+                   onkeydown="if(event.key==='Enter'){event.preventDefault();onAddDinnerPlaceClick(${d.id})}" />
+          </div>
+        </div>
+
+        <div class="mbtns" style="justify-content:space-between;flex-wrap:wrap;gap:8px">
+          <button class="btn btn-danger-ghost" type="button" onclick="onDeleteDinnerClick(${d.id})">
+            <i class="ti ti-calendar-x"></i>회식 취소
+          </button>
+          <span style="display:inline-flex;gap:8px">
+            <button class="btn btn-ghost" id="dinnerDiceBtn" type="button" onclick="rollDinnerDice()" style="display:none">🎲 골라줘</button>
+            <button class="btn btn-primary" type="button" onclick="onAddDinnerPlaceClick(${d.id})">
+              <i class="ti ti-plus"></i>후보 추가
+            </button>
+          </span>
+        </div>
+
+        <div class="mfooter">
+          <i class="ti ti-cloud" style="font-size:13px"></i>
+          실시간 동기화 · 가장 많은 표를 받은 곳이 1위가 돼요
+        </div>
+      </div>
+    </div>`;
+}
+
+// rerender 에서 호출 — 열려 있는 회식 모달의 목록만 갱신 (재애니메이션 없음)
+function refreshDinnerModal(){
+  const mw = document.getElementById('mw');
+  const modal = mw && mw.querySelector('.modal[data-dinner-id]');
+  if(!modal) return;
+  const id = +modal.getAttribute('data-dinner-id');
+  const d = findDinner(id);
+  if(!d){ closeMod(); return; }
+  refreshDinnerModalContent(d, modal);
+}
+
+function refreshDinnerModalContent(d, modalEl){
+  modalEl = modalEl || document.querySelector('.modal[data-dinner-id="'+d.id+'"]');
+  if(!modalEl) return;
+  const sorted = d.places.slice().sort((a,b)=> (b.voters.size - a.voters.size) || (a.id - b.id));
+  const maxV = sorted.length ? sorted[0].voters.size : 0;
+
+  const html = sorted.length ? sorted.map(p => {
+    const v = p.voters.size, my = p.voters.has(MY_VOTER_ID);
+    const win = v > 0 && v === maxV;
+    return `
+    <div class="erow${win?' winner':''}" data-eid="d${p.id}">
+      ${win ? '<span class="chip-crown">👑</span>' : '<span class="edot"></span>'}
+      <div style="flex:1;min-width:0">
+        <div class="ename">${esc(p.name)}</div>
+        ${p.memo ? '<div class="ememo">'+esc(p.memo)+'</div>' : ''}
+      </div>
+      <button class="evote${my?' voted':''}" type="button" aria-pressed="${my}" aria-label="투표"
+              onclick="toggleDinnerVoteAsync(${p.id})">
+        <i class="ti ti-thumb-up"></i><span class="vote-num">${v}</span>
+      </button>
+      <button class="edel" type="button" onclick="onDeleteDinnerPlaceClick(${p.id})" aria-label="삭제">
+        <i class="ti ti-x"></i>
+      </button>
+    </div>`;
+  }).join('') : '<div class="empty-state"><i class="ti ti-map-pin"></i>아직 장소 후보가 없어요<br/>첫 후보를 올려보세요!</div>';
+
+  const list = modalEl.querySelector('#dinnerList');
+  if(list) list.innerHTML = html;
+  const dice = modalEl.querySelector('#dinnerDiceBtn');
+  if(dice) dice.style.display = sorted.length >= 2 ? '' : 'none';
+}
+
+// 장소 랜덤 추첨 — 점심 rollDice 와 같은 셔플-스포트라이트 연출
+function rollDinnerDice(){
+  const list = document.getElementById('dinnerList');
+  if(!list) return;
+  const rows = Array.from(list.querySelectorAll('.erow'));
+  if(rows.length < 2) return;
+  const btn = document.getElementById('dinnerDiceBtn');
+  if(btn) btn.disabled = true;
+  const pickIdx = Math.floor(Math.random() * rows.length);
+  let i = 0;
+  const shuffleCount = 8;
+  const id = setInterval(() => {
+    rows.forEach(r => r.classList.remove('spotlight'));
+    rows[i % rows.length].classList.add('spotlight');
+    i++;
+    if(i >= shuffleCount){
+      clearInterval(id);
+      rows.forEach(r => r.classList.remove('spotlight','dice-winner'));
+      const winner = rows[pickIdx];
+      winner.classList.add('dice-winner');
+      winner.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      if(navigator.vibrate){ try { navigator.vibrate([12, 60, 18]); } catch(e){} }
+      winner.addEventListener('animationend', () => winner.classList.remove('dice-winner'), { once: true });
+      if(window._fireConfetti) window._fireConfetti(winner);
+      if(btn) btn.disabled = false;
+    }
+  }, 90);
+}
+
 /* ---------- jump to today ---------- */
 function jumpToToday(){
   const t = todayInfo();
   if(!YEARS.includes(t.y) || !MONTHS.includes(t.m)){
-    // outside the calendar's range — just bounce
+    showToast('이 캘린더는 ' + YEAR_START + '–' + YEAR_END + '년만 지원해요', 'err');
     return;
   }
   if(t.y !== curYear || t.m !== cur) sw(t.y, t.m);
@@ -3052,8 +3701,10 @@ function rerender(animate){
   renderTabs();
   renderHero();
   renderSidebarHero();
+  renderDinnerBanner();
   render(animate);
   if(openDay!=null) renderModal(openDay);
+  if(openDinnerId!=null) refreshDinnerModal();
   updateNavButtons();
 }
 function _curIdx(){ return YEARS.indexOf(curYear) * 12 + (cur - 1); }
@@ -3200,6 +3851,17 @@ function render(animate){
       cell.appendChild(t);
     }
 
+    const dnr = getDinnerOn(curYear, cur, dn);
+    if(dnr){
+      cell.classList.add('dinner');
+      const t=document.createElement('div');
+      t.className='day-tag dinner-tag';
+      t.title='회식 · 장소 정하기';
+      t.textContent='🍻 ' + (dnr.title || '회식');
+      t.onclick=ev=>{ ev.stopPropagation(); openDinnerModal(dnr.id); };
+      cell.appendChild(t);
+    }
+
     const entries=(dat[dn]&&dat[dn].entries)||[];
     // sort by votes desc within cell display
     const sorted = entries.slice().sort((a,b) => (b.voters.size - a.voters.size) || (a.id - b.id));
@@ -3246,6 +3908,7 @@ function openModal(dn){
   ensureDay(curYear, cur, dn);
   es = { name: '', memo: '' };
   openDay = dn;
+  openDinnerId = null;  // mw 를 점유하므로 회식 모달 상태는 해제
   renderModal(dn);
   document.body.classList.add('modal-open');
 }
@@ -3253,11 +3916,13 @@ function closeMod(ev, ov){
   if(ev && ov && ev.target !== ov) return;
   const mw = document.getElementById('mw');
   const bd = mw.querySelector('.backdrop');
-  if(!bd){ mw.innerHTML=''; openDay=null; helpOpen=false; document.body.classList.remove('modal-open'); return; }
+  if(!bd){ mw.innerHTML=''; openDay=null; helpOpen=false; openDinnerId=null; document.body.classList.remove('modal-open'); return; }
   bd.classList.add('closing');
   setTimeout(() => {
+    // 닫는 사이 다른 모달이 mw 를 차지했다면 (빠른 연속 클릭) 건드리지 않는다
+    if(!mw.contains(bd)) return;
     mw.innerHTML='';
-    openDay=null; helpOpen=false;
+    openDay=null; helpOpen=false; openDinnerId=null;
     document.body.classList.remove('modal-open');
   }, 450);
 }
@@ -3278,7 +3943,8 @@ function renderModal(dn){
 function buildModalShellHTML(dn){
   const h=getHolidayName(curYear,cur,dn), isOff=dn===lastFri(curYear,cur);
   const dow=DOW_KR[new Date(curYear,cur-1,dn).getDay()];
-  const sub=curYear+'년 '+MN[cur]+' '+dn+'일 ('+dow+')'+(h?' · '+h:isOff?' · 공동휴무':'');
+  const dnr=getDinnerOn(curYear,cur,dn);
+  const sub=curYear+'년 '+MN[cur]+' '+dn+'일 ('+dow+')'+(h?' · '+h:isOff?' · 공동휴무':'')+(dnr?' · 🍻 회식일':'');
 
   const names = getAllRestaurantNames();
   const dataListHTML = names.length
@@ -3302,7 +3968,7 @@ function buildModalShellHTML(dn){
         <div class="igrp">
           <div>
             <div class="lbl">식당 이름</div>
-            <input class="inp" type="text" id="nName" placeholder=""
+            <input class="inp" type="text" id="nName" placeholder="예: 김밥천국"
                    maxlength="30" value="" list="restNames" autocomplete="off"
                    oninput="es.name=this.value"
                    onkeydown="if(event.key==='Enter'){event.preventDefault();onAddClick(${dn})}" />
@@ -3310,7 +3976,7 @@ function buildModalShellHTML(dn){
           </div>
           <div>
             <div class="lbl">메모 (선택)</div>
-            <input class="inp" type="text" id="nMemo" placeholder=""
+            <input class="inp" type="text" id="nMemo" placeholder="예: 3층 · 웨이팅 있음"
                    maxlength="40" value=""
                    oninput="es.memo=this.value"
                    onkeydown="if(event.key==='Enter'){event.preventDefault();onAddClick(${dn})}" />
@@ -3366,7 +4032,7 @@ function refreshModalContent(dn, modalEl){
         <div class="ename">${esc(e.name)}</div>
         ${e.memo?'<div class="ememo">'+esc(e.memo)+'</div>':''}
       </div>
-      <button class="evote${my?' voted':''}" type="button" onclick="toggleVoteAsync(${e.id})">
+      <button class="evote${my?' voted':''}" type="button" aria-pressed="${my}" aria-label="투표" onclick="toggleVoteAsync(${e.id})">
         <i class="ti ti-thumb-up"></i><span class="vote-num">${v}</span>
       </button>
       <button class="eedit" type="button" onclick="onEditClick(${e.id})" aria-label="수정"><i class="ti ti-pencil"></i></button>
@@ -3438,6 +4104,7 @@ async function onSaveEditClick(entryId){
 
 function openHelp(){
   helpOpen=true;
+  openDay=null; openDinnerId=null;  // mw 를 점유
   document.body.classList.add('modal-open');
   document.getElementById('mw').innerHTML = `
     <div class="backdrop" onclick="closeMod(event,this)">
@@ -3452,6 +4119,7 @@ function openHelp(){
         <div style="display:flex;flex-direction:column;gap:14px;font-size:13px;color:var(--text-2);line-height:1.65;margin-bottom:1.2rem">
           ${[
             ['ti-bowl','오늘 뭐 먹지?','오전엔 상단 카드에 오늘 후보가 표시됩니다. 🎲 골라줘 버튼으로 랜덤 추첨도 가능 (13시 이후 자동 숨김).'],
+            ['ti-beer','회식','설정(⚙️)에서 날짜를 잡으면 달력에 🍻 태그와 상단 배너가 생겨요. 배너를 눌러 장소 후보를 올리고 투표로 정합니다.'],
             ['ti-bolt','실시간 공유','다른 팀원의 추가·투표·삭제가 새로고침 없이 즉시 반영됩니다.'],
             ['ti-calendar-event','오늘로 이동','상단의 오늘 버튼이나 \`홈\` 키로 이번 달 + 오늘 칸으로 점프합니다.'],
             ['ti-moon','다크 모드','달/해 버튼으로 토글. 시스템 설정도 자동 감지합니다.'],
@@ -3478,11 +4146,14 @@ function isModalOpen(){
   return !!(document.getElementById('mw').innerHTML.trim() || document.getElementById('cw').innerHTML.trim());
 }
 document.addEventListener('keydown',(e)=>{
-  if(isTypingTarget(document.activeElement)) return;
-  if(e.key==='Escape'){
+  // Escape closes dialogs even while an input is focused (platform convention).
+  // Skips IME composition and inputs that already handled Escape themselves
+  // (edit rows cancel editing via their own onkeydown + preventDefault).
+  if(e.key==='Escape' && !e.isComposing && !e.defaultPrevented){
     if(document.getElementById('cw').innerHTML.trim()){ resolveConfirm(null,null,false); return; }
     if(document.getElementById('mw').innerHTML.trim()){ closeMod(); return; }
   }
+  if(isTypingTarget(document.activeElement)) return;
   if(isModalOpen()) return;
   if(e.key==='ArrowLeft'){ e.preventDefault(); changeMonth(-1); }
   else if(e.key==='ArrowRight'){ e.preventDefault(); changeMonth(1); }
@@ -3880,7 +4551,7 @@ setInterval(() => { if(isTodaysMonth()){ renderHero(); renderSidebarHero(); } },
      with the tilt transition on .modal. */
   let _lastXY = null;
   document.addEventListener('click', e => {
-    if(e.target.closest('.cell, .hero-row, .more-lnk, .add-btn-ghost')){
+    if(e.target.closest('.cell, .hero-row, .more-lnk, .add-btn-ghost, .today-leader, .today-row, .ti-add, .dinner-banner, .dinner-tag, .help-btn, [data-twk-dinner-open]')){
       _lastXY = { x: e.clientX, y: e.clientY };
     }
   }, true);
@@ -3894,9 +4565,10 @@ setInterval(() => { if(isTodaysMonth()){ renderHero(); renderSidebarHero(); } },
     m.style.transition = 'none';
   }
 
-  const _openModalOrig = openModal;
-  openModal = function(dn){
-    _openModalOrig.apply(this, arguments);
+  // Shared open animation — used by the lunch modal, the dinner modal and
+  // the help modal so every dialog enters the same way (help used to pop in
+  // with no entrance at all).
+  function animateModalOpen(){
     requestAnimationFrame(() => {
       const m = document.querySelector('.modal');
       if(!m) return;
@@ -3933,6 +4605,22 @@ setInterval(() => { if(isTodaysMonth()){ renderHero(); renderSidebarHero(); } },
         m.style.transformOrigin = '50% 50%';
       };
     });
+  }
+
+  const _openModalOrig = openModal;
+  openModal = function(dn){
+    _openModalOrig.apply(this, arguments);
+    animateModalOpen();
+  };
+  const _openDinnerModalOrig = openDinnerModal;
+  openDinnerModal = function(){
+    _openDinnerModalOrig.apply(this, arguments);
+    animateModalOpen();
+  };
+  const _openHelpOrig = openHelp;
+  openHelp = function(){
+    _openHelpOrig.apply(this, arguments);
+    animateModalOpen();
   };
 
   const _closeModOrig = closeMod;
@@ -3966,23 +4654,24 @@ setInterval(() => { if(isTodaysMonth()){ renderHero(); renderSidebarHero(); } },
       easing: 'cubic-bezier(.45, .05, .55, .95)',
       fill: 'forwards'
     });
-    anim.onfinish = () => {
+    // Only clear mw if this closing backdrop still owns it — if the user
+    // opened another modal (help/dinner/cell) within the close animation
+    // window, wiping innerHTML here would silently kill the new modal.
+    const finalizeClose = () => {
+      if(!mw.contains(bd)) return;
       mw.innerHTML = '';
-      openDay = null; helpOpen = false;
+      openDay = null; helpOpen = false; openDinnerId = null;
       document.body.classList.remove('modal-open');
     };
+    anim.onfinish = finalizeClose;
     // Safety net — if onfinish doesn't fire (e.g. WAA bug), clean up anyway.
-    setTimeout(() => {
-      if(mw.innerHTML){
-        mw.innerHTML = '';
-        openDay = null; helpOpen = false;
-        document.body.classList.remove('modal-open');
-      }
-    }, 760);
+    setTimeout(finalizeClose, 760);
   };
 
-  // Expose freeze helper so resolveConfirm (defined earlier) can reuse it.
+  // Expose freeze helper so resolveConfirm (defined earlier) can reuse it,
+  // and confetti so the dinner dice (rollDinnerDice) can celebrate too.
   window._freezeModalTilt = _freezeModalTilt;
+  window._fireConfetti = fireConfetti;
 
   /* (6) Tip rotator — only when there are no records this month */
   const TIPS = [
@@ -4053,6 +4742,7 @@ setInterval(() => { if(isTodaysMonth()){ renderHero(); renderSidebarHero(); } },
     if(part.palette){
       root.setAttribute('data-palette', part.palette);
       try { localStorage.setItem('gtl-palette', part.palette); } catch(e){}
+      if(typeof syncThemeColor === 'function') syncThemeColor();
     }
     if(part.font){
       root.setAttribute('data-font', part.font);
@@ -4082,13 +4772,52 @@ setInterval(() => { if(isTodaysMonth()){ renderHero(); renderSidebarHero(); } },
     bindPanel();
   }
 
+  // 회식 섹션 — 자주 없는 일정이라 메인 UI 대신 설정 안에서 날짜를 잡는다.
+  function dinnerSectionHTML(){
+    let inner;
+    if(!_loaded){
+      inner = '<div class="twk-hint">데이터를 불러오는 중…</div>';
+    } else if(!_dinnerReady){
+      inner = '<div class="twk-hint">회식 기능을 켜려면 Supabase SQL Editor 에서 <b>supabase/schema.sql</b> 을 한 번 더 실행해주세요.</div>';
+    } else {
+      const ups = getUpcomingDinners();
+      const t = new Date();
+      const pad = n => String(n).padStart(2, '0');
+      const minDate = t.getFullYear() + '-' + pad(t.getMonth()+1) + '-' + pad(t.getDate());
+      const rows = ups.map(function(d){
+        const dow = DOW_KR[new Date(d.year, d.month-1, d.day).getDay()];
+        const dd = dinnerDday(d);
+        return '<div class="twk-dinner-row">'+
+          '<span style="flex-shrink:0">🍻</span>'+
+          '<span class="tdr-date">'+d.month+'/'+d.day+' ('+dow+')'+(d.title?' · '+esc(d.title):'')+
+            (dd?' <b style="color:var(--accent)">'+dd+'</b>':'')+
+          '</span>'+
+          '<button class="tdr-btn primary" type="button" data-twk-dinner-open="'+d.id+'">장소</button>'+
+          '<button class="tdr-btn danger" type="button" data-twk-dinner-del="'+d.id+'" aria-label="회식 취소" title="회식 취소"><i class="ti ti-trash" style="font-size:12px"></i></button>'+
+        '</div>';
+      }).join('');
+      inner =
+        (rows ? '<div class="twk-dinner-list">'+rows+'</div>' : '')+
+        '<div class="twk-dinner-form">'+
+          '<input class="inp" type="date" id="twkDinnerDate" min="'+minDate+'" max="'+YEAR_END+'-12-31" aria-label="회식 날짜" />'+
+          '<input class="inp" type="text" id="twkDinnerTitle" maxlength="30" placeholder="이름 (선택) — 예: 분기 회식" aria-label="회식 이름" />'+
+          '<button class="twk-btn-wide" type="button" data-twk-dinner-create><i class="ti ti-calendar-plus" style="font-size:14px"></i>회식 날짜 잡기</button>'+
+        '</div>'+
+        (rows ? '' : '<div class="twk-hint" style="margin-top:6px">날짜를 잡으면 달력에 🍻 표시와 장소 투표 화면이 생겨요.</div>');
+    }
+    return '<div class="twk-section">'+
+      '<div class="twk-section-title">🍻 회식</div>'+inner+
+    '</div>';
+  }
+
   function panelHTML(s){
     return ''+
       '<div class="twk-head">'+
-        '<div class="twk-title"><i class="ti ti-palette"></i>꾸미기</div>'+
+        '<div class="twk-title"><i class="ti ti-settings"></i>설정</div>'+
         '<button class="twk-close" type="button" data-twk-act="close" aria-label="닫기"><i class="ti ti-x" style="font-size:16px"></i></button>'+
       '</div>'+
       '<div class="twk-body">'+
+        dinnerSectionHTML()+
         '<div class="twk-section">'+
           '<div class="twk-section-title">레이아웃</div>'+
           '<div class="twk-radio">'+
@@ -4152,6 +4881,21 @@ setInterval(() => { if(isTodaysMonth()){ renderHero(); renderSidebarHero(); } },
     panel.querySelectorAll('[data-twk-act="close"]').forEach(function(el){
       el.addEventListener('click', closeTweaks);
     });
+    panel.querySelectorAll('[data-twk-dinner-open]').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        const id = +btn.getAttribute('data-twk-dinner-open');
+        closeTweaks();
+        openDinnerModal(id);
+      });
+    });
+    panel.querySelectorAll('[data-twk-dinner-del]').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        onDeleteDinnerClick(+btn.getAttribute('data-twk-dinner-del'));
+      });
+    });
+    panel.querySelectorAll('[data-twk-dinner-create]').forEach(function(btn){
+      btn.addEventListener('click', onCreateDinnerClick);
+    });
   }
 
   function openTweaks(){
@@ -4199,6 +4943,8 @@ setInterval(() => { if(isTodaysMonth()){ renderHero(); renderSidebarHero(); } },
 
   window.openTweaks = openTweaks;
   window.closeTweaks = closeTweaks;
+  // 회식 데이터가 바뀌면 (생성/취소 echo) 열려 있는 패널 내용을 갱신
+  window._refreshTweaks = renderTweaks;
 })();
 
 /* ---------- boot ---------- */
@@ -4220,6 +4966,7 @@ setInterval(() => { if(isTodaysMonth()){ renderHero(); renderSidebarHero(); } },
   if(!sb) return;
   await loadAll();
   subscribe();
+  subscribeDinners();
 })();
 </script>
 </body>

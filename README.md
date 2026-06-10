@@ -63,7 +63,9 @@ git push -u origin main
 4. 우측 하단 **Run** 클릭 (또는 `Ctrl+Enter`)
 5. "Success. No rows returned" 같은 메시지가 뜨면 OK
 
-확인: 좌측 **Table Editor** 클릭 → `entries`, `votes` 두 테이블이 보여야 함.
+확인: 좌측 **Table Editor** 클릭 → `entries`, `votes`, `dinners`, `dinner_places`, `dinner_votes` 테이블이 보여야 함.
+
+> 💡 **이미 운영 중인 프로젝트에 회식 기능을 추가하려면** — `supabase/schema.sql` 전체를 SQL Editor 에서 한 번 더 실행하면 됩니다 (모든 구문이 idempotent 라 기존 데이터는 안전). 실행 전까지는 회식 기능만 비활성화되고 점심 캘린더는 정상 작동합니다.
 
 ## 4. URL + Anon Key 복사
 
@@ -112,9 +114,17 @@ git push -u origin main
 2. 우측 상단 동기 표시줄 확인:
    - **"불러오는 중…"** → **"서버에 저장됨"** 으로 바뀌면 ✅ Supabase 연결 성공
    - **"설정 누락"** 이면 환경 변수가 안 잡힌 것 → Render Environment 다시 확인
-   - **"서버 연결 오류"** 면 SQL 스키마가 적용 안 됐거나 anon key 가 틀린 것
+   - **"연결 오류"** 면 SQL 스키마가 적용 안 됐거나 anon key 가 틀린 것 (표시줄 클릭 시 재시도)
 3. 5월 어느 날 칸 클릭 → 식당 이름 입력 → 추가
 4. **다른 브라우저 / 폰** 에서 같은 URL 열어서 — 새로고침 없이 즉시 같은 내용이 보이면 실시간 OK 👍
+
+### 회식 기능 사용법
+
+1. 우측 하단 ⚙️ (또는 좌측 상단 ●●● 점 3개) → 설정 패널의 **🍻 회식** 섹션
+2. 날짜 선택 (+ 이름은 선택) → **회식 날짜 잡기**
+3. 달력 해당 날짜에 🍻 태그가, 달력 위에는 D-day 배너가 생김
+4. 배너/태그 클릭 → **장소 정하기** 화면에서 후보 등록 + 투표 (🎲 골라줘로 랜덤 선택도 가능)
+5. 회식이 끝나거나 취소하려면 설정 패널 또는 장소 화면의 **회식 취소**
 
 ---
 
@@ -131,7 +141,8 @@ git push -u origin main
 | 증상 | 해결 |
 | --- | --- |
 | "설정 누락" 표시 | Render → Environment → `SUPABASE_URL`, `SUPABASE_ANON_KEY` 둘 다 들어갔는지 확인. 추가 후 **Manual Deploy 한 번 더** (env 바뀌면 재배포 필요). |
-| "서버 연결 오류" 표시 | (1) Supabase SQL 스키마 적용했는지 확인 (Table Editor 에 entries/votes 보여야 함). (2) Project Settings → API 의 **anon public** 키를 썼는지 (service_role 아님). |
+| 설정 패널에 "회식 기능을 켜려면…" 안내가 보임 | `supabase/schema.sql` 을 SQL Editor 에서 다시 실행 (dinners 테이블들이 아직 없는 상태). |
+| "연결 오류 · 재시도" 표시 | (1) Supabase SQL 스키마 적용했는지 확인 (Table Editor 에 entries/votes 보여야 함). (2) Project Settings → API 의 **anon public** 키를 썼는지 (service_role 아님). 표시줄을 클릭하면 다시 연결을 시도합니다. |
 | 추가는 되는데 다른 브라우저에서 안 보임 | Supabase Dashboard → Database → Replication → `supabase_realtime` publication 에 entries, votes 둘 다 들어있는지 확인. schema.sql 이 자동으로 넣어주지만 가끔 빠짐. |
 | 같은 사람이 두 번 투표됨 | localStorage 가 비워졌거나, 시크릿 모드. 정상 동작. 한 디바이스 = 1표. |
 | Render 가 자다 깨서 첫 응답이 느림 | 무료 플랜 특성. UptimeRobot 으로 5분마다 `/healthz` 핑 보내면 sleep 방지 (선택). |

@@ -12,7 +12,7 @@
 
 - `index.html` — 단일 파일 SPA. 모든 UI/로직/CSS 인라인.
 - `server.js` — 의존성 0개 Node HTTP 서버. `index.html` 정적 서빙 + `/config.js` (Supabase env 주입) + `/api/holidays/:year` (KASI 공휴일 프록시).
-- `supabase/schema.sql` — Supabase Postgres 스키마 (entries / votes 테이블 + RLS).
+- `supabase/schema.sql` — Supabase Postgres 스키마 (entries / votes + 회식용 dinners / dinner_places / dinner_votes 테이블 + RLS). 테이블이 추가되면 사용자가 Supabase SQL Editor에서 재실행해야 반영됨 (전체 idempotent).
 - `.env.example` — 로컬 개발용 환경변수 템플릿.
 
 ## 환경변수 (Render)
