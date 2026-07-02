@@ -482,6 +482,7 @@
   .today-card .swatch { display: none; }
   .big-date {
     position: relative;
+    overflow: hidden;
     padding: 20px 20px 16px;
     color: var(--text);
     background:
@@ -510,6 +511,34 @@
     font-size: 80px; font-weight: 600;
     line-height: .9; letter-spacing: -4px;
     font-variant-numeric: tabular-nums;
+    text-shadow: 0 2px 0 rgba(255,255,255,.55);
+    animation: fadeUp .35s var(--ease) both;
+  }
+  [data-theme="dark"] .big-date .bd-num { text-shadow: 0 2px 0 rgba(0,0,0,.45); }
+  /* 헤더 위를 천천히 떠다니는 빛 블롭 두 개 */
+  .big-date::before, .big-date::after {
+    content: ''; position: absolute; border-radius: 50%;
+    pointer-events: none; filter: blur(2px);
+  }
+  .big-date::before {
+    width: 150px; height: 150px; right: -30px; top: -44px;
+    background: radial-gradient(circle, color-mix(in oklch, var(--highlight) 34%, transparent), transparent 70%);
+    animation: blob-drift 11s ease-in-out infinite alternate;
+  }
+  .big-date::after {
+    width: 110px; height: 110px; left: -26px; bottom: -40px;
+    background: radial-gradient(circle, color-mix(in oklch, var(--accent) 28%, transparent), transparent 70%);
+    animation: blob-drift 8.5s ease-in-out infinite alternate-reverse;
+  }
+  [data-theme="dark"] .big-date::before {
+    background: radial-gradient(circle, color-mix(in oklch, var(--highlight) 20%, transparent), transparent 70%);
+  }
+  [data-theme="dark"] .big-date::after {
+    background: radial-gradient(circle, color-mix(in oklch, var(--accent) 18%, transparent), transparent 70%);
+  }
+  @keyframes blob-drift {
+    from { transform: translate(0, 0) scale(1); }
+    to   { transform: translate(-16px, 10px) scale(1.18); }
   }
   .big-date .bd-holiday {
     display: inline-flex; align-items: center; gap: 4px;
@@ -733,16 +762,6 @@
     flex-wrap: wrap;
   }
   .toolbar-spacer { flex: 1; }
-  .legend {
-    display: inline-flex; align-items: center; gap: 12px;
-    font-size: 12px; color: var(--text-3);
-    font-weight: 500;
-  }
-  .legend-item { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
-  .legend-dot {
-    width: 8px; height: 8px; border-radius: 50%;
-    box-shadow: 0 0 0 1px var(--bd);
-  }
 
   /* === Settings FAB === */
   .settings-fab {
@@ -1400,7 +1419,7 @@
   .mclose:hover{ background: var(--surface-2); color: var(--text); }
   .mclose:active{ transform: scale(.94); }
 
-  .elist{ display:flex; flex-direction:column; gap: 6px; max-height: 240px; overflow-y: auto; overflow-x: hidden; margin-bottom: 16px; padding-right: 2px; }
+  .elist{ display:flex; flex-direction:column; gap: 6px; max-height: 300px; overflow-y: auto; overflow-x: hidden; margin-bottom: 16px; padding-right: 2px; }
   .erow{
     display:flex; align-items:flex-start; gap: 10px;
     padding: 10px 12px; border-radius: var(--r-sm);
@@ -1640,30 +1659,10 @@
   .twk-hint{ font-size: 11px; color: var(--text-3); line-height: 1.55; }
 
   /* ============================================================
-     기록 관리 모달 리뉴얼 — 스큐어모픽 날짜 뱃지 + 순위 리스트 + 추가 카드
+     기록 관리 모달 v2 — 상단 퀵 추가 바 + 투표 비율 바 리스트
      ============================================================ */
-  .mdate{
-    flex-shrink: 0; width: 54px; border-radius: 10px; overflow: hidden;
-    border: 1px solid var(--bd);
-    box-shadow: inset 0 1px 0 rgba(255,255,255,.4), 0 3px 8px -4px rgba(0,0,0,.25);
-    text-align: center; background: var(--surface-solid);
-  }
-  .mdate .md-dow{
-    display: block;
-    font-family: var(--ff-mono); font-size: 9.5px; font-weight: 500; letter-spacing: .08em;
-    padding: 3px 0; color: #fff;
-    background: linear-gradient(180deg, color-mix(in oklch, var(--accent) 86%, white), var(--accent));
-    box-shadow: inset 0 1px 0 rgba(255,255,255,.25);
-  }
-  [data-theme="dark"] .mdate .md-dow{ color: var(--bg); }
-  .mdate .md-num{
-    display: block;
-    font-family: var(--ff-numeric); font-size: 25px; font-weight: 600;
-    letter-spacing: -1px; line-height: 1; padding: 5px 0 6px;
-    color: var(--text);
-    font-variant-numeric: tabular-nums;
-  }
   .mhdr-titles{ flex: 1; min-width: 0; }
+  .lm-dow{ color: var(--text-3); font-weight: 500; font-size: 13px; margin-left: 2px; }
   .msub-chips{ display: flex; gap: 5px; flex-wrap: wrap; margin-top: 6px; }
   .mchip{
     display: inline-flex; align-items: center; gap: 4px;
@@ -1701,24 +1700,14 @@
   .elist .erow:nth-child(5){ animation-delay: 120ms; }
   .elist .erow:nth-child(n+6){ animation-delay: 150ms; }
 
-  .add-card{
-    background: var(--surface-2);
-    border: 1px solid var(--bd); border-radius: var(--r-md);
-    padding: 12px;
-    box-shadow: inset 0 1px 0 var(--hi);
-  }
-  .ac-head{
-    display: flex; align-items: center; gap: 6px;
-    font-size: 12px; font-weight: 600; color: var(--text-2);
-    margin-bottom: 8px;
-  }
-  .ac-head .ti{ color: var(--accent); font-size: 13px; }
-  .ac-row{ display: flex; gap: 6px; margin-bottom: 8px; }
-  .ac-row .inp{ background: var(--surface-solid); }
-  .ac-row .inp:first-of-type{ flex: 1.4; }
-  .ac-row .inp:last-of-type{ flex: 1; }
+  /* 하단 입력폼 — 라벨 있는 클래식 2필드 + 전폭 추가 버튼 */
+  .lm-fields{ display: flex; gap: 8px; margin-bottom: 10px; }
+  .lm-field{ flex: 1; min-width: 0; }
+  .lm-field.name{ flex: 1.4; }
+  @media (max-width: 520px){ .lm-fields{ flex-direction: column; gap: 10px; } }
+  .msub b{ color: var(--text-2); font-weight: 600; }
+  .msub .msub-hl{ color: var(--hol-t); }
   .btn-block{ width: 100%; justify-content: center; }
-  @media (max-width: 520px){ .ac-row{ flex-direction: column; } }
 
   /* ============================================================
      회식 날짜 잡기 — 미니 캘린더
@@ -1953,7 +1942,6 @@
     .brand-text .name{ font-size: 13.5px; }
     .cell{ min-height: 104px; }
     .hero-title { font-size: 20px; }
-    .legend { gap: 8px; font-size: 11px; }
   }
 
   @media (max-width: 720px){
@@ -2018,7 +2006,6 @@
     .month-label { min-width: 0; flex: 1; font-size: 13px; }
     .today-btn { width: 38px; padding: 0; justify-content: center; }
     .today-btn span { display: none; }
-    .legend { display: none; }
 
     .today-hero { padding: 16px 14px 14px; }
     .hero-title { font-size: 19px; letter-spacing: -.5px; }
@@ -2188,7 +2175,7 @@
       </div>
     </header>
 
-    <!-- === Toolbar (controls row): month nav + today + legend === -->
+    <!-- === Toolbar (controls row): month nav + today === -->
     <div class="toolbar">
       <div class="month-ctrl" aria-label="월 이동">
         <button class="nav-btn" type="button" onclick="changeMonth(-1)" aria-label="이전 달">
@@ -2203,17 +2190,6 @@
         <i class="ti ti-circle-dot"></i><span>오늘</span>
       </button>
       <div class="toolbar-spacer"></div>
-      <div class="legend" aria-hidden="true">
-        <span class="legend-item">
-          <span class="legend-dot" style="background:var(--accent)"></span>1순위
-        </span>
-        <span class="legend-item">
-          <span class="legend-dot" style="background:var(--secondary)"></span>후보
-        </span>
-        <span class="legend-item">
-          <span class="legend-dot" style="background:var(--hol-t)"></span>공휴일
-        </span>
-      </div>
     </div>
 
     <!-- === Body (hero + tabs + calendar + notice) === -->
@@ -3951,45 +3927,40 @@ function buildModalShellHTML(dn){
     <div class="backdrop" onclick="closeMod(event,this)">
       <div class="modal" data-day="${dn}" onclick="event.stopPropagation()" role="dialog" aria-modal="true">
         <div class="mhdr">
-          <div class="mdate" aria-hidden="true">
-            <span class="md-dow">${dow}요일</span>
-            <span class="md-num">${dn}</span>
-          </div>
           <div class="mhdr-titles">
-            <div class="mtitle">${MN[cur]} ${dn}일의 점심</div>
-            <div class="msub-chips">
-              <span class="mchip"><i class="ti ti-tools-kitchen-2" style="font-size:11px"></i><span><b id="mCount" style="font-weight:600">0</b>개 후보</span></span>
-              ${h?'<span class="mchip hol"><i class="ti ti-flag-filled" style="font-size:10px"></i>'+esc(h)+'</span>':''}
-              ${isOff?'<span class="mchip off">공동 휴무</span>':''}
-              ${dnr?'<span class="mchip accent">🍻 회식일</span>':''}
-            </div>
+            <div class="mtitle">${MN[cur]} ${dn}일 <span class="lm-dow">${dow}요일</span></div>
+            <div class="msub"><b id="mCount">0</b>개 후보<span id="mVotesWrap" hidden> · 👍 <b id="mVotes">0</b>표</span>${h?' · <span class="msub-hl">'+esc(h)+'</span>':''}${isOff?' · 공동 휴무':''}${dnr?' · 🍻 회식일':''}</div>
           </div>
           <button class="mclose" type="button" onclick="closeMod()" aria-label="닫기"><i class="ti ti-x"></i></button>
         </div>
 
         <div class="elist" id="modalList"></div>
+        <hr class="hr" />
 
-        <div class="add-card">
-          <div class="ac-head"><i class="ti ti-plus"></i>새 후보 올리기</div>
-          <div class="ac-row">
-            <input class="inp" type="text" id="nName" placeholder="식당 이름"
+        <div class="lm-fields">
+          <div class="lm-field name">
+            <div class="lbl">식당 이름</div>
+            <input class="inp" type="text" id="nName" placeholder="예: 김밥천국"
                    maxlength="30" value="" list="restNames" autocomplete="off"
                    oninput="es.name=this.value"
                    onkeydown="if(event.key==='Enter'){event.preventDefault();onAddClick(${dn})}" />
             ${dataListHTML}
-            <input class="inp" type="text" id="nMemo" placeholder="메모 (선택)"
+          </div>
+          <div class="lm-field">
+            <div class="lbl">메모 (선택)</div>
+            <input class="inp" type="text" id="nMemo" placeholder="예: 3층 · 웨이팅 있음"
                    maxlength="40" value=""
                    oninput="es.memo=this.value"
                    onkeydown="if(event.key==='Enter'){event.preventDefault();onAddClick(${dn})}" />
           </div>
-          <button class="btn btn-primary btn-block" type="button" onclick="onAddClick(${dn})">
-            <i class="ti ti-plus"></i>후보 추가
-          </button>
         </div>
+        <button class="btn btn-primary btn-block" type="button" onclick="onAddClick(${dn})">
+          <i class="ti ti-plus"></i>후보 추가
+        </button>
 
         <div class="mfooter">
           <i class="ti ti-cloud" style="font-size:13px"></i>
-          실시간 동기화 · 팀원 모두와 공유됩니다
+          실시간 동기화 · 👍 를 눌러 투표 · 한 사람당 1표
         </div>
       </div>
     </div>`;
@@ -4000,6 +3971,7 @@ function refreshModalContent(dn, modalEl){
   const entries=(((D[curYear]||{})[cur]||{})[dn]&&D[curYear][cur][dn].entries)||[];
   const sorted = entries.slice().sort((a,b)=> (b.voters.size - a.voters.size) || (a.id - b.id));
 
+  const totalV = sorted.reduce((s,e)=>s+e.voters.size, 0);
   const eHTML = sorted.length ? sorted.map((e,i)=>{
     const v=e.voters.size, my=e.voters.has(MY_VOTER_ID);
     const win = i===0 && v>0;
@@ -4029,15 +4001,15 @@ function refreshModalContent(dn, modalEl){
         <div class="ename">${esc(e.name)}</div>
         ${e.memo?'<div class="ememo">'+esc(e.memo)+'</div>':''}
       </div>
-      <button class="evote${my?' voted':''}" type="button" aria-pressed="${my}" aria-label="투표" onclick="toggleVoteAsync(${e.id})">
-        <i class="ti ti-thumb-up"></i><span class="vote-num">${v}</span>
-      </button>
       <div class="eacts">
         <button class="eedit" type="button" onclick="onEditClick(${e.id})" aria-label="수정"><i class="ti ti-pencil"></i></button>
         <button class="edel" type="button" onclick="onDeleteClick(${e.id})" aria-label="삭제">
           <i class="ti ti-x"></i>
         </button>
       </div>
+      <button class="evote${my?' voted':''}" type="button" aria-pressed="${my}" aria-label="투표" onclick="toggleVoteAsync(${e.id})">
+        <i class="ti ti-thumb-up"></i><span class="vote-num">${v}</span>
+      </button>
     </div>`;
   }).join('') : '<div class="empty-state"><i class="ti ti-clipboard-list"></i>아직 후보가 없어요<br/>아래에서 첫 후보를 올려보세요!</div>';
 
@@ -4045,6 +4017,10 @@ function refreshModalContent(dn, modalEl){
   if(list) list.innerHTML = eHTML;
   const cntEl = modalEl.querySelector('#mCount');
   if(cntEl) cntEl.textContent = sorted.length;
+  const vWrap = modalEl.querySelector('#mVotesWrap');
+  const vEl = modalEl.querySelector('#mVotes');
+  if(vWrap) vWrap.hidden = totalV === 0;
+  if(vEl) vEl.textContent = totalV;
   if(_editingId != null){
     const el = document.getElementById('editName_'+_editingId);
     if(el){ el.focus(); el.setSelectionRange(el.value.length, el.value.length); }
@@ -4161,6 +4137,23 @@ document.addEventListener('keydown',(e)=>{
   else if(e.key==='Home' || e.key==='t' || e.key==='T'){ e.preventDefault(); jumpToToday(); }
   else if(e.key==='d' || e.key==='D'){ e.preventDefault(); toggleTheme(); }
 });
+
+// Mouse wheel over the calendar/tabs: down = next month, up = previous.
+// 델타 누적 + 쿨다운으로 트랙패드 관성 스크롤에도 한 칸씩만 움직인다.
+let _wheelAcc = 0, _wheelLock = 0;
+document.addEventListener('wheel', (e) => {
+  if(isModalOpen()) return;
+  if(!(e.target.closest && e.target.closest('#calGrid, #monthTabs'))) return;
+  e.preventDefault();
+  const now = Date.now();
+  if(now < _wheelLock){ _wheelAcc = 0; return; }
+  _wheelAcc += e.deltaY;
+  if(Math.abs(_wheelAcc) >= 60){
+    changeMonth(_wheelAcc > 0 ? 1 : -1);
+    _wheelAcc = 0;
+    _wheelLock = now + 400;
+  }
+}, { passive: false });
 
 // Touch swipe: left/right to change month
 let _touchStartX = null, _touchStartY = null;
