@@ -499,22 +499,65 @@
       color-mix(in oklch, var(--accent) 14%, transparent) 0%,
       color-mix(in oklch, var(--highlight) 8%, transparent) 100%);
   }
-  .big-date .bd-month {
+  /* 상단 행 — '오늘' 액센트 pill + 연도 */
+  .bd-top {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 12px;
+    position: relative;
+  }
+  .bd-today {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 11px; font-weight: 600; letter-spacing: .02em;
+    color: #fff; padding: 3px 10px 3px 9px; border-radius: 9999px;
+    background: linear-gradient(180deg, color-mix(in oklch, var(--accent) 86%, white), var(--accent));
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.3), 0 3px 8px -3px color-mix(in oklch, var(--accent) 60%, transparent);
+  }
+  [data-theme="dark"] .bd-today { color: var(--bg); }
+  .bd-dot {
+    width: 5px; height: 5px; border-radius: 50%;
+    background: currentColor;
+    animation: bd-dot-pulse 2.2s ease-in-out infinite;
+  }
+  @keyframes bd-dot-pulse {
+    0%, 100% { transform: scale(1);   opacity: .95; }
+    50%      { transform: scale(1.6); opacity: .5;  }
+  }
+  .bd-year {
     font-family: var(--ff-mono);
-    font-size: 11px; letter-spacing: .14em;
-    font-weight: 500; text-transform: uppercase;
-    color: var(--text-2);
-    margin-bottom: 4px;
+    font-size: 11px; font-weight: 500; letter-spacing: .12em;
+    color: var(--text-3);
+    font-variant-numeric: tabular-nums;
+  }
+  /* 메인 행 — 큰 숫자 + 세로 구분선 + 월/요일 스택 */
+  .bd-main {
+    display: flex; align-items: flex-end; gap: 14px;
+    position: relative;
   }
   .big-date .bd-num {
     font-family: var(--ff-numeric);
-    font-size: 80px; font-weight: 600;
-    line-height: .9; letter-spacing: -4px;
+    font-size: 74px; font-weight: 600;
+    line-height: .82; letter-spacing: -3px;
     font-variant-numeric: tabular-nums;
     text-shadow: 0 2px 0 rgba(255,255,255,.55);
     animation: fadeUp .35s var(--ease) both;
   }
+  .bd-side {
+    display: flex; flex-direction: column; gap: 3px;
+    padding: 0 0 5px 14px; min-width: 0;
+    border-left: 1px solid color-mix(in oklch, var(--text) 14%, transparent);
+    animation: fadeUp .35s var(--ease) .06s both;
+  }
+  .bd-mon {
+    font-family: var(--ff-display);
+    font-size: 22px; font-weight: 600; letter-spacing: -.5px;
+    line-height: 1; color: var(--text);
+  }
+  .bd-dow {
+    font-size: 13px; font-weight: 500;
+    color: var(--text-2);
+  }
   [data-theme="dark"] .big-date .bd-num { text-shadow: 0 2px 0 rgba(0,0,0,.45); }
+  [data-theme="dark"] .bd-side { border-left-color: color-mix(in oklch, var(--text) 18%, transparent); }
   /* 헤더 위를 천천히 떠다니는 빛 블롭 두 개 */
   .big-date::before, .big-date::after {
     content: ''; position: absolute; border-radius: 50%;
@@ -1955,10 +1998,13 @@
     }
 
     .today-card { border-radius: var(--r-md); }
-    .big-date { padding: 14px 16px 12px; }
-    .big-date .bd-month { font-size: 10px; }
-    .big-date .bd-num { font-size: 56px; letter-spacing: -2px; line-height: .95; }
-    .big-date .bd-holiday { margin-top: 6px; font-size: 10.5px; padding: 2px 8px; }
+    .big-date { padding: 12px 16px 12px; }
+    .bd-top { margin-bottom: 8px; }
+    .big-date .bd-num { font-size: 46px; letter-spacing: -1.5px; }
+    .bd-side { padding-left: 11px; padding-bottom: 3px; }
+    .bd-mon { font-size: 17px; }
+    .bd-dow { font-size: 11.5px; }
+    .big-date .bd-holiday { margin-top: 8px; font-size: 10.5px; padding: 2px 8px; }
     .today-card .body-inner { padding: 8px 16px 14px; }
     .today-card .ti-head { margin-bottom: 10px; }
     .today-card h2 { font-size: 17px; }
@@ -3084,11 +3130,19 @@ function renderSidebarHero(){
     el.innerHTML =
       '<div class="swatch"></div>' +
       '<div class="big-date">' +
-        '<div class="bd-month">' + MN_EN[t.m] + ' · ' + t.dow + '요일</div>' +
-        '<div class="bd-num">' + t.d + '</div>' +
+        '<div class="bd-top">' +
+          '<span class="bd-today"><span class="bd-dot"></span>오늘</span>' +
+          '<span class="bd-year">' + t.y + '</span>' +
+        '</div>' +
+        '<div class="bd-main">' +
+          '<div class="bd-num">' + t.d + '</div>' +
+          '<div class="bd-side">' +
+            '<div class="bd-mon">' + MN[t.m] + '</div>' +
+            '<div class="bd-dow">' + t.dow + '요일</div>' +
+          '</div>' +
+        '</div>' +
       '</div>' +
       '<div class="body-inner">' +
-        '<div class="eyebrow">탐색 중</div>' +
         '<h2><span class="emoji">🗓️</span>다른 달이에요</h2>' +
         '<div class="today-empty" style="margin-top:0;line-height:1.55">' +
           '지금은 오늘이 아닌 달을 보고 있어요.<br/>' +
@@ -3141,14 +3195,22 @@ function renderSidebarHero(){
   el.innerHTML = `
     <div class="swatch"></div>
     <div class="big-date">
-      <div class="bd-month">${MN_EN[t.m]} · ${t.dow}요일</div>
-      <div class="bd-num">${t.d}</div>
+      <div class="bd-top">
+        <span class="bd-today"><span class="bd-dot"></span>오늘</span>
+        <span class="bd-year">${t.y}</span>
+      </div>
+      <div class="bd-main">
+        <div class="bd-num">${t.d}</div>
+        <div class="bd-side">
+          <div class="bd-mon">${MN[t.m]}</div>
+          <div class="bd-dow">${t.dow}요일</div>
+        </div>
+      </div>
       ${holName ? '<div class="bd-holiday"><i class="ti ti-flag-filled"></i>'+esc(holName)+'</div>' : ''}
     </div>
     <div class="body-inner">
       <div class="ti-head">
         <div class="ti-titles">
-          <div class="eyebrow">Today's Pick</div>
           <h2><span class="emoji">🍱</span>오늘의 점심</h2>
         </div>
         <button class="ti-add" type="button" onclick="openModalForToday(${t.d})" aria-label="메뉴 추가" title="메뉴 추가">
