@@ -84,11 +84,15 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  // 메인 페이지
+  // 메인 페이지 — no-cache 로 항상 최신 배포본을 받게 한다
+  // (헤더가 없으면 브라우저 휴리스틱 캐시가 예전 HTML 을 재사용할 수 있음)
   if (req.method === 'GET' && (req.url === '/' || req.url === '/index.html')) {
     const htmlPath = path.join(__dirname, 'index.html');
     if (fs.existsSync(htmlPath)) {
-      res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+      res.writeHead(200, {
+        'Content-Type': 'text/html; charset=utf-8',
+        'Cache-Control': 'no-cache, must-revalidate'
+      });
       res.end(fs.readFileSync(htmlPath, 'utf8'));
     } else {
       res.writeHead(404); res.end('index.html not found');
