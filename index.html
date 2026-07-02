@@ -1639,6 +1639,188 @@
   .twk-btn-wide:active{ transform: scale(.98); }
   .twk-hint{ font-size: 11px; color: var(--text-3); line-height: 1.55; }
 
+  /* ============================================================
+     기록 관리 모달 리뉴얼 — 스큐어모픽 날짜 뱃지 + 순위 리스트 + 추가 카드
+     ============================================================ */
+  .mdate{
+    flex-shrink: 0; width: 54px; border-radius: 10px; overflow: hidden;
+    border: 1px solid var(--bd);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.4), 0 3px 8px -4px rgba(0,0,0,.25);
+    text-align: center; background: var(--surface-solid);
+  }
+  .mdate .md-dow{
+    display: block;
+    font-family: var(--ff-mono); font-size: 9.5px; font-weight: 500; letter-spacing: .08em;
+    padding: 3px 0; color: #fff;
+    background: linear-gradient(180deg, color-mix(in oklch, var(--accent) 86%, white), var(--accent));
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.25);
+  }
+  [data-theme="dark"] .mdate .md-dow{ color: var(--bg); }
+  .mdate .md-num{
+    display: block;
+    font-family: var(--ff-numeric); font-size: 25px; font-weight: 600;
+    letter-spacing: -1px; line-height: 1; padding: 5px 0 6px;
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+  }
+  .mhdr-titles{ flex: 1; min-width: 0; }
+  .msub-chips{ display: flex; gap: 5px; flex-wrap: wrap; margin-top: 6px; }
+  .mchip{
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 9999px;
+    background: var(--surface-2); border: 1px solid var(--bd); color: var(--text-2);
+  }
+  .mchip.accent{ background: var(--accent-soft); border-color: var(--accent-bd); color: var(--accent); }
+  .mchip.hol{ background: var(--hol-bg); border-color: var(--hol-bd); color: var(--hol-t); }
+  .mchip.off{ background: var(--off-bg); border-color: var(--off-bd); color: var(--off-t); }
+
+  .erank{
+    width: 26px; height: 26px; flex-shrink: 0; border-radius: 9999px;
+    display: grid; place-items: center;
+    font-family: var(--ff-numeric); font-size: 12px; font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    background: var(--surface-3); color: var(--text-2);
+  }
+  .erow.winner .erank{
+    background: linear-gradient(135deg, #f2c94c, #d4a02b);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.4), 0 2px 6px -2px rgba(212,160,43,.5);
+    font-size: 13px;
+  }
+  .einfo{ flex: 1; min-width: 0; }
+  .eacts{ display: flex; gap: 2px; flex-shrink: 0; align-items: center; }
+  /* 수정/삭제는 호버 시에만 드러난다 (터치 기기는 항상 표시) */
+  @media (hover: hover) and (pointer: fine){
+    .erow .eacts{ opacity: 0; transition: opacity var(--dur-fast) var(--ease-out); }
+    .erow:hover .eacts, .erow:focus-within .eacts{ opacity: 1; }
+  }
+  /* 리스트 스태거 — 위에서부터 살짝 시간차 등장 */
+  .elist .erow:nth-child(1){ animation-delay: 0ms; }
+  .elist .erow:nth-child(2){ animation-delay: 30ms; }
+  .elist .erow:nth-child(3){ animation-delay: 60ms; }
+  .elist .erow:nth-child(4){ animation-delay: 90ms; }
+  .elist .erow:nth-child(5){ animation-delay: 120ms; }
+  .elist .erow:nth-child(n+6){ animation-delay: 150ms; }
+
+  .add-card{
+    background: var(--surface-2);
+    border: 1px solid var(--bd); border-radius: var(--r-md);
+    padding: 12px;
+    box-shadow: inset 0 1px 0 var(--hi);
+  }
+  .ac-head{
+    display: flex; align-items: center; gap: 6px;
+    font-size: 12px; font-weight: 600; color: var(--text-2);
+    margin-bottom: 8px;
+  }
+  .ac-head .ti{ color: var(--accent); font-size: 13px; }
+  .ac-row{ display: flex; gap: 6px; margin-bottom: 8px; }
+  .ac-row .inp{ background: var(--surface-solid); }
+  .ac-row .inp:first-of-type{ flex: 1.4; }
+  .ac-row .inp:last-of-type{ flex: 1; }
+  .btn-block{ width: 100%; justify-content: center; }
+  @media (max-width: 520px){ .ac-row{ flex-direction: column; } }
+
+  /* ============================================================
+     회식 날짜 잡기 — 미니 캘린더
+     ============================================================ */
+  .ds-cal-head{
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 8px; margin-bottom: 6px; padding: 0 2px;
+  }
+  .ds-month{
+    font-family: var(--ff-display); font-weight: 600; font-size: 14px;
+    letter-spacing: -.28px; font-variant-numeric: tabular-nums;
+    color: var(--text);
+  }
+  .ds-grid{
+    display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px;
+    margin-bottom: 14px;
+  }
+  .ds-dow{
+    text-align: center;
+    font-family: var(--ff-mono); font-size: 10px; font-weight: 500;
+    color: var(--text-3); padding: 4px 0 6px;
+  }
+  .ds-dow.sun{ color: var(--sun); }
+  .ds-dow.sat{ color: var(--sat); }
+  .ds-day{
+    position: relative; aspect-ratio: 1; min-height: 34px;
+    border-radius: var(--r-sm); border: 1px solid transparent;
+    background: transparent; cursor: pointer;
+    font-family: var(--ff-numeric); font-size: 13px; font-weight: 500;
+    font-variant-numeric: tabular-nums; color: var(--text);
+    display: grid; place-items: center;
+    transition: background-color var(--dur-fast) var(--ease-out),
+                border-color var(--dur-fast) var(--ease-out),
+                transform var(--dur-fast) var(--ease-out);
+  }
+  .ds-day.sun{ color: var(--sun); }
+  .ds-day.sat{ color: var(--sat); }
+  .ds-day:hover:not(:disabled){ background: var(--surface-2); border-color: var(--bd); }
+  .ds-day:active:not(:disabled){ transform: scale(.9); }
+  .ds-day:disabled{ color: var(--text-3); opacity: .35; cursor: default; }
+  .ds-day.empty{ visibility: hidden; }
+  .ds-day.today-mark::after{
+    content: ''; position: absolute; left: 50%; bottom: 4px; transform: translateX(-50%);
+    width: 4px; height: 4px; border-radius: 50%; background: var(--teal);
+  }
+  .ds-day.sel{
+    background: linear-gradient(180deg, color-mix(in oklch, var(--accent) 86%, white), var(--accent));
+    color: #fff !important; border-color: transparent; font-weight: 600;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.3), 0 4px 10px -4px color-mix(in oklch, var(--accent) 60%, transparent);
+    animation: ds-pop .25s var(--ease-spring);
+  }
+  [data-theme="dark"] .ds-day.sel{ color: var(--bg) !important; }
+  .ds-day.sel.today-mark::after{ background: rgba(255,255,255,.8); }
+  @keyframes ds-pop{ from{ transform: scale(.8); } to{ transform: scale(1); } }
+  .ds-field{ margin-bottom: 12px; }
+
+  /* ============================================================
+     추가 애니메이션 — 상태를 설명하거나 손맛을 주는 것들
+     ============================================================ */
+  /* 주사위 버튼 글로스 스윕 — 몇 초에 한 번 광택이 지나간다 */
+  .dice-btn::after{
+    content: ''; position: absolute; top: 0; bottom: 0; width: 45%; left: -60%;
+    background: linear-gradient(105deg, transparent, rgba(255,255,255,.14) 45%, rgba(255,255,255,.26) 50%, rgba(255,255,255,.14) 55%, transparent);
+    transform: skewX(-18deg);
+    animation: btn-shine 5s ease-in-out infinite;
+    pointer-events: none;
+  }
+  .dice-btn[disabled]::after{ animation: none; opacity: 0; }
+  @keyframes btn-shine{
+    0%   { left: -60%; }
+    16%  { left: 130%; }
+    100% { left: 130%; }
+  }
+
+  /* 아이콘 회전 손맛 */
+  .theme-btn .ti, .settings-icon-btn .ti, .settings-fab .ti, .mclose .ti{
+    transition: transform .4s var(--ease-spring);
+  }
+  .theme-btn:hover .ti{ transform: rotate(180deg); }
+  .settings-icon-btn:hover .ti, .settings-fab:hover .ti{ transform: rotate(60deg); }
+  .mclose:hover .ti{ transform: rotate(90deg); }
+  .today-card .ti-add .ti{ transition: transform .35s var(--ease-spring); }
+  .today-card .ti-add:hover .ti{ transform: rotate(90deg); }
+
+  /* 칩·탭·투표 마이크로 인터랙션 */
+  .chip{ transition: background-color var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out); }
+  .chip:hover{ transform: translateY(-1px); }
+  .tab{ transition: background-color var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out); }
+  .tab:hover{ transform: translateY(-1px); }
+  .tab:active{ transform: scale(.96); }
+  .evote i{ transition: transform .3s var(--ease-spring); }
+  .evote:hover i{ transform: scale(1.15) rotate(-8deg); }
+  .dinner-banner .db-emoji{ transition: transform .3s var(--ease-spring); }
+  .dinner-banner:hover .db-emoji{ transform: rotate(-10deg) scale(1.15); }
+
+  /* 1위 뱃지 둥실 */
+  .today-leader .rank{ animation: rank-float 3.2s ease-in-out infinite; }
+  @keyframes rank-float{
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-2px); }
+  }
+
   /* === theme transition (토글 중에만) === */
   html.theme-switching,
   html.theme-switching *,
@@ -2030,9 +2212,6 @@
         </span>
         <span class="legend-item">
           <span class="legend-dot" style="background:var(--hol-t)"></span>공휴일
-        </span>
-        <span class="legend-item">
-          <span class="legend-dot" style="background:linear-gradient(135deg,var(--accent),var(--highlight))"></span>회식
         </span>
       </div>
     </div>
@@ -3081,38 +3260,138 @@ function rollDice(){
    전용 모달에서 장소 후보를 올리고 투표/랜덤으로 정한다.
 ================================================================== */
 
-/* ----- mutations ----- */
-async function onCreateDinnerClick(){
-  const dEl = document.getElementById('twkDinnerDate');
-  const tEl = document.getElementById('twkDinnerTitle');
-  const val = dEl && dEl.value;
-  if(!val){ _shakeInput('twkDinnerDate'); return; }
-  const parts = val.split('-').map(Number);
-  const y = parts[0], m = parts[1], dd = parts[2];
-  if(!YEARS.includes(y) || !MONTHS.includes(m)){
-    _shakeInput('twkDinnerDate');
-    showToast(YEAR_START + '–' + YEAR_END + ' 사이 날짜만 가능해요', 'err');
-    return;
-  }
+/* ----- 회식 날짜 잡기 — 미니 캘린더 모달 ----- */
+let dscView = null;   // {y, m} 지금 보고 있는 달
+let dscSel  = null;   // {y, m, d} 선택한 날짜
+let dscTitle = '';
+
+function openDinnerScheduler(){
+  if(window.closeTweaks) closeTweaks();
+  const t = new Date();
+  let y = t.getFullYear(), m = t.getMonth()+1;
+  if(!YEARS.includes(y)){ y = YEAR_START; m = 1; }
+  dscView = { y, m };
+  dscSel = null;
+  dscTitle = '';
+  openDay = null; openDinnerId = null; helpOpen = false;
+  document.getElementById('mw').innerHTML = `
+    <div class="backdrop" onclick="closeMod(event,this)">
+      <div class="modal" onclick="event.stopPropagation()" role="dialog" aria-modal="true">
+        <div class="mhdr">
+          <div>
+            <div class="mtitle">🍻 회식 날짜 잡기</div>
+            <div class="msub">날짜를 고르면 달력에 배지가 생기고 장소 투표를 시작할 수 있어요</div>
+          </div>
+          <button class="mclose" type="button" onclick="closeMod()" aria-label="닫기"><i class="ti ti-x"></i></button>
+        </div>
+        <div class="ds-cal-head">
+          <button class="nav-btn" id="dscPrev" type="button" onclick="dscNav(-1)" aria-label="이전 달"><i class="ti ti-chevron-left"></i></button>
+          <span class="ds-month" id="dscMonth"></span>
+          <button class="nav-btn" id="dscNext" type="button" onclick="dscNav(1)" aria-label="다음 달"><i class="ti ti-chevron-right"></i></button>
+        </div>
+        <div class="ds-grid" id="dscGrid"></div>
+        <div class="ds-field">
+          <div class="lbl">회식 이름 (선택)</div>
+          <input class="inp" type="text" id="dscTitleInp" maxlength="30"
+                 placeholder="예: 분기 회식 · 송별회" autocomplete="off"
+                 oninput="dscTitle=this.value" />
+        </div>
+        <button class="btn btn-primary btn-block" id="dscConfirmBtn" type="button" disabled onclick="dscConfirm()">날짜를 골라주세요</button>
+        <div class="mfooter">
+          <i class="ti ti-info-circle" style="font-size:13px"></i>
+          지난 날짜와 이미 회식이 있는 날은 고를 수 없어요
+        </div>
+      </div>
+    </div>`;
+  document.body.classList.add('modal-open');
+  renderDscCal();
+  if(window._animateModalOpen) window._animateModalOpen();
+}
+
+function renderDscCal(){
+  const g = document.getElementById('dscGrid');
+  const lbl = document.getElementById('dscMonth');
+  if(!g || !lbl || !dscView) return;
+  const y = dscView.y, m = dscView.m;
+  lbl.textContent = y + '년 ' + MN[m];
+
   const t = new Date();
   const t0 = new Date(t.getFullYear(), t.getMonth(), t.getDate()).getTime();
-  if(new Date(y, m-1, dd).getTime() < t0){
-    _shakeInput('twkDinnerDate');
-    showToast('지난 날짜에는 잡을 수 없어요', 'err');
-    return;
+  const firstDay = new Date(y, m-1, 1).getDay();
+  const dim = new Date(y, m, 0).getDate();
+
+  let out = DOW_KR.map((d,i)=>'<span class="ds-dow'+(i===0?' sun':i===6?' sat':'')+'">'+d+'</span>').join('');
+  for(let i=0;i<firstDay;i++) out += '<span class="ds-day empty"></span>';
+  for(let d=1; d<=dim; d++){
+    const time = new Date(y, m-1, d).getTime();
+    const taken = !!getDinnerOn(y, m, d);
+    const dis = time < t0 || taken;
+    const sel = dscSel && dscSel.y===y && dscSel.m===m && dscSel.d===d;
+    const col = new Date(y, m-1, d).getDay();
+    out += '<button type="button" class="ds-day'+(sel?' sel':'')+(time===t0?' today-mark':'')+
+      (col===0?' sun':col===6?' sat':'')+'"'+
+      (dis?' disabled':'')+(taken?' title="이미 회식이 있는 날이에요"':'')+
+      ' onclick="dscPick('+d+')">'+(taken?'🍻':d)+'</button>';
   }
-  if(getDinnerOn(y, m, dd)){
-    _shakeInput('twkDinnerDate');
-    showToast('그 날엔 이미 회식이 있어요', 'err');
-    return;
+  g.innerHTML = out;
+
+  // 이동 범위: 이번 달 ~ 마지막 지원 연도 12월
+  const idx = YEARS.indexOf(y)*12 + (m-1);
+  const minIdx = YEARS.includes(t.getFullYear()) ? YEARS.indexOf(t.getFullYear())*12 + t.getMonth() : 0;
+  const maxIdx = YEARS.length*12 - 1;
+  const prevB = document.getElementById('dscPrev'), nextB = document.getElementById('dscNext');
+  if(prevB) prevB.disabled = idx <= minIdx;
+  if(nextB) nextB.disabled = idx >= maxIdx;
+
+  const btn = document.getElementById('dscConfirmBtn');
+  if(btn){
+    if(dscSel){
+      const dow = DOW_KR[new Date(dscSel.y, dscSel.m-1, dscSel.d).getDay()];
+      btn.disabled = false;
+      btn.innerHTML = '<i class="ti ti-calendar-plus"></i>' +
+        dscSel.m + '월 ' + dscSel.d + '일 (' + dow + ') 로 잡기';
+    } else {
+      btn.disabled = true;
+      btn.textContent = '날짜를 골라주세요';
+    }
   }
-  const title = ((tEl && tEl.value) || '').trim();
+}
+
+function dscNav(delta){
+  if(!dscView) return;
+  const t = new Date();
+  const idx = YEARS.indexOf(dscView.y)*12 + (dscView.m-1) + delta;
+  const minIdx = YEARS.includes(t.getFullYear()) ? YEARS.indexOf(t.getFullYear())*12 + t.getMonth() : 0;
+  const maxIdx = YEARS.length*12 - 1;
+  if(idx < minIdx || idx > maxIdx) return;
+  dscView = { y: YEARS[Math.floor(idx/12)], m: (idx%12)+1 };
+  renderDscCal();
+}
+
+function dscPick(d){
+  if(!dscView) return;
+  dscSel = { y: dscView.y, m: dscView.m, d };
+  renderDscCal();
+}
+
+async function dscConfirm(){
+  if(!dscSel) return;
+  const y = dscSel.y, m = dscSel.m, dd = dscSel.d;
+  if(getDinnerOn(y, m, dd)){ showToast('그 날엔 이미 회식이 있어요', 'err'); renderDscCal(); return; }
+  const title = (dscTitle||'').trim();
+  const btn = document.getElementById('dscConfirmBtn');
+  if(btn) btn.disabled = true;
   setSyncState('sv');
   const { error } = await sb.from('dinners').insert({
     year:y, month:m, day:dd, title, created_by:MY_VOTER_ID
   });
   setSyncState(error ? 'err' : 'ok');
-  if(error){ showToast('회식 저장 실패: ' + error.message, 'err'); return; }
+  if(error){
+    if(btn) btn.disabled = false;
+    showToast('회식 저장 실패: ' + error.message, 'err');
+    return;
+  }
+  closeMod();
   showToast('🍻 회식이 잡혔어요! 배너에서 장소를 정해보세요', 'ok');
 }
 
@@ -3475,6 +3754,14 @@ function sw(y, m){
   void g.offsetWidth;
   g.classList.add(newIdx > prevIdx ? 'slide-r' : 'slide-l');
   updateNavButtons();
+  // 월 라벨 micro-pop — 달이 실제로 바뀔 때만
+  const ml = document.querySelector('.month-label');
+  if(ml && typeof ml.animate === 'function'){
+    ml.animate(
+      [{ opacity: .35, transform: 'translateY(-3px)' }, { opacity: 1, transform: 'translateY(0)' }],
+      { duration: 220, easing: 'cubic-bezier(0.175, 0.885, 0.32, 1.1)' }
+    );
+  }
 }
 
 function changeMonth(delta){
@@ -3654,7 +3941,6 @@ function buildModalShellHTML(dn){
   const h=getHolidayName(curYear,cur,dn), isOff=dn===lastFri(curYear,cur);
   const dow=DOW_KR[new Date(curYear,cur-1,dn).getDay()];
   const dnr=getDinnerOn(curYear,cur,dn);
-  const sub=curYear+'년 '+MN[cur]+' '+dn+'일 ('+dow+')'+(h?' · '+h:isOff?' · 공동휴무':'')+(dnr?' · 🍻 회식일':'');
 
   const names = getAllRestaurantNames();
   const dataListHTML = names.length
@@ -3665,38 +3951,39 @@ function buildModalShellHTML(dn){
     <div class="backdrop" onclick="closeMod(event,this)">
       <div class="modal" data-day="${dn}" onclick="event.stopPropagation()" role="dialog" aria-modal="true">
         <div class="mhdr">
-          <div>
-            <div class="mtitle">기록 관리</div>
-            <div class="msub">${esc(sub)}</div>
+          <div class="mdate" aria-hidden="true">
+            <span class="md-dow">${dow}요일</span>
+            <span class="md-num">${dn}</span>
+          </div>
+          <div class="mhdr-titles">
+            <div class="mtitle">${MN[cur]} ${dn}일의 점심</div>
+            <div class="msub-chips">
+              <span class="mchip"><i class="ti ti-tools-kitchen-2" style="font-size:11px"></i><span><b id="mCount" style="font-weight:600">0</b>개 후보</span></span>
+              ${h?'<span class="mchip hol"><i class="ti ti-flag-filled" style="font-size:10px"></i>'+esc(h)+'</span>':''}
+              ${isOff?'<span class="mchip off">공동 휴무</span>':''}
+              ${dnr?'<span class="mchip accent">🍻 회식일</span>':''}
+            </div>
           </div>
           <button class="mclose" type="button" onclick="closeMod()" aria-label="닫기"><i class="ti ti-x"></i></button>
         </div>
 
         <div class="elist" id="modalList"></div>
-        <hr class="hr" />
 
-        <div class="igrp">
-          <div>
-            <div class="lbl">식당 이름</div>
-            <input class="inp" type="text" id="nName" placeholder="예: 김밥천국"
+        <div class="add-card">
+          <div class="ac-head"><i class="ti ti-plus"></i>새 후보 올리기</div>
+          <div class="ac-row">
+            <input class="inp" type="text" id="nName" placeholder="식당 이름"
                    maxlength="30" value="" list="restNames" autocomplete="off"
                    oninput="es.name=this.value"
                    onkeydown="if(event.key==='Enter'){event.preventDefault();onAddClick(${dn})}" />
             ${dataListHTML}
-          </div>
-          <div>
-            <div class="lbl">메모 (선택)</div>
-            <input class="inp" type="text" id="nMemo" placeholder="예: 3층 · 웨이팅 있음"
+            <input class="inp" type="text" id="nMemo" placeholder="메모 (선택)"
                    maxlength="40" value=""
                    oninput="es.memo=this.value"
                    onkeydown="if(event.key==='Enter'){event.preventDefault();onAddClick(${dn})}" />
           </div>
-        </div>
-
-        <div class="mbtns">
-          <button class="btn btn-ghost" type="button" onclick="closeMod()">닫기</button>
-          <button class="btn btn-primary" type="button" onclick="onAddClick(${dn})">
-            <i class="ti ti-plus"></i>추가
+          <button class="btn btn-primary btn-block" type="button" onclick="onAddClick(${dn})">
+            <i class="ti ti-plus"></i>후보 추가
           </button>
         </div>
 
@@ -3713,12 +4000,12 @@ function refreshModalContent(dn, modalEl){
   const entries=(((D[curYear]||{})[cur]||{})[dn]&&D[curYear][cur][dn].entries)||[];
   const sorted = entries.slice().sort((a,b)=> (b.voters.size - a.voters.size) || (a.id - b.id));
 
-  const eHTML = sorted.length ? sorted.map(e=>{
+  const eHTML = sorted.length ? sorted.map((e,i)=>{
     const v=e.voters.size, my=e.voters.has(MY_VOTER_ID);
+    const win = i===0 && v>0;
     if(_editingId === e.id){
       return `
       <div class="erow editing" data-eid="${e.id}">
-        <span class="edot"></span>
         <div class="edit-form">
           <input class="inp" type="text" id="editName_${e.id}" maxlength="30"
                  value="${esc(_editDraft.name)}" list="restNames" autocomplete="off"
@@ -3736,24 +4023,28 @@ function refreshModalContent(dn, modalEl){
       </div>`;
     }
     return `
-    <div class="erow" data-eid="${e.id}">
-      <span class="edot"></span>
-      <div style="flex:1;min-width:0">
+    <div class="erow${win?' winner':''}" data-eid="${e.id}">
+      <div class="erank">${win?'👑':(i+1)}</div>
+      <div class="einfo">
         <div class="ename">${esc(e.name)}</div>
         ${e.memo?'<div class="ememo">'+esc(e.memo)+'</div>':''}
       </div>
       <button class="evote${my?' voted':''}" type="button" aria-pressed="${my}" aria-label="투표" onclick="toggleVoteAsync(${e.id})">
         <i class="ti ti-thumb-up"></i><span class="vote-num">${v}</span>
       </button>
-      <button class="eedit" type="button" onclick="onEditClick(${e.id})" aria-label="수정"><i class="ti ti-pencil"></i></button>
-      <button class="edel" type="button" onclick="onDeleteClick(${e.id})" aria-label="삭제">
-        <i class="ti ti-x"></i>
-      </button>
+      <div class="eacts">
+        <button class="eedit" type="button" onclick="onEditClick(${e.id})" aria-label="수정"><i class="ti ti-pencil"></i></button>
+        <button class="edel" type="button" onclick="onDeleteClick(${e.id})" aria-label="삭제">
+          <i class="ti ti-x"></i>
+        </button>
+      </div>
     </div>`;
-  }).join('') : '<div class="empty-state"><i class="ti ti-clipboard-list"></i>아직 기록된 내용이 없어요</div>';
+  }).join('') : '<div class="empty-state"><i class="ti ti-clipboard-list"></i>아직 후보가 없어요<br/>아래에서 첫 후보를 올려보세요!</div>';
 
   const list = modalEl.querySelector('#modalList');
   if(list) list.innerHTML = eHTML;
+  const cntEl = modalEl.querySelector('#mCount');
+  if(cntEl) cntEl.textContent = sorted.length;
   if(_editingId != null){
     const el = document.getElementById('editName_'+_editingId);
     if(el){ el.focus(); el.setSelectionRange(el.value.length, el.value.length); }
@@ -4177,8 +4468,9 @@ setInterval(() => { if(isTodaysMonth()){ renderHero(); renderSidebarHero(); } },
     setTimeout(finalizeClose, 320);
   };
 
-  // Expose confetti so the dinner dice (rollDinnerDice) can celebrate too.
+  // Expose confetti (dinner dice) + modal-open animation (dinner scheduler).
   window._fireConfetti = fireConfetti;
+  window._animateModalOpen = animateModalOpen;
 
   /* (6) Tip rotator — only when there are no records this month */
   const TIPS = [
@@ -4289,9 +4581,6 @@ setInterval(() => { if(isTodaysMonth()){ renderHero(); renderSidebarHero(); } },
       inner = '<div class="twk-hint">회식 기능을 켜려면 Supabase SQL Editor 에서 <b>supabase/schema.sql</b> 을 한 번 더 실행해주세요.</div>';
     } else {
       const ups = getUpcomingDinners();
-      const t = new Date();
-      const pad = n => String(n).padStart(2, '0');
-      const minDate = t.getFullYear() + '-' + pad(t.getMonth()+1) + '-' + pad(t.getDate());
       const rows = ups.map(function(d){
         const dow = DOW_KR[new Date(d.year, d.month-1, d.day).getDay()];
         const dd = dinnerDday(d);
@@ -4306,12 +4595,8 @@ setInterval(() => { if(isTodaysMonth()){ renderHero(); renderSidebarHero(); } },
       }).join('');
       inner =
         (rows ? '<div class="twk-dinner-list">'+rows+'</div>' : '')+
-        '<div class="twk-dinner-form">'+
-          '<input class="inp" type="date" id="twkDinnerDate" min="'+minDate+'" max="'+YEAR_END+'-12-31" aria-label="회식 날짜" />'+
-          '<input class="inp" type="text" id="twkDinnerTitle" maxlength="30" placeholder="이름 (선택) — 예: 분기 회식" aria-label="회식 이름" />'+
-          '<button class="twk-btn-wide" type="button" data-twk-dinner-create><i class="ti ti-calendar-plus" style="font-size:14px"></i>회식 날짜 잡기</button>'+
-        '</div>'+
-        (rows ? '' : '<div class="twk-hint" style="margin-top:6px">날짜를 잡으면 달력에 🍻 표시와 장소 투표 화면이 생겨요.</div>');
+        '<button class="twk-btn-wide" type="button" data-twk-dinner-create><i class="ti ti-calendar-plus" style="font-size:14px"></i>회식 날짜 잡기</button>'+
+        (rows ? '' : '<div class="twk-hint" style="margin-top:6px">캘린더에서 날짜를 고르면 🍻 배지와 장소 투표 화면이 생겨요.</div>');
     }
     return '<div class="twk-section">'+
       '<div class="twk-section-title">🍻 회식</div>'+inner+
@@ -4402,7 +4687,7 @@ setInterval(() => { if(isTodaysMonth()){ renderHero(); renderSidebarHero(); } },
       });
     });
     panel.querySelectorAll('[data-twk-dinner-create]').forEach(function(btn){
-      btn.addEventListener('click', onCreateDinnerClick);
+      btn.addEventListener('click', openDinnerScheduler);
     });
   }
 
