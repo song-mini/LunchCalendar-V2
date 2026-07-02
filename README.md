@@ -1,205 +1,130 @@
-# 팀 GTL 캘린더 — Supabase 실시간 버전
+# 팀 GTL 캘린더
 
-기존 `data.json` 파일 저장 방식에서 **Supabase Postgres + Realtime** 으로 교체한 버전입니다.
+> "오늘 뭐 먹지?" 를 하루 30분씩 고민하는 팀을 위한 실시간 점심 달력
 
-| 항목 | 변경 전 | 변경 후 |
-| --- | --- | --- |
-| 저장소 | `data.json` (디스크) | Supabase Postgres |
-| 영구성 | Render 재시작 시 ❌ 사라짐 | ✅ 영구 보관 |
-| 실시간 반영 | ❌ (새로고침 필요) | ✅ 자동 (postgres_changes) |
-| 동시 편집 | ⚠️ 전체 덮어쓰기 (한쪽 사라짐) | ✅ 안전 (row 단위) |
-| 비용 | Render 무료 | Render 무료 + Supabase 무료 |
+날짜 칸에 식당을 올리고, 👍 로 투표하고, 그래도 못 정하겠으면 주사위한테 맡깁니다.
+팀원 누가 뭘 올리든 새로고침 없이 바로 보입니다.
 
----
+의존성 0개짜리 Node 서버 하나 + 단일 `index.html` — 데이터와 실시간 동기화는 전부
+브라우저가 Supabase 와 직접 주고받습니다.
 
-## 0. 준비물
+<br/>
 
-- Supabase 계정 (무료) — https://supabase.com
-- 기존 Render 계정
-- 이 폴더 (`lunch-calendar-supabase/`)
+## 뭘 할 수 있나
 
----
+**점심**
+- 날짜 칸을 클릭해 식당 후보 등록 (메모, 이전 입력 자동완성 지원)
+- 후보마다 👍 투표 — 한 디바이스 1표, 1위엔 왕관 👑
+- 오전엔 왼쪽 "오늘의 점심" 카드에 오늘 후보와 현재 1위가 정리됨
+- **메뉴 정해줘!** 버튼 — 셔플 스포트라이트 후 랜덤 당첨, 김 나는 이펙트 + 음식 콘페티 🎲
 
-## 1. GitHub 에 새 리포지토리 만들기
+**회식**
+- 설정(⚙️)에서 미니 캘린더로 날짜를 잡으면 달력에 🍻 배지 + D-day 배너 생성
+- 배너를 눌러 장소 후보를 올리고 투표로 결정 (여기도 주사위 있음)
 
-기존 `lunch-calendar` 리포가 있더라도, 이 폴더를 **새 리포로 올리는 게 권장**입니다. (구버전은 백업 차원에서 그대로 두세요.)
+**보는 재미**
+- 컬러 팔레트 6종 (살구 · 라떼 · 피스타치오 · 베리 · 잉크 · 로즈) + 다크 모드
+- 제목 폰트 5종 (Geist 기본 · 함렛 · 고운바탕 · 송명 · 고운돋움)
+- 레이아웃 2종 (사이드바 / 상단 카드), FHD 화면에선 스크롤 없이 꽉 차게
+- 한국 공휴일 자동 표시 (KASI 특일 정보 API), 매달 마지막 금요일은 공동 휴무로 표시
 
-### 방법 A — GitHub 웹 UI 에 그냥 드래그
-1. https://github.com/new 에서 새 리포지토리 생성 (예: `lunch-calendar-v2`)
-2. "uploading an existing file" 링크 클릭
-3. 이 폴더 안의 파일을 **전부** 드래그해서 올림
-   - `index.html`, `server.js`, `package.json`, `.gitignore`, `.env.example`, `README.md`, `supabase/schema.sql`
-4. Commit
+**조작**
+| 동작 | 방법 |
+| --- | --- |
+| 월 이동 | `←` `→` 키, 마우스 휠, 모바일 스와이프 |
+| 오늘로 점프 | `T` 또는 `Home` |
+| 다크 모드 토글 | `D` |
+| 설정 열기 | 좌측 상단 ●●● 또는 우하단 ⚙️ |
 
-### 방법 B — 터미널
+<br/>
+
+## 바로 돌려보기
+
 ```bash
-cd lunch-calendar-supabase
-git init
-git add .
-git commit -m "Initial commit (Supabase realtime version)"
-git branch -M main
-git remote add origin https://github.com/<your-username>/lunch-calendar-v2.git
-git push -u origin main
+node server.js
 ```
 
----
+이게 전부입니다. `npm install` 필요 없음 (의존성 0개).
+Supabase 환경 변수가 없으면 시드 데이터가 들어간 인메모리 mock 으로 떠서,
+`http://localhost:3000` 에서 모든 기능을 그대로 만져볼 수 있습니다.
 
-## 2. Supabase 프로젝트 만들기
+실제 데이터로 붙이려면:
 
-1. https://supabase.com 접속 → **Start your project** → GitHub 로 로그인
-2. **New project** 클릭
-3. 입력:
-   - **Name**: `lunch-calendar` (아무거나)
-   - **Database Password**: 적당히 강한 비밀번호 (어차피 직접 쓸 일 없음, 어딘가 메모만)
-   - **Region**: **`Northeast Asia (Seoul)`** 선택 — 한국에서 가장 빠름
-   - **Pricing Plan**: `Free`
-4. **Create new project** → 약 2분 대기 (DB 프로비저닝)
+```bash
+cp .env.example .env        # SUPABASE_URL, SUPABASE_ANON_KEY 채우기
+node --env-file=.env server.js
+```
 
-## 3. 스키마 적용 (테이블 만들기)
+<br/>
 
-1. 프로비저닝 끝나면 좌측 메뉴에서 **SQL Editor** 클릭
-2. **New query** 버튼
-3. 이 폴더의 `supabase/schema.sql` 파일 전체 내용을 복사해서 붙여넣기
-4. 우측 하단 **Run** 클릭 (또는 `Ctrl+Enter`)
-5. "Success. No rows returned" 같은 메시지가 뜨면 OK
+## 배포 (Render + Supabase, 둘 다 무료)
 
-확인: 좌측 **Table Editor** 클릭 → `entries`, `votes`, `dinners`, `dinner_places`, `dinner_votes` 테이블이 보여야 함.
+요약하면 ① Supabase 프로젝트 만들고 ② 스키마 넣고 ③ Render 에 리포 연결 + 환경 변수 두 개.
 
-> 💡 **이미 운영 중인 프로젝트에 회식 기능을 추가하려면** — `supabase/schema.sql` 전체를 SQL Editor 에서 한 번 더 실행하면 됩니다 (모든 구문이 idempotent 라 기존 데이터는 안전). 실행 전까지는 회식 기능만 비활성화되고 점심 캘린더는 정상 작동합니다.
+<details>
+<summary><b>따라하기 (처음이면 펼치세요)</b></summary>
 
-## 4. URL + Anon Key 복사
+### 1. Supabase 프로젝트
 
-1. 좌측 메뉴 맨 아래 **Project Settings** (⚙️ 아이콘) 클릭
-2. **API** 탭
-3. 두 값을 메모장에 복사:
-   - **Project URL** — `https://xxxxxxxxxxxxxxxxxxxx.supabase.co` 형태
-   - **anon public** key — `eyJ...` 로 시작하는 긴 문자열
+1. [supabase.com](https://supabase.com) → New project
+2. Region 은 `Northeast Asia (Seoul)`, Plan 은 Free
+3. 프로비저닝이 끝나면 **SQL Editor** → `supabase/schema.sql` 내용 전체 붙여넣고 Run
+4. Table Editor 에 `entries` `votes` `dinners` `dinner_places` `dinner_votes` 가 보이면 성공
 
-> 💡 `service_role` key 는 **절대 복사하지 마세요**. 그건 슈퍼유저 권한이라 브라우저에 노출되면 안 됩니다. `anon public` 만 사용합니다.
+이미 운영 중인 DB 에 새 테이블만 추가할 때도 `schema.sql` 을 통째로 다시 실행하면
+됩니다 — 전부 idempotent 라 기존 데이터는 건드리지 않습니다.
 
----
+### 2. 키 복사
 
-## 5. Render 에 배포
+Project Settings → API 에서 두 값을 복사합니다.
 
-### 5-1. 새 웹 서비스로 다시 만들기 (권장)
-1. https://dashboard.render.com → **New** → **Web Service**
-2. GitHub 연결 후 방금 만든 `lunch-calendar-v2` 리포 선택
-3. 설정:
-   - **Name**: `lunch-calendar-v2`
-   - **Region**: `Singapore` (한국에서 가장 가까움)
-   - **Branch**: `main`
-   - **Build Command**: 비워둠
-   - **Start Command**: `node server.js`
-   - **Instance Type**: `Free`
-4. **Environment Variables** 섹션에서 추가:
+- **Project URL** (`https://xxxx.supabase.co`)
+- **anon public** key
+
+`service_role` 키는 브라우저에 노출되면 안 되므로 절대 쓰지 않습니다.
+
+### 3. Render
+
+1. [dashboard.render.com](https://dashboard.render.com) → New → Web Service → 이 리포 연결
+2. Branch `main` / Build Command 비움 / Start Command `node server.js` / Free
+3. Environment Variables:
+
    | Key | Value |
    | --- | --- |
-   | `SUPABASE_URL` | (4번에서 복사한 URL) |
-   | `SUPABASE_ANON_KEY` | (4번에서 복사한 anon key) |
-   | `HOLIDAY_API_KEY` | (공공데이터포털 "특일 정보" Decoding 서비스키, 선택) |
+   | `SUPABASE_URL` | 위에서 복사한 URL |
+   | `SUPABASE_ANON_KEY` | 위에서 복사한 anon key |
+   | `HOLIDAY_API_KEY` | 공공데이터포털 "특일 정보" 서비스키 *(선택 — 없으면 공휴일 표시만 꺼짐)* |
 
-   > `HOLIDAY_API_KEY`는 공휴일 자동 동기화용입니다. 비워두면 캘린더는 정상 작동하지만 공휴일 표시가 비활성화됩니다. 발급: https://www.data.go.kr → "특일 정보" 검색 → 활용신청 → 마이페이지 → 인증키.
-5. **Create Web Service** → 자동 배포 (약 1~2분)
+4. 배포 후 우측 상단 표시가 **"서버에 저장됨"** 으로 바뀌면 끝.
+   다른 브라우저에서 열어 실시간으로 같이 움직이는지 확인해보세요.
 
-### 5-2. 기존 서비스의 리포만 바꾸고 싶다면
-- 기존 서비스의 **Settings** → **Repository** → 새 리포 URL 로 변경
-- **Environment** 탭에서 위 두 환경 변수 추가
-- **Manual Deploy** → **Deploy latest commit**
+</details>
 
----
-
-## 6. 테스트
-
-1. Render 가 준 URL 접속 (예: `https://lunch-calendar-v2.onrender.com`)
-2. 우측 상단 동기 표시줄 확인:
-   - **"불러오는 중…"** → **"서버에 저장됨"** 으로 바뀌면 ✅ Supabase 연결 성공
-   - **"설정 누락"** 이면 환경 변수가 안 잡힌 것 → Render Environment 다시 확인
-   - **"연결 오류"** 면 SQL 스키마가 적용 안 됐거나 anon key 가 틀린 것 (표시줄 클릭 시 재시도)
-3. 5월 어느 날 칸 클릭 → 식당 이름 입력 → 추가
-4. **다른 브라우저 / 폰** 에서 같은 URL 열어서 — 새로고침 없이 즉시 같은 내용이 보이면 실시간 OK 👍
-
-### 회식 기능 사용법
-
-1. 우측 하단 ⚙️ (또는 좌측 상단 ●●● 점 3개) → 설정 패널의 **🍻 회식** 섹션
-2. 날짜 선택 (+ 이름은 선택) → **회식 날짜 잡기**
-3. 달력 해당 날짜에 🍻 태그가, 달력 위에는 D-day 배너가 생김
-4. 배너/태그 클릭 → **장소 정하기** 화면에서 후보 등록 + 투표 (🎲 골라줘로 랜덤 선택도 가능)
-5. 회식이 끝나거나 취소하려면 설정 패널 또는 장소 화면의 **회식 취소**
-
----
-
-## 7. 비용 / 한도 (참고)
-
-- **Supabase Free**: DB 500MB + Auth + Realtime 200 동시 접속 + Egress 5GB/월. 점심 캘린더 8개월 운영 시 0.01% 도 안 씀.
-- **Render Free**: 15분 미사용 시 sleep — **이제 무관**. 자다 깨도 데이터가 Supabase 에 있으므로 안 사라짐. 첫 요청만 5~10초 늦게 응답.
-- 둘 다 평생 무료로 충분합니다.
-
----
-
-## 8. 자주 막히는 부분
-
-| 증상 | 해결 |
-| --- | --- |
-| "설정 누락" 표시 | Render → Environment → `SUPABASE_URL`, `SUPABASE_ANON_KEY` 둘 다 들어갔는지 확인. 추가 후 **Manual Deploy 한 번 더** (env 바뀌면 재배포 필요). |
-| 설정 패널에 "회식 기능을 켜려면…" 안내가 보임 | `supabase/schema.sql` 을 SQL Editor 에서 다시 실행 (dinners 테이블들이 아직 없는 상태). |
-| "연결 오류 · 재시도" 표시 | (1) Supabase SQL 스키마 적용했는지 확인 (Table Editor 에 entries/votes 보여야 함). (2) Project Settings → API 의 **anon public** 키를 썼는지 (service_role 아님). 표시줄을 클릭하면 다시 연결을 시도합니다. |
-| 추가는 되는데 다른 브라우저에서 안 보임 | Supabase Dashboard → Database → Replication → `supabase_realtime` publication 에 entries, votes 둘 다 들어있는지 확인. schema.sql 이 자동으로 넣어주지만 가끔 빠짐. |
-| 같은 사람이 두 번 투표됨 | localStorage 가 비워졌거나, 시크릿 모드. 정상 동작. 한 디바이스 = 1표. |
-| Render 가 자다 깨서 첫 응답이 느림 | 무료 플랜 특성. UptimeRobot 으로 5분마다 `/healthz` 핑 보내면 sleep 방지 (선택). |
-
----
-
-## 9. 데이터 백업
-
-Supabase Dashboard → **Database** → **Backups** → 일일 백업이 자동으로 7일치 보관됩니다 (무료 플랜도).
-
-수동으로 받고 싶으면 SQL Editor 에서:
-```sql
-select * from entries;
-select * from votes;
-```
-실행 후 우측 상단 **Download CSV**.
-
----
-
-## 10. 로컬 개발
-
-```bash
-cd lunch-calendar-supabase
-cp .env.example .env
-# .env 에 본인 SUPABASE_URL, SUPABASE_ANON_KEY 채우기
-
-# .env 파일을 자동으로 읽으려면 (선택):
-node --env-file=.env server.js     # node 20+
-# 또는
-SUPABASE_URL=... SUPABASE_ANON_KEY=... node server.js
-```
-
-브라우저로 `http://localhost:3000` 접속.
-
-> Node 의존성 0개라서 `npm install` 도 필요 없습니다. 그냥 `node server.js`.
-
----
+<br/>
 
 ## 파일 구성
 
 | 파일 | 역할 |
 | --- | --- |
-| `index.html` | 메인 UI. 원본의 모든 디자인/인터랙션 유지. 데이터 레이어만 Supabase 로 교체. |
-| `server.js` | `index.html` + `/config.js` 만 서빙. 데이터 API 는 없음. |
-| `package.json` | start 스크립트만. 의존성 없음. |
-| `supabase/schema.sql` | Supabase SQL Editor 에 붙여넣을 스키마. |
-| `.env.example` | 로컬 개발용 환경 변수 템플릿. |
-| `.gitignore` | `.env`, `data.json`, `node_modules` 제외. |
+| `index.html` | 앱 전체. UI·로직·CSS 가 한 파일에 들어있는 SPA |
+| `server.js` | 정적 서빙 + `/config.js`(env 주입) + `/api/holidays/:year`(공휴일 프록시) |
+| `supabase/schema.sql` | 테이블 + RLS. SQL Editor 에 붙여넣기용, 재실행 안전 |
+| `.env.example` | 로컬 개발용 환경 변수 템플릿 |
 
----
+<br/>
 
-## 다음 단계 아이디어
+## 자주 막히는 부분
 
-지금 구조에서 더 발전시키고 싶다면:
+| 증상 | 확인할 것 |
+| --- | --- |
+| "설정 누락" 표시 | Render Environment 에 `SUPABASE_URL` / `SUPABASE_ANON_KEY` 둘 다 있는지. env 를 바꿨으면 Manual Deploy 한 번 더 |
+| "연결 오류 · 재시도" | 스키마를 적용했는지, anon key 를 썼는지 (`service_role` 아님). 표시줄 클릭 시 재연결 시도 |
+| 설정에 "회식 기능을 켜려면…" 안내 | `schema.sql` 재실행 필요 (dinners 테이블이 아직 없음) |
+| 추가는 되는데 남에게 안 보임 | Supabase → Database → Replication 에서 `supabase_realtime` publication 에 테이블들이 들어있는지 |
+| 첫 접속이 5~10초 느림 | Render Free 의 sleep. 신경 쓰이면 UptimeRobot 으로 `/healthz` 를 5분마다 핑 |
 
-- **본인 이름 입력** — 처음 접속 시 이름 한 번 받아서 localStorage 저장 → entries.created_by 에 이름도 넣기 → "이거 누가 추천했지?" 추적
-- **자동완성** — 이전에 입력된 식당 목록에서 추천
-- **월말 1등 자동 집계** — `select name, count(*) from votes ... group by name`
-- **검색** — `select` 에 `.ilike('name', '%검색어%')`
-- **공휴일 자동 업데이트** — 공공데이터포털 API 로 매년 1월 자동 fetch
+투표는 계정 없이 localStorage 의 익명 id 로 구분합니다. 시크릿 모드나 캐시 삭제 후엔
+새 사람으로 취급되는데, 점심 정하는 용도엔 이 정도가 적당하다고 판단했습니다.
+
+데이터 백업은 Supabase 가 무료 플랜에서도 일일 백업 7일치를 자동 보관하고,
+급하면 SQL Editor 에서 `select * from entries;` 찍고 Download CSV 하면 됩니다.
