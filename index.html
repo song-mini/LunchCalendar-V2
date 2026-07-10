@@ -341,38 +341,29 @@
   }
   [data-theme="dark"] body::after { filter: invert(1); opacity: .05; }
 
-  /* 배경 오로라 — 창 뒤에서 아주 천천히 떠다니는 색 글로우.
-     transform 전용 + will-change 로 컴포지터에서만 움직인다. */
+  /* 배경 글로우 — 창 뒤 모서리의 은은한 색 번짐.
+     ⚠️ filter: blur + 모션 조합은 GPU 가속이 약한 환경에서 매 프레임
+     거대 블러 재래스터를 유발, 페이지 전체를 ~19fps 로 떨어뜨렸다 (실측:
+     블러 제거 시 51fps, 블러+모션 둘 다 제거 시 60fps). 그라디언트 자체가
+     이미 부드러우므로 블러·모션 없이 정적으로만 깐다. */
   .bg-aurora{
     position: fixed; z-index: 1;
     pointer-events: none;
     border-radius: 50%;
-    filter: blur(80px);
-    will-change: transform;
   }
   .bg-aurora.a1{
-    width: 560px; height: 560px; left: -160px; top: -180px;
-    background: radial-gradient(circle, color-mix(in oklch, var(--accent) 17%, transparent), transparent 65%);
-    animation: aurora-a 26s ease-in-out infinite alternate;
+    width: 640px; height: 640px; left: -200px; top: -220px;
+    background: radial-gradient(circle, color-mix(in oklch, var(--accent) 15%, transparent), transparent 68%);
   }
   .bg-aurora.a2{
-    width: 500px; height: 500px; right: -140px; bottom: -160px;
-    background: radial-gradient(circle, color-mix(in oklch, var(--teal) 15%, transparent), transparent 65%);
-    animation: aurora-b 32s ease-in-out infinite alternate;
+    width: 580px; height: 580px; right: -180px; bottom: -200px;
+    background: radial-gradient(circle, color-mix(in oklch, var(--teal) 13%, transparent), transparent 68%);
   }
   [data-theme="dark"] .bg-aurora.a1{
-    background: radial-gradient(circle, color-mix(in oklch, var(--accent) 11%, transparent), transparent 65%);
+    background: radial-gradient(circle, color-mix(in oklch, var(--accent) 10%, transparent), transparent 68%);
   }
   [data-theme="dark"] .bg-aurora.a2{
-    background: radial-gradient(circle, color-mix(in oklch, var(--teal) 10%, transparent), transparent 65%);
-  }
-  @keyframes aurora-a{
-    from { transform: translate(0, 0) scale(1); }
-    to   { transform: translate(100px, 70px) scale(1.18); }
-  }
-  @keyframes aurora-b{
-    from { transform: translate(0, 0) scale(1.12); }
-    to   { transform: translate(-90px, -60px) scale(.94); }
+    background: radial-gradient(circle, color-mix(in oklch, var(--teal) 9%, transparent), transparent 68%);
   }
   @media (max-width: 720px){ .bg-aurora{ display: none; } }
 
@@ -4317,10 +4308,12 @@ document.addEventListener('keydown',(e)=>{
 
 // Mouse wheel over the calendar/tabs: down = next month, up = previous.
 // 델타 누적 + 쿨다운으로 트랙패드 관성 스크롤에도 한 칸씩만 움직인다.
+// ⚠️ document 전체에 non-passive wheel 을 달면 페이지의 모든 휠 스크롤이
+// 매번 JS 핸들러 완료를 기다려 전역 스크롤 버벅임을 만든다 — 실제로
+// preventDefault 가 필요한 캘린더/탭 요소에만 리스너를 단다.
 let _wheelAcc = 0, _wheelLock = 0;
-document.addEventListener('wheel', (e) => {
+function _wheelMonthNav(e){
   if(isModalOpen()) return;
-  if(!(e.target.closest && e.target.closest('#calGrid, #monthTabs'))) return;
   e.preventDefault();
   const now = Date.now();
   if(now < _wheelLock){ _wheelAcc = 0; return; }
@@ -4330,7 +4323,11 @@ document.addEventListener('wheel', (e) => {
     _wheelAcc = 0;
     _wheelLock = now + 400;
   }
-}, { passive: false });
+}
+['calGrid', 'monthTabs'].forEach(id => {
+  const el = document.getElementById(id);
+  if(el) el.addEventListener('wheel', _wheelMonthNav, { passive: false });
+});
 
 // Touch swipe: left/right to change month
 let _touchStartX = null, _touchStartY = null;
