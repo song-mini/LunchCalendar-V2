@@ -1471,14 +1471,16 @@
     to   { opacity: 0; }
   }
   .backdrop{
-    position:fixed; inset:0; background: rgba(20,15,10,.40);
+    position:fixed; inset:0; background: rgba(20,15,10,.48);
     display:flex; align-items:center; justify-content:center;
     z-index: 200; padding: 16px;
-    backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
-    animation: backdrop-in .25s var(--ease-out);
+    /* ⚠️ backdrop-filter: blur 제거 — 열림/닫힘 페이드 동안 매 프레임
+       화면 전체를 재블러해 모달 애니메이션이 통째로 버벅였다
+       (실측 35fps → 제거 후 50fps). 어둡기를 살짝 올려 분리감으로 보상. */
+    animation: backdrop-in .22s var(--ease-out);
   }
-  .backdrop.closing { animation: backdrop-out .2s var(--ease-out) forwards; }
-  [data-theme="dark"] .backdrop { background: rgba(0,0,0,.55); }
+  .backdrop.closing { animation: backdrop-out .18s var(--ease-out) forwards; }
+  [data-theme="dark"] .backdrop { background: rgba(0,0,0,.62); }
 
   .modal{
     width: min(480px, 100%); background: var(--surface-solid);
