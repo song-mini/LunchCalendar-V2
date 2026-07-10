@@ -333,11 +333,48 @@
     position: fixed; inset: 0;
     pointer-events: none;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.10 0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
-    opacity: 0.28;
-    mix-blend-mode: multiply;
+    /* mix-blend-mode 제거 — 고정 전체화면 블렌드는 모든 프레임에서
+       화면 전체 재합성을 강제해 스크롤/애니메이션 렉의 주범이었다.
+       일반 알파 합성으로도 종이 질감은 거의 동일하게 나온다. */
+    opacity: .22;
     z-index: 0;
   }
-  [data-theme="dark"] body::after { mix-blend-mode: screen; opacity: 0.20; }
+  [data-theme="dark"] body::after { filter: invert(1); opacity: .05; }
+
+  /* 배경 오로라 — 창 뒤에서 아주 천천히 떠다니는 색 글로우.
+     transform 전용 + will-change 로 컴포지터에서만 움직인다. */
+  .bg-aurora{
+    position: fixed; z-index: 1;
+    pointer-events: none;
+    border-radius: 50%;
+    filter: blur(80px);
+    will-change: transform;
+  }
+  .bg-aurora.a1{
+    width: 560px; height: 560px; left: -160px; top: -180px;
+    background: radial-gradient(circle, color-mix(in oklch, var(--accent) 17%, transparent), transparent 65%);
+    animation: aurora-a 26s ease-in-out infinite alternate;
+  }
+  .bg-aurora.a2{
+    width: 500px; height: 500px; right: -140px; bottom: -160px;
+    background: radial-gradient(circle, color-mix(in oklch, var(--teal) 15%, transparent), transparent 65%);
+    animation: aurora-b 32s ease-in-out infinite alternate;
+  }
+  [data-theme="dark"] .bg-aurora.a1{
+    background: radial-gradient(circle, color-mix(in oklch, var(--accent) 11%, transparent), transparent 65%);
+  }
+  [data-theme="dark"] .bg-aurora.a2{
+    background: radial-gradient(circle, color-mix(in oklch, var(--teal) 10%, transparent), transparent 65%);
+  }
+  @keyframes aurora-a{
+    from { transform: translate(0, 0) scale(1); }
+    to   { transform: translate(100px, 70px) scale(1.18); }
+  }
+  @keyframes aurora-b{
+    from { transform: translate(0, 0) scale(1.12); }
+    to   { transform: translate(-90px, -60px) scale(.94); }
+  }
+  @media (max-width: 720px){ .bg-aurora{ display: none; } }
 
   /* 숨겨진 iframe 에서 entry 애니메이션 정지 방지 */
   html.no-anim *, html.no-anim *::before, html.no-anim *::after {
@@ -354,10 +391,10 @@
   /* === keyframes === */
   @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
   @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-  @keyframes popIn  { from { opacity: 0; transform: translateY(6px) scale(.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+  @keyframes popIn  { from { opacity: 0; transform: translateY(10px) scale(.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
   @keyframes popOut { from { opacity: 1; transform: translateY(0) scale(1); } to { opacity: 0; transform: translateY(4px) scale(.98); } }
-  @keyframes monthSlideRight { from { opacity: 0; transform: translateX(16px); } to { opacity: 1; transform: translateX(0); } }
-  @keyframes monthSlideLeft  { from { opacity: 0; transform: translateX(-16px); } to { opacity: 1; transform: translateX(0); } }
+  @keyframes monthSlideRight { from { opacity: 0; transform: translateX(18px) scale(.992); } to { opacity: 1; transform: translateX(0) scale(1); } }
+  @keyframes monthSlideLeft  { from { opacity: 0; transform: translateX(-18px) scale(.992); } to { opacity: 1; transform: translateX(0) scale(1); } }
   @keyframes sync-pulse { 0%,100% { opacity: 1; } 50% { opacity: .55; } }
   @keyframes dice-roll {
     0%   { transform: rotate(0deg)   scale(1);   }
@@ -413,9 +450,11 @@
     0%   { background-position: 200% 0; }
     100% { background-position: -200% 0; }
   }
+  /* box-shadow 를 직접 키우는 대신 미리 그려둔 링의 opacity 만 흔든다 —
+     매 프레임 페인트 없이 컴포지터에서만 도는 무한 애니메이션 */
   @keyframes today-ring-pulse {
-    0%, 100% { box-shadow: 0 0 0 0 var(--teal-glow); }
-    50%      { box-shadow: 0 0 0 4px var(--teal-glow); }
+    0%, 100% { opacity: 0; }
+    50%      { opacity: 1; }
   }
   @keyframes vote-roll {
     from { opacity: 0; transform: translateY(60%); }
@@ -539,7 +578,11 @@
     line-height: .82; letter-spacing: -3px;
     font-variant-numeric: tabular-nums;
     text-shadow: 0 2px 0 rgba(255,255,255,.55);
-    animation: fadeUp .35s var(--ease) both;
+    animation: num-pop .5s var(--ease-spring) both;
+  }
+  @keyframes num-pop {
+    from { opacity: 0; transform: translateY(12px) scale(.9); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
   }
   .bd-side {
     display: flex; flex-direction: column; gap: 3px;
@@ -562,6 +605,7 @@
   .big-date::before, .big-date::after {
     content: ''; position: absolute; border-radius: 50%;
     pointer-events: none; filter: blur(2px);
+    will-change: transform;
   }
   .big-date::before {
     width: 150px; height: 150px; right: -30px; top: -44px;
@@ -1334,8 +1378,8 @@
     transition: border-color var(--dur-fast) var(--ease-out), background-color var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out);
   }
   .cal.mounting .cell {
-    animation: popIn .25s var(--ease) both;
-    animation-delay: calc(var(--cell-i, 0) * 8ms);
+    animation: popIn .32s var(--ease-spring) both;
+    animation-delay: calc(var(--cell-i, 0) * 9ms);
   }
   .cell:hover{
     border-color: var(--bd-strong);
@@ -1364,6 +1408,8 @@
     position: absolute; inset: -1.5px;
     border-radius: inherit;
     pointer-events: none;
+    box-shadow: 0 0 0 4px var(--teal-glow);
+    opacity: 0;
     animation: today-ring-pulse 3.4s cubic-bezier(.45, .05, .55, .95) infinite;
   }
 
@@ -1550,8 +1596,12 @@
     background: var(--surface-solid); border: 1px solid var(--bd);
     box-shadow: var(--shadow-pop); color: var(--text); font-size: 13px;
     display: inline-flex; align-items: center; gap: 8px;
-    animation: popIn .2s var(--ease);
+    animation: toast-in .4s var(--ease-spring);
     pointer-events: auto;
+  }
+  @keyframes toast-in {
+    from { opacity: 0; transform: translateY(16px) scale(.9); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
   }
   .toast i { font-size: 15px; }
   .toast.err { border-color: var(--hol-bd); color: var(--hol-t); }
@@ -1811,18 +1861,20 @@
      추가 애니메이션 — 상태를 설명하거나 손맛을 주는 것들
      ============================================================ */
   /* 주사위 버튼 글로스 스윕 — 몇 초에 한 번 광택이 지나간다 */
+  /* left 대신 transform 으로 이동 — left 애니메이션은 매 프레임
+     레이아웃+페인트를 유발해 상시 렉의 원인이었다 */
   .dice-btn::after{
     content: ''; position: absolute; top: 0; bottom: 0; width: 45%; left: -60%;
     background: linear-gradient(105deg, transparent, rgba(255,255,255,.14) 45%, rgba(255,255,255,.26) 50%, rgba(255,255,255,.14) 55%, transparent);
-    transform: skewX(-18deg);
+    transform: translateX(0) skewX(-18deg);
     animation: btn-shine 5s ease-in-out infinite;
     pointer-events: none;
+    will-change: transform;
   }
   .dice-btn[disabled]::after{ animation: none; opacity: 0; }
   @keyframes btn-shine{
-    0%   { left: -60%; }
-    16%  { left: 130%; }
-    100% { left: 130%; }
+    0%        { transform: translateX(0) skewX(-18deg); }
+    16%, 100% { transform: translateX(440%) skewX(-18deg); }
   }
 
   /* 아이콘 회전 손맛 */
@@ -1851,6 +1903,35 @@
   @keyframes rank-float{
     0%, 100% { transform: translateY(0); }
     50%      { transform: translateY(-2px); }
+  }
+
+  /* 👑 왕관 바운스 — 1위 표시가 살아 움직인다 (transform 전용) */
+  .chip-crown, .erow.winner .erank{
+    display: inline-block;
+    animation: crown-bob 2.8s ease-in-out infinite;
+  }
+  @keyframes crown-bob{
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    30%      { transform: translateY(-1.5px) rotate(-7deg); }
+    60%      { transform: translateY(.5px) rotate(5deg); }
+  }
+  .erow.winner .erank{ animation-duration: 3.4s; }
+
+  /* 투표 시 떠오르는 +1 */
+  .plus-one{
+    position: fixed; z-index: 340;
+    font-family: var(--ff-numeric);
+    font-weight: 700; font-size: 13px;
+    color: var(--accent);
+    pointer-events: none;
+    text-shadow: 0 1px 0 var(--surface-solid);
+    animation: plus-rise .9s var(--ease-out) forwards;
+    will-change: transform, opacity;
+  }
+  @keyframes plus-rise{
+    0%   { opacity: 0; transform: translateY(0) scale(.6); }
+    18%  { opacity: 1; transform: translateY(-9px) scale(1.2); }
+    100% { opacity: 0; transform: translateY(-36px) scale(1); }
   }
 
   /* === theme transition (토글 중에만) === */
@@ -1920,6 +2001,7 @@
     width: 7px; height: 11px; border-radius: 2px;
     opacity: 0;
     animation: confetti-fall 1.5s cubic-bezier(.22,1,.36,1) forwards;
+    will-change: transform, opacity;
   }
   .confetti-emoji{
     position: absolute; top: 0; left: 0;
@@ -1927,6 +2009,7 @@
     opacity: 0;
     pointer-events: none;
     animation: confetti-fall 1.8s cubic-bezier(.22,1,.36,1) forwards;
+    will-change: transform, opacity;
   }
   @keyframes confetti-fall {
     0%   { opacity: 1; transform: translate(0,0) rotate(0deg); }
@@ -2185,6 +2268,10 @@
     if (!document.hidden) document.documentElement.classList.remove('no-anim');
   });
 </script>
+
+<!-- 배경 오로라 글로우 — 창 뒤에서 천천히 떠다니는 색 블롭 (컴포지터 전용) -->
+<div class="bg-aurora a1" aria-hidden="true"></div>
+<div class="bg-aurora a2" aria-hidden="true"></div>
 
 <div class="stage">
   <div class="window">
@@ -2973,9 +3060,29 @@ async function deleteEntryAsync(entryId){
   setSyncState('ok');
 }
 const _votingIds = new Set();
+// 투표 확정 순간 버튼 위로 +1 이 떠오른다 — 화면에 보이는 첫 버튼 하나에만
+function _spawnPlusOne(rect){
+  const el = document.createElement('span');
+  el.className = 'plus-one';
+  el.textContent = '+1';
+  el.style.left = (rect.left + rect.width/2 - 8) + 'px';
+  el.style.top  = (rect.top - 8) + 'px';
+  document.body.appendChild(el);
+  el.addEventListener('animationend', () => el.remove(), { once: true });
+  setTimeout(() => el.remove(), 1200);
+}
 function _animateVote(entryId, becameVoted){
   if(becameVoted && navigator.vibrate){ try { navigator.vibrate(10); } catch(e){} }
   requestAnimationFrame(() => {
+    if(becameVoted){
+      const btns = document.querySelectorAll(
+        '[data-eid="'+entryId+'"] .evote, [data-entry-id="'+entryId+'"] .hero-vote'
+      );
+      for(const b of btns){
+        const r = b.getBoundingClientRect();
+        if(r.width){ _spawnPlusOne(r); break; }
+      }
+    }
     document.querySelectorAll(
       '[data-eid="'+entryId+'"] .evote, [data-entry-id="'+entryId+'"] .hero-vote'
     ).forEach(btn => {
@@ -3798,6 +3905,14 @@ function sw(y, m){
     ml.animate(
       [{ opacity: .35, transform: 'translateY(-3px)' }, { opacity: 1, transform: 'translateY(0)' }],
       { duration: 220, easing: 'cubic-bezier(0.175, 0.885, 0.32, 1.1)' }
+    );
+  }
+  // 활성 탭 스프링 팝 — rerender 시 재생되지 않도록 달 전환 시에만 WAAPI 로
+  const at = document.querySelector('.tab.active');
+  if(at && typeof at.animate === 'function'){
+    at.animate(
+      [{ transform: 'scale(.86)' }, { transform: 'scale(1)' }],
+      { duration: 320, easing: 'cubic-bezier(.34, 1.56, .64, 1)' }
     );
   }
 }
