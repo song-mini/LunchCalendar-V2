@@ -9,9 +9,11 @@
  * (따라서 data.json 도, /api/data 도 없음.)
  */
 
-const http = require('http');
-const fs   = require('fs');
-const path = require('path');
+const http   = require('http');
+const fs     = require('fs');
+const path   = require('path');
+const zlib   = require('zlib');
+const crypto = require('crypto');
 
 const PORT = process.env.PORT || 3000;
 
@@ -63,6 +65,33 @@ async function fetchHolidaysForYear(year) {
   return result;
 }
 
+// index.html 캐시 — mtime 이 바뀔 때만 다시 읽어 gzip 본문과 ETag 를 미리 만들어 둔다.
+// (매 요청 readFileSync 제거, 전송량 ~200KB → ~40KB, 재방문은 304 로 즉시 응답)
+let htmlCache = null; // { mtimeMs, raw, gz, etag }
+
+function getHtmlCache() {
+  const htmlPath = path.join(__dirname, 'index.html');
+  const stat = fs.statSync(htmlPath);
+  if (!htmlCache || htmlCache.mtimeMs !== stat.mtimeMs) {
+    let html = fs.readFileSync(htmlPath, 'utf8');
+    // Supabase 도메인 preconnect 주입 — 첫 데이터 요청의 DNS+TLS 핸드셰이크를 앞당김
+    if (SUPABASE_URL) {
+      html = html.replace(
+        '</title>',
+        '</title>\n<link rel="preconnect" href="' + SUPABASE_URL + '" crossorigin>'
+      );
+    }
+    const raw = Buffer.from(html, 'utf8');
+    htmlCache = {
+      mtimeMs: stat.mtimeMs,
+      raw,
+      gz: zlib.gzipSync(raw, { level: 9 }),
+      etag: 'W/"' + crypto.createHash('sha1').update(raw).digest('base64url').slice(0, 16) + '"'
+    };
+  }
+  return htmlCache;
+}
+
 function getLocalIP() {
   const { networkInterfaces } = require('os');
   for (const iface of Object.values(networkInterfaces())) {
@@ -84,19 +113,31 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  // 메인 페이지 — no-cache 로 항상 최신 배포본을 받게 한다
+  // 메인 페이지 — no-cache 로 항상 재검증하되, 배포본이 그대로면 304 로 즉시 끝낸다
   // (헤더가 없으면 브라우저 휴리스틱 캐시가 예전 HTML 을 재사용할 수 있음)
   if (req.method === 'GET' && (req.url === '/' || req.url === '/index.html')) {
-    const htmlPath = path.join(__dirname, 'index.html');
-    if (fs.existsSync(htmlPath)) {
-      res.writeHead(200, {
-        'Content-Type': 'text/html; charset=utf-8',
-        'Cache-Control': 'no-cache, must-revalidate'
-      });
-      res.end(fs.readFileSync(htmlPath, 'utf8'));
-    } else {
-      res.writeHead(404); res.end('index.html not found');
+    let cache;
+    try { cache = getHtmlCache(); }
+    catch (e) { res.writeHead(404); res.end('index.html not found'); return; }
+
+    if (req.headers['if-none-match'] === cache.etag) {
+      res.writeHead(304, { 'ETag': cache.etag, 'Vary': 'Accept-Encoding' });
+      res.end();
+      return;
     }
+
+    const gzipOk = /\bgzip\b/i.test(req.headers['accept-encoding'] || '');
+    const body = gzipOk ? cache.gz : cache.raw;
+    const headers = {
+      'Content-Type': 'text/html; charset=utf-8',
+      'Cache-Control': 'no-cache, must-revalidate',
+      'ETag': cache.etag,
+      'Vary': 'Accept-Encoding',
+      'Content-Length': body.length
+    };
+    if (gzipOk) headers['Content-Encoding'] = 'gzip';
+    res.writeHead(200, headers);
+    res.end(body);
     return;
   }
 
