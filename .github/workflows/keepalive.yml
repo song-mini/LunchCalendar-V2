@@ -11,7 +11,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - name: 후보 URL 프로브
+      - name: 평일·공휴일·마지막 금요일 체크 후 핑
+        env:
+          TARGET_URL: ${{ vars.KEEPALIVE_URL || 'https://lunchcalendar-v2.onrender.com/healthz' }}
         run: |
           for name in lunch-calendar-v2 lunchcalendar-v2 lunch-calendar lunchcalendar \
                       lunch-calendar-v2-1 lunchcalendar-v2-1 gtl-calendar team-gtl-calendar \
