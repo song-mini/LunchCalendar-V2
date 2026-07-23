@@ -14,7 +14,7 @@
 - `server.js` — 의존성 0개 Node HTTP 서버. `index.html` 정적 서빙 + `/config.js` (Supabase env 주입) + `/api/holidays/:year` (KASI 공휴일 프록시).
 - `supabase/schema.sql` — Supabase Postgres 스키마 (entries / votes + 회식용 dinners / dinner_places / dinner_votes 테이블 + RLS). 테이블이 추가되면 사용자가 Supabase SQL Editor에서 재실행해야 반영됨 (전체 idempotent).
 - `.env.example` — 로컬 개발용 환경변수 템플릿.
-- `.github/workflows/keepalive.yml` — 평일 09~14시(KST) 10분 간격으로 `/healthz` 를 핑해 Render Free sleep 방지. 주말·한국 공휴일(Nager.Date 조회)·매달 마지막 금요일(공동 휴무)은 건너뜀. 대상 URL 은 리포 변수 `KEEPALIVE_URL` 로 변경 가능.
+- `.github/workflows/keepalive.yml` — 평일 08:07~14시(KST) 10분 간격으로 `/healthz` 를 핑해 Render Free sleep 방지. 주말·한국 공휴일(Nager.Date 조회)·매달 마지막 금요일(공동 휴무)은 건너뜀. 대상 URL 은 리포 변수 `KEEPALIVE_URL` 로 변경 가능.
 
 ## 환경변수 (Render)
 
