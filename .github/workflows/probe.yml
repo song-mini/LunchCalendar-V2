@@ -1,0 +1,24 @@
+# 임시 진단용 — 실제 Render 배포 URL 을 찾기 위한 후보 서브도메인 프로브.
+# 확인이 끝나면 이 파일은 삭제된다. main 에는 절대 머지하지 않음.
+name: probe
+
+on:
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: 후보 URL 프로브
+        run: |
+          for name in lunch-calendar-v2 lunchcalendar-v2 lunch-calendar lunchcalendar \
+                      lunch-calendar-v2-1 lunchcalendar-v2-1 gtl-calendar team-gtl-calendar \
+                      gtl-lunch-calendar gtl-lunch teamgtl gtl-cal; do
+            url="https://${name}.onrender.com/healthz"
+            out=$(curl -s --max-time 90 -o /dev/null -w '%{http_code}' "$url" || echo ERR)
+            routing=$(curl -s --max-time 20 -D - -o /dev/null "https://${name}.onrender.com/" | grep -i 'x-render-routing' | tr -d '\r' || true)
+            echo "${name} -> healthz=${out} ${routing}"
+          done
