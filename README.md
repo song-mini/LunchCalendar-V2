@@ -121,7 +121,7 @@ Project Settings → API 에서 두 값을 복사합니다.
 | "연결 오류 · 재시도" | 스키마를 적용했는지, anon key 를 썼는지 (`service_role` 아님). 표시줄 클릭 시 재연결 시도 |
 | 설정에 "회식 기능을 켜려면…" 안내 | `schema.sql` 재실행 필요 (dinners 테이블이 아직 없음) |
 | 추가는 되는데 남에게 안 보임 | Supabase → Database → Replication 에서 `supabase_realtime` publication 에 테이블들이 들어있는지 |
-| 첫 접속이 5~10초 느림 | Render Free 의 sleep. 신경 쓰이면 UptimeRobot 으로 `/healthz` 를 5분마다 핑 |
+| 첫 접속이 5~10초 느림 | Render Free 의 sleep. 평일 09~14시(KST)엔 GitHub Actions(`.github/workflows/keepalive.yml`)가 10분마다 `/healthz` 를 핑해 깨워둠 — 주말·공휴일·마지막 금요일 제외. 다른 시간대까지 원하면 UptimeRobot 으로 `/healthz` 를 5분마다 핑 |
 
 투표는 계정 없이 localStorage 의 익명 id 로 구분합니다. 시크릿 모드나 캐시 삭제 후엔
 새 사람으로 취급되는데, 점심 정하는 용도엔 이 정도가 적당하다고 판단했습니다.
