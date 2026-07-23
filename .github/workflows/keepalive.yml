@@ -28,7 +28,7 @@ jobs:
     steps:
       - name: 평일·공휴일·마지막 금요일 체크 후 핑
         env:
-          TARGET_URL: ${{ vars.KEEPALIVE_URL || 'https://lunch-calendar-v2.onrender.com/healthz' }}
+          TARGET_URL: ${{ vars.KEEPALIVE_URL || 'https://lunchcalendar-v2.onrender.com/healthz' }}
         run: |
           node --input-type=module <<'EOF'
           const kst = new Date(Date.now() + 9 * 3600 * 1000);
