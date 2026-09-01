@@ -1,0 +1,53 @@
+# Supabase Free 는 프로젝트가 7일간 아무 요청도 받지 못하면 자동으로 일시중지된다.
+# 기존 keepalive.yml 은 Render 를 깨우는 게 목적이라 정적 /healthz 만 치고,
+# 주말·공휴일·마지막 금요일은 아예 건너뛴다 → 연휴가 길면 7일 무활동이 그대로 발생한다.
+#
+# 그래서 이 워크플로는 별도로, **매일 · 조건 없이** /healthz/db 를 친다.
+# (서버가 Supabase entries 를 1건 읽어서 활동 기록을 남김 — 데이터는 바꾸지 않음)
+#
+# - 대상은 keepalive.yml 과 같은 리포 변수 KEEPALIVE_URL 에서 유도한다.
+# - 비용: 하루 1회 요청 — Actions·Render·Supabase 모두 무시할 수준.
+# - 주의: 리포에 60일간 커밋이 없으면 GitHub 이 스케줄 워크플로를 자동으로 끈다.
+name: supabase-keepalive
+
+on:
+  workflow_dispatch:
+  schedule:
+    # cron 은 UTC 기준 (KST = UTC+9). 매일 12:41 KST — 평일엔 Render 가 이미 깨어 있는 시간대.
+    - cron: '41 3 * * *'
+
+permissions: {}
+
+concurrency:
+  group: supabase-keepalive
+  cancel-in-progress: true
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - name: Supabase 활동 핑
+        env:
+          BASE_URL: ${{ vars.KEEPALIVE_URL || 'https://lunchcalendar-v2.onrender.com/healthz' }}
+        run: |
+          node --input-type=module <<'EOF'
+          // KEEPALIVE_URL 이 .../healthz 든 .../ 든 모두 .../healthz/db 로 맞춘다.
+          const base = process.env.BASE_URL.replace(/\/+$/, '');
+          const url  = base.replace(/\/healthz$/, '') + '/healthz/db';
+
+          // Render 가 자고 있으면 콜드 스타트로 수십 초 걸린다 — 넉넉한 타임아웃 + 재시도.
+          for (let i = 1; i <= 3; i++) {
+            try {
+              const res  = await fetch(url, { signal: AbortSignal.timeout(90000) });
+              const body = (await res.text().catch(() => '')).slice(0, 300);
+              console.log('ping ' + url + ' → ' + res.status + ' ' + body);
+              if (res.ok) process.exit(0);
+            } catch (e) {
+              console.warn('시도 ' + i + '/3 실패:', e.message);
+            }
+            if (i < 3) await new Promise(r => setTimeout(r, 10000));
+          }
+          console.error('Supabase 핑 실패 — 이대로면 7일 무활동 시 프로젝트가 일시중지됩니다.');
+          process.exit(1);
+          EOF

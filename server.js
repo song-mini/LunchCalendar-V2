@@ -65,6 +65,30 @@ async function fetchHolidaysForYear(year) {
   return result;
 }
 
+// Supabase 활동 핑 (프로젝트 자동 일시중지 방지)
+// Supabase Free 는 프로젝트가 7일간 아무 요청도 받지 못하면 자동으로 일시중지된다.
+// keepalive 워크플로가 치던 /healthz 는 정적 'ok' 라 Supabase 를 전혀 건드리지 않아서,
+// 팀이 한 주 쉬면(연휴·휴가) 그대로 pause 대상이 된다.
+// 여기서 entries 를 1건만 읽어 "활동"을 남긴다 — 쓰기가 아니라 데이터는 건드리지 않음.
+async function pingSupabase() {
+  if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+    throw new Error('SUPABASE_URL / SUPABASE_ANON_KEY not configured on server');
+  }
+  const url = SUPABASE_URL.replace(/\/+$/, '') + '/rest/v1/entries?select=id&limit=1';
+  const res = await fetch(url, {
+    headers: {
+      apikey: SUPABASE_ANON_KEY,
+      Authorization: 'Bearer ' + SUPABASE_ANON_KEY
+    },
+    signal: AbortSignal.timeout(10000)
+  });
+  if (!res.ok) {
+    const detail = await res.text().catch(() => '');
+    throw new Error('supabase HTTP ' + res.status + ' ' + detail.slice(0, 200));
+  }
+  return res.status;
+}
+
 // index.html 캐시 — mtime 이 바뀔 때만 다시 읽어 gzip 본문과 ETag 를 미리 만들어 둔다.
 // (매 요청 readFileSync 제거, 전송량 ~200KB → ~40KB, 재방문은 304 로 즉시 응답)
 let htmlCache = null; // { mtimeMs, raw, gz, etag }
@@ -145,6 +169,29 @@ const server = http.createServer((req, res) => {
   if (req.method === 'GET' && req.url === '/healthz') {
     res.writeHead(200, { 'Content-Type': 'text/plain' });
     res.end('ok');
+    return;
+  }
+
+  // Supabase 까지 확인하는 헬스체크 — Supabase 자동 일시중지 방지용 핑 대상.
+  // /healthz 는 Render 헬스체크가 쓰므로 항상 즉답(ok)으로 두고, DB 왕복은 여기서만 한다.
+  if (req.method === 'GET' && req.url === '/healthz/db') {
+    pingSupabase()
+      .then(status => {
+        res.writeHead(200, {
+          'Content-Type': 'application/json; charset=utf-8',
+          'Cache-Control': 'no-store'
+        });
+        res.end(JSON.stringify({ ok: true, supabase: status }));
+      })
+      .catch(err => {
+        const msg = String(err && err.message || err);
+        console.error('supabase keepalive 핑 실패:', msg);
+        res.writeHead(503, {
+          'Content-Type': 'application/json; charset=utf-8',
+          'Cache-Control': 'no-store'
+        });
+        res.end(JSON.stringify({ ok: false, error: msg }));
+      });
     return;
   }
 

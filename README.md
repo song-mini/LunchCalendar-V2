@@ -107,7 +107,7 @@ Project Settings → API 에서 두 값을 복사합니다.
 | 파일 | 역할 |
 | --- | --- |
 | `index.html` | 앱 전체. UI·로직·CSS 가 한 파일에 들어있는 SPA |
-| `server.js` | 정적 서빙 + `/config.js`(env 주입) + `/api/holidays/:year`(공휴일 프록시) |
+| `server.js` | 정적 서빙 + `/config.js`(env 주입) + `/api/holidays/:year`(공휴일 프록시) + `/healthz`·`/healthz/db` |
 | `supabase/schema.sql` | 테이블 + RLS. SQL Editor 에 붙여넣기용, 재실행 안전 |
 | `.env.example` | 로컬 개발용 환경 변수 템플릿 |
 
@@ -122,6 +122,7 @@ Project Settings → API 에서 두 값을 복사합니다.
 | 설정에 "회식 기능을 켜려면…" 안내 | `schema.sql` 재실행 필요 (dinners 테이블이 아직 없음) |
 | 추가는 되는데 남에게 안 보임 | Supabase → Database → Replication 에서 `supabase_realtime` publication 에 테이블들이 들어있는지 |
 | 첫 접속이 5~10초 느림 | Render Free 의 sleep. 평일 08~14시(KST)엔 GitHub Actions(`.github/workflows/keepalive.yml`)가 10분마다 `/healthz` 를 핑해 깨워둠 — 주말·공휴일·마지막 금요일 제외. 다른 시간대까지 원하면 UptimeRobot 으로 `/healthz` 를 5분마다 핑 |
+| Supabase 에서 "프로젝트 일시중지 예정" 메일 | Supabase Free 는 7일간 요청이 없으면 자동 일시중지. `.github/workflows/supabase-keepalive.yml` 이 **매일**(주말·공휴일 포함) `/healthz/db` 를 쳐서 활동을 남김. 메일이 계속 오면 Actions 탭에서 이 워크플로가 켜져 있는지 확인 |
 
 투표는 계정 없이 localStorage 의 익명 id 로 구분합니다. 시크릿 모드나 캐시 삭제 후엔
 새 사람으로 취급되는데, 점심 정하는 용도엔 이 정도가 적당하다고 판단했습니다.
