@@ -1378,6 +1378,12 @@
     transform: translateY(-1px);
     z-index: 2;
   }
+  .cell:focus-visible{
+    border-color: var(--accent);
+    box-shadow: inset 0 1px 0 var(--hi), 0 0 0 3px color-mix(in oklch, var(--accent) 22%, transparent), var(--shadow-pop);
+    transform: translateY(-1px);
+    z-index: 3;
+  }
   .cell.empty{ background: transparent; box-shadow: none; border: none; min-height: 48px; pointer-events: none; padding: 0; animation: none; }
   .cell.wknd{ background: var(--wk-bg); border-color: var(--wk-bd); }
   .cell.hol{ background: var(--hol-bg); border-color: var(--hol-bd); }
@@ -2307,7 +2313,7 @@
         <button class="nav-btn" type="button" onclick="changeMonth(-1)" aria-label="이전 달">
           <i class="ti ti-chevron-left"></i>
         </button>
-        <span class="month-label" id="monthTitle"></span>
+        <span class="month-label" id="monthTitle" aria-live="polite" aria-atomic="true"></span>
         <button class="nav-btn" type="button" onclick="changeMonth(1)" aria-label="다음 달">
           <i class="ti ti-chevron-right"></i>
         </button>
@@ -2340,7 +2346,7 @@
 
         <div class="tabs-wrap" id="monthTabs" role="tablist"></div>
 
-        <div class="cal" id="calGrid" role="grid" aria-label="월간 캘린더"></div>
+        <div class="cal" id="calGrid" role="grid" aria-label="월간 캘린더" aria-busy="true"></div>
 
         <p class="notice" id="notice"></p>
       </div>
@@ -3846,6 +3852,14 @@ function updateNavButtons(){
   const yi = YEARS.indexOf(curYear);
   if(yns[0]) yns[0].disabled = (yi <= 0);
   if(yns[1]) yns[1].disabled = (yi >= YEARS.length - 1);
+  const now = new Date();
+  const todayBtn = document.querySelector('.today-btn');
+  if(todayBtn){
+    const viewingToday = curYear === now.getFullYear() && cur === now.getMonth() + 1;
+    todayBtn.disabled = viewingToday;
+    todayBtn.setAttribute('aria-current', viewingToday ? 'date' : 'false');
+    todayBtn.title = viewingToday ? '현재 이번 달을 보고 있어요' : '오늘로 이동';
+  }
 }
 
 function renderTabs(){
@@ -3869,10 +3883,17 @@ function renderTabs(){
     t.type='button';
     t.className='tab'+(m===cur?' active':'')+(hasDat(curYear, m)&&m!==cur?' has-data':'');
     t.setAttribute('role','tab');
+    t.setAttribute('aria-selected', m===cur ? 'true' : 'false');
+    t.tabIndex = m===cur ? 0 : -1;
+    t.setAttribute('aria-label', curYear+'년 '+MN[m]);
     t.textContent=MN[m];
     t.onclick=()=>sw(curYear, m);
     c.appendChild(t);
   });
+}
+
+function prefersReducedMotion(){
+  return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 }
 
 function sw(y, m){
@@ -3894,7 +3915,7 @@ function sw(y, m){
   updateNavButtons();
   // 월 라벨 micro-pop — 달이 실제로 바뀔 때만
   const ml = document.querySelector('.month-label');
-  if(ml && typeof ml.animate === 'function'){
+  if(ml && typeof ml.animate === 'function' && !prefersReducedMotion()){
     ml.animate(
       [{ opacity: .35, transform: 'translateY(-3px)' }, { opacity: 1, transform: 'translateY(0)' }],
       { duration: 220, easing: 'cubic-bezier(0.175, 0.885, 0.32, 1.1)' }
@@ -3902,7 +3923,7 @@ function sw(y, m){
   }
   // 활성 탭 스프링 팝 — rerender 시 재생되지 않도록 달 전환 시에만 WAAPI 로
   const at = document.querySelector('.tab.active');
-  if(at && typeof at.animate === 'function'){
+  if(at && typeof at.animate === 'function' && !prefersReducedMotion()){
     at.animate(
       [{ transform: 'scale(.86)' }, { transform: 'scale(1)' }],
       { duration: 320, easing: 'cubic-bezier(.34, 1.56, .64, 1)' }
@@ -3929,6 +3950,7 @@ function render(animate){
   document.getElementById('monthTitle').textContent = curYear + '년 ' + MN[cur];
 
   const g=document.getElementById('calGrid');
+  g.setAttribute('aria-label', curYear + '년 ' + MN[cur] + ' 월간 캘린더');
   g.classList.remove('mounting');
   g.innerHTML='';
   if(animate){
@@ -3951,8 +3973,10 @@ function render(animate){
       g.appendChild(sk);
     }
     document.getElementById('notice').textContent = '';
+    g.setAttribute('aria-busy', 'true');
     return;
   }
+  g.setAttribute('aria-busy', 'false');
 
   const firstDay=new Date(curYear,cur-1,1).getDay();
   const dim=new Date(curYear,cur,0).getDate();
@@ -3978,8 +4002,26 @@ function render(animate){
     else if(isOff) cls+=' off';
     else if(isWeekend) cls+=' wknd';
     cell.className=cls;
+    cell.setAttribute('role', 'gridcell');
+    const monthHasToday = today.getFullYear()===curYear && today.getMonth()+1===cur;
+    cell.tabIndex = isToday || (!monthHasToday && dn===1) ? 0 : -1;
     cell.style.setProperty('--cell-i', i);
     cell.onclick=()=>openModal(dn);
+    cell.onfocus=()=>{
+      g.querySelectorAll('.cell[role="gridcell"]').forEach(el=>{ el.tabIndex = el===cell ? 0 : -1; });
+    };
+    cell.onkeydown=ev=>{
+      if(ev.key === 'Enter' || ev.key === ' '){
+        ev.preventDefault();
+        openModal(dn);
+        return;
+      }
+      const step = {ArrowLeft:-1, ArrowRight:1, ArrowUp:-7, ArrowDown:7}[ev.key];
+      if(!step) return;
+      const cells = [...g.querySelectorAll('.cell[role="gridcell"]')];
+      const next = cells[cells.indexOf(cell)+step];
+      if(next){ ev.preventDefault(); next.focus(); }
+    };
 
     const nd=document.createElement('div');
     nd.className='dn'+(col===0?' sun':col===6?' sat':'');
@@ -4006,6 +4048,8 @@ function render(animate){
     }
 
     const entries=(dat[dn]&&dat[dn].entries)||[];
+    const stateLabel = h ? ', '+h : isOff ? ', 공동 휴무' : dnr ? ', '+(dnr.title || '회식') : '';
+    cell.setAttribute('aria-label', curYear+'년 '+cur+'월 '+dn+'일'+stateLabel+', 점심 후보 '+entries.length+'개. 열기');
     // sort by votes desc within cell display
     const sorted = entries.slice().sort((a,b) => (b.voters.size - a.voters.size) || (a.id - b.id));
 
