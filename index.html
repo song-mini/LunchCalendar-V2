@@ -526,68 +526,45 @@
     align-self: start;
     animation: fadeUp .3s var(--ease) .04s both;
   }
-  /* swatch 는 이제 배경을 그리지 않는다 — 헤더 배경은 .big-date 가
-     콘텐츠 높이에 맞춰 직접 가져서 넘침/겹침이 없다. */
-  .today-card .swatch { display: none; }
+  /* ============================================================
+     오늘 헤더 — 애플 캘린더 위젯처럼: 액센트색 '10월 · 월요일' 한 줄,
+     아주 큰 날짜 숫자, 그 아래 이번 주 한 줄(오늘은 꽉 찬 원).
+     장식(그라데이션 덩어리·구분선·알약)을 걷어내고 여백과 크기로 위계를 만든다.
+     ============================================================ */
   .big-date {
     position: relative;
     overflow: hidden;
-    padding: 20px 20px 16px;
+    padding: 18px 20px 14px;
+    text-align: center;
     color: var(--text);
-    background:
-      radial-gradient(170px 95px at 26% 36%, color-mix(in oklch, var(--highlight-soft) 88%, white), transparent 70%),
-      radial-gradient(210px 130px at 84% 72%, color-mix(in oklch, var(--accent-soft) 80%, white), transparent 72%),
-      linear-gradient(150deg,
-        color-mix(in oklch, var(--accent-soft) 85%, white) 0%,
-        color-mix(in oklch, var(--highlight-soft) 75%, var(--surface-2)) 100%);
+    background: linear-gradient(180deg, color-mix(in oklch, var(--accent) 6%, var(--surface-solid)), var(--surface-solid) 72%);
     border-bottom: 1px solid var(--bd);
-    box-shadow: inset 0 1px 0 rgba(255,255,255,.5);
+  }
+  /* 오른쪽 위 은은한 액센트 빛 하나 */
+  .big-date::before {
+    content: ''; position: absolute; pointer-events: none;
+    width: 220px; height: 220px; right: -90px; top: -110px; border-radius: 50%;
+    background: radial-gradient(circle, color-mix(in oklch, var(--accent) 16%, transparent), transparent 70%);
   }
   [data-theme="dark"] .big-date {
-    background: linear-gradient(150deg,
-      color-mix(in oklch, var(--accent) 14%, transparent) 0%,
-      color-mix(in oklch, var(--highlight) 8%, transparent) 100%);
+    background: linear-gradient(180deg, color-mix(in oklch, var(--accent) 11%, var(--surface-solid)), var(--surface-solid) 72%);
   }
-  /* 상단 행 — '오늘' 액센트 pill + 연도 */
-  .bd-top {
-    display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 12px;
-    position: relative;
+  .bd-top { position: relative; }
+  .bd-dow {
+    font-family: var(--ff-display);
+    font-size: 15px; font-weight: 700; letter-spacing: -.2px;
+    color: var(--accent);
   }
-  .bd-today {
-    display: inline-flex; align-items: center; gap: 5px;
-    font-size: 11px; font-weight: 600; letter-spacing: .02em;
-    color: #fff; padding: 3px 10px 3px 9px; border-radius: 9999px;
-    background: linear-gradient(180deg, color-mix(in oklch, var(--accent) 86%, white), var(--accent));
-    box-shadow: inset 0 1px 0 rgba(255,255,255,.3), 0 3px 8px -3px color-mix(in oklch, var(--accent) 60%, transparent);
-  }
-  [data-theme="dark"] .bd-today { color: var(--bg); }
-  .bd-dot {
-    width: 5px; height: 5px; border-radius: 50%;
-    background: currentColor;
-    animation: bd-dot-pulse 2.2s ease-in-out infinite;
-  }
-  @keyframes bd-dot-pulse {
-    0%, 100% { transform: scale(1);   opacity: .95; }
-    50%      { transform: scale(1.6); opacity: .5;  }
-  }
-  .bd-year {
-    font-family: var(--ff-mono);
-    font-size: 11px; font-weight: 500; letter-spacing: .12em;
-    color: var(--text-3);
-    font-variant-numeric: tabular-nums;
-  }
-  /* 메인 행 — 큰 숫자 + 세로 구분선 + 월/요일 스택 */
-  .bd-main {
-    display: flex; align-items: flex-end; gap: 14px;
-    position: relative;
-  }
+  /* 애플 캘린더 아이콘처럼 가운데에 크게 — 오늘이 며칠인지 한눈에 */
   .big-date .bd-num {
+    position: relative;
+    margin: 2px 0 0;
+    padding-right: .05em;   /* 음수 자간으로 오른쪽이 비어 보이는 것 보정 */
     font-family: var(--ff-numeric);
-    font-size: 74px; font-weight: 600;
-    line-height: .82; letter-spacing: -3px;
+    font-size: 104px; font-weight: 700;
+    line-height: .95; letter-spacing: -5px;
+    color: var(--text);
     font-variant-numeric: tabular-nums;
-    text-shadow: 0 2px 0 rgba(255,255,255,.55);
     transform-origin: 50% 0;
     animation: num-flip .75s var(--ease-out) .12s both;
   }
@@ -598,68 +575,66 @@
     78%  { transform: perspective(420px) rotateX(-6deg); }
     100% { opacity: 1; transform: perspective(420px) rotateX(0); }
   }
+  .big-date .bd-holiday {
+    position: relative;
+    display: inline-flex; align-items: center; gap: 6px;
+    margin-top: 6px;
+    font-size: 13px; font-weight: 600; letter-spacing: -.2px;
+    color: var(--hol-t);
+  }
+  .bd-hdot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+  /* 이번 주 — 오늘은 액센트로 꽉 찬 원, 후보가 있는 날은 아래 점, 누르면 그날 모달 */
+  .bd-week {
+    position: relative;
+    display: grid; grid-template-columns: repeat(7, 1fr);
+    margin-top: 14px; padding-top: 12px;
+    border-top: 1px solid var(--bd);
+    animation: fadeUp .4s var(--ease-out) .22s both;
+  }
+  .bd-wd {
+    appearance: none; border: 0; background: transparent; padding: 0;
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    cursor: pointer; font-family: var(--ff-display); color: var(--text);
+    -webkit-tap-highlight-color: transparent;
+  }
+  .bd-wl { font-size: 11px; font-weight: 600; color: var(--text-3); }
+  .bd-wn {
+    width: 32px; height: 32px; border-radius: 50%;
+    display: grid; place-items: center;
+    font-family: var(--ff-numeric); font-size: 15px; font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    transition: background-color var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out);
+  }
+  .bd-wd:hover .bd-wn { background: var(--surface-2); }
+  .bd-wd:active .bd-wn { transform: scale(.92); }
+  .bd-wd:focus-visible { outline: none; }
+  .bd-wd:focus-visible .bd-wn { box-shadow: 0 0 0 2px var(--accent); }
+  .bd-wd.sun .bd-wn { color: var(--sun); }
+  .bd-wd.sat .bd-wn { color: var(--sat); }
+  .bd-wd.out .bd-wn { opacity: .45; }
+  .bd-wd.today .bd-wl { color: var(--accent); }
+  .bd-wd.today .bd-wn {
+    background: var(--accent); color: #fff; font-weight: 700;
+    box-shadow: 0 6px 14px -6px color-mix(in oklch, var(--accent) 75%, transparent);
+    animation: today-pop .5s var(--ease-spring) .42s both;
+  }
+  [data-theme="dark"] .bd-wd.today .bd-wn { color: var(--bg); }
+  @keyframes today-pop {
+    from { transform: scale(.4); opacity: 0; }
+    to   { transform: scale(1); opacity: 1; }
+  }
+  .bd-wdot { width: 4px; height: 4px; border-radius: 50%; background: transparent; }
+  .bd-wd.has .bd-wdot { background: var(--teal); }
+  .bd-wd.today.has .bd-wdot { background: var(--accent); }
   /* 첫 진입 연출은 한 번만 — 투표·실시간 갱신으로 innerHTML 이 다시
      그려질 때마다 숫자가 다시 넘어가지 않게 */
   html.intro-done .big-date .bd-num,
-  html.intro-done .bd-side,
+  html.intro-done .bd-week,
+  html.intro-done .bd-wd.today .bd-wn,
   html.intro-done .dinner-banner { animation: none; }
   /* 그리드의 첫 페이드업도 — 안 막으면 페이지 넘김 클래스(flip-prev)를 뗄 때
      원래 animation 으로 되돌아가면서 페이드업이 다시 재생돼 한 번 깜빡인다 */
   html.intro-done .cal:not(.flip-prev):not(.cal-ghost) { animation: none; }
-  .bd-side {
-    display: flex; flex-direction: column; gap: 3px;
-    padding: 0 0 5px 14px; min-width: 0;
-    border-left: 1px solid color-mix(in oklch, var(--text) 14%, transparent);
-    animation: fadeUp .35s var(--ease) .06s both;
-  }
-  .bd-mon {
-    font-family: var(--ff-display);
-    font-size: 22px; font-weight: 600; letter-spacing: -.5px;
-    line-height: 1; color: var(--text);
-  }
-  .bd-dow {
-    font-size: 13px; font-weight: 500;
-    color: var(--text-2);
-  }
-  [data-theme="dark"] .big-date .bd-num { text-shadow: 0 2px 0 rgba(0,0,0,.45); }
-  [data-theme="dark"] .bd-side { border-left-color: color-mix(in oklch, var(--text) 18%, transparent); }
-  /* 헤더 위를 천천히 떠다니는 빛 블롭 두 개 */
-  .big-date::before, .big-date::after {
-    content: ''; position: absolute; border-radius: 50%;
-    pointer-events: none; filter: blur(2px);
-    will-change: transform;
-  }
-  .big-date::before {
-    width: 150px; height: 150px; right: -30px; top: -44px;
-    background: radial-gradient(circle, color-mix(in oklch, var(--highlight) 34%, transparent), transparent 70%);
-    animation: blob-drift 11s ease-in-out infinite alternate;
-  }
-  .big-date::after {
-    width: 110px; height: 110px; left: -26px; bottom: -40px;
-    background: radial-gradient(circle, color-mix(in oklch, var(--accent) 28%, transparent), transparent 70%);
-    animation: blob-drift 8.5s ease-in-out infinite alternate-reverse;
-  }
-  [data-theme="dark"] .big-date::before {
-    background: radial-gradient(circle, color-mix(in oklch, var(--highlight) 20%, transparent), transparent 70%);
-  }
-  [data-theme="dark"] .big-date::after {
-    background: radial-gradient(circle, color-mix(in oklch, var(--accent) 18%, transparent), transparent 70%);
-  }
-  @keyframes blob-drift {
-    from { transform: translate(0, 0) scale(1); }
-    to   { transform: translate(-16px, 10px) scale(1.18); }
-  }
-  .big-date .bd-holiday {
-    display: inline-flex; align-items: center; gap: 4px;
-    margin-top: 10px;
-    padding: 3px 9px;
-    background: var(--surface-solid);
-    border: 1px solid var(--bd);
-    border-radius: 9999px;
-    font-size: 11px; font-weight: 500;
-    color: var(--accent);
-  }
-  .big-date .bd-holiday .ti { font-size: 11px; }
 
   .today-card .body-inner {
     position: relative;
@@ -679,33 +654,39 @@
     margin-bottom: 4px;
   }
   .today-card h2 {
+    display: flex; align-items: center; gap: 8px;
     font-family: var(--ff-display);
-    font-weight: 600; font-size: 20px;
+    font-weight: 700; font-size: 19px;
     letter-spacing: -.4px;
     color: var(--text);
     line-height: 1.15;
+  }
+  .today-card .ti-count {
+    font-family: var(--ff-numeric);
+    font-size: 12px; font-weight: 700;
+    color: var(--accent); background: var(--accent-soft);
+    padding: 2px 8px; border-radius: 9999px;
+    font-variant-numeric: tabular-nums;
   }
   .today-card h2 .emoji {
     display: inline-block;
     transform: translateY(1px);
     margin-right: 4px;
   }
+  /* 동그란 액센트 + 버튼 (iOS 툴바 버튼 느낌) */
   .today-card .ti-add {
     flex-shrink: 0;
     width: 32px; height: 32px;
-    border-radius: var(--r-sm);
-    background: var(--surface-solid);
-    border: 1px solid var(--bd);
-    color: var(--text-2);
+    border-radius: 50%;
+    background: var(--accent-soft);
+    border: 0;
+    color: var(--accent);
     display: grid; place-items: center;
     cursor: pointer;
     transition: all var(--dur-fast) var(--ease-out);
   }
-  .today-card .ti-add:hover {
-    background: var(--surface-2);
-    border-color: var(--bd-strong);
-    color: var(--text);
-  }
+  .today-card .ti-add:hover { background: var(--accent); color: #fff; }
+  [data-theme="dark"] .today-card .ti-add:hover { color: var(--bg); }
   .today-card .ti-add:active { transform: scale(.95); }
   .today-card .ti-add .ti { font-size: 16px; }
 
@@ -729,9 +710,9 @@
     padding: 2px 8px;
     background: linear-gradient(180deg, color-mix(in oklch, var(--accent) 88%, white), var(--accent));
     color: var(--surface-solid);
-    font-family: var(--ff-mono);
-    font-size: 10px; font-weight: 500;
-    letter-spacing: .08em;
+    font-family: var(--ff);
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 0;
     border-radius: 9999px;
     box-shadow: inset 0 1px 0 rgba(255,255,255,.3), 0 3px 8px -3px color-mix(in oklch, var(--accent) 60%, transparent);
   }
@@ -807,14 +788,37 @@
   }
   .today-card .today-row .vcnt .ti { color: var(--accent); font-size: 13px; }
 
+  /* 후보가 없을 때 — 칸 전체가 '추가' 버튼 (안내문 대신 바로 누르게) */
   .today-card .today-empty {
-    padding: 16px 14px;
+    width: 100%;
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    padding: 20px 14px 18px;
     text-align: center;
+    font-family: var(--ff);
     color: var(--text-3);
-    font-size: 13px;
     background: var(--surface-2);
-    border-radius: var(--r-sm);
-    border: 1px dashed var(--bd-strong);
+    border: 0;
+    border-radius: 14px;
+    cursor: pointer;
+    transition: background-color var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out);
+  }
+  .today-card .today-empty:hover { background: var(--surface-3); }
+  .today-card .today-empty:active { transform: scale(.98); }
+  .today-empty .te-icon {
+    width: 40px; height: 40px; margin-bottom: 6px;
+    border-radius: 50%;
+    display: grid; place-items: center;
+    background: var(--accent-soft); color: var(--accent);
+    font-size: 20px;
+    transition: transform .3s var(--ease-spring);
+  }
+  .today-empty:hover .te-icon { transform: scale(1.08) rotate(-8deg); }
+  .today-empty .te-title { font-size: 14px; font-weight: 600; color: var(--text); }
+  .today-empty .te-sub { font-size: 12px; color: var(--text-3); }
+  .today-card .ti-hint {
+    margin-top: 12px;
+    text-align: center;
+    font-size: 12px; color: var(--text-3);
   }
 
   .today-card .dice-btn {
@@ -2309,13 +2313,12 @@
     }
 
     .today-card { border-radius: var(--r-md); }
-    .big-date { padding: 12px 16px 12px; }
-    .bd-top { margin-bottom: 8px; }
-    .big-date .bd-num { font-size: 46px; letter-spacing: -1.5px; }
-    .bd-side { padding-left: 11px; padding-bottom: 3px; }
-    .bd-mon { font-size: 17px; }
-    .bd-dow { font-size: 11.5px; }
-    .big-date .bd-holiday { margin-top: 8px; font-size: 10.5px; padding: 2px 8px; }
+    .big-date { padding: 14px 16px 12px; }
+    .bd-dow { font-size: 14px; }
+    .big-date .bd-num { font-size: 84px; letter-spacing: -4px; }
+    .big-date .bd-holiday { font-size: 12px; }
+    .bd-week { margin-top: 10px; padding-top: 10px; }
+    .bd-wn { width: 30px; height: 30px; font-size: 14px; }
     .today-card .body-inner { padding: 8px 16px 14px; }
     .today-card .ti-head { margin-bottom: 10px; }
     .today-card h2 { font-size: 17px; }
@@ -2323,7 +2326,7 @@
     .today-card .ti-add .ti { font-size: 14px; }
     .today-card .today-leader { padding: 12px; margin-bottom: 8px; }
     .today-card .today-leader .name { font-size: 15px; }
-    .today-card .today-empty { padding: 12px; font-size: 12.5px; line-height: 1.5; }
+    .today-card .today-empty { padding: 16px 12px 14px; }
     .today-card .dice-btn { height: 38px; margin-top: 10px; font-size: 13px; }
 
     .title-bar {
@@ -3458,58 +3461,72 @@ function renderHero(){
   `;
 }
 
-// V3 sidebar variant of the today widget — big date number + compact list.
-// Only rendered when the user picked the "sidebar" layout in Tweaks.
-// Same data source as renderHero; CSS picks which one to show.
-const MN_EN = ['', 'JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+// 오늘 카드 헤더 — 애플 캘린더 위젯처럼: 액센트색 '10월 · 월요일', 아주 큰 날짜 숫자,
+// (공휴일이면 빨간 점 + 이름), 그리고 이번 주 한 줄. 오늘은 꽉 찬 원, 점심 후보가 있는
+// 날은 아래 점, 날짜를 누르면 그날 모달이 열린다. 오늘이 아닌 달을 볼 때도 같은 헤더.
+function bigDateHTML(t){
+  const hol = getHolidayName(t.y, t.m, t.d);
+  const base = new Date(t.y, t.m - 1, t.d);
+  const start = new Date(t.y, t.m - 1, t.d - base.getDay());   // 이번 주 일요일
+  let week = '';
+  for(let i = 0; i < 7; i++){
+    const dt = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
+    const y = dt.getFullYear(), m = dt.getMonth() + 1, d = dt.getDate();
+    const isToday = i === base.getDay();
+    const h = getHolidayName(y, m, d);
+    const list = ((((D[y]||{})[m]||{})[d]||{}).entries) || [];
+    const cls = 'bd-wd' + (isToday ? ' today' : '') + (i === 0 || h ? ' sun' : i === 6 ? ' sat' : '') +
+                (m !== t.m ? ' out' : '') + (list.length ? ' has' : '');
+    const label = m + '월 ' + d + '일 ' + DOW_KR[i] + '요일' + (isToday ? ', 오늘' : '') + (h ? ', ' + h : '') +
+                  (list.length ? ', 점심 후보 ' + list.length + '개' : '');
+    week += '<button type="button" class="' + cls + '" onclick="_openDayFromWeek(' + y + ',' + m + ',' + d + ')"' +
+            ' aria-label="' + esc(label) + '"' + (isToday ? ' aria-current="date"' : '') + '>' +
+              '<span class="bd-wl">' + DOW_KR[i] + '</span>' +
+              '<span class="bd-wn">' + d + '</span>' +
+              '<span class="bd-wdot"></span>' +
+            '</button>';
+  }
+  return '<div class="big-date">' +
+      '<div class="bd-top"><span class="bd-dow">' + MN[t.m] + ' · ' + t.dow + '요일</span></div>' +
+      '<div class="bd-num" aria-label="' + t.m + '월 ' + t.d + '일">' + t.d + '</div>' +
+      (hol ? '<div class="bd-holiday"><span class="bd-hdot"></span>' + esc(hol) + '</div>' : '') +
+      '<div class="bd-week" role="group" aria-label="이번 주">' + week + '</div>' +
+    '</div>';
+}
+// 이번 주 줄에서 날짜를 누르면 — 다른 달이면 그 달로 넘기고 그날 모달을 연다
+function _openDayFromWeek(y, m, d){
+  if(!YEARS.includes(y) || !MONTHS.includes(m)) return;
+  if(y !== curYear || m !== cur) sw(y, m);
+  openModal(d);
+}
+
+// 사이드바 레이아웃의 오늘 카드 — 위 헤더 + 오늘의 점심 (1위 카드 + 2~4위 목록)
 function renderSidebarHero(){
   const el = document.getElementById('todaySidebar');
   if(!el) return;
   if(!_loaded){ el.hidden = true; el.innerHTML=''; return; }
-  // Sidebar widget is always shown when this layout is active. The 13:00
-  // hide rule only governs the horizontal hero (stacked layout). When
-  // viewing a non-today month, fall back to a friendlier placeholder.
+  const t = todayInfo();
+  el.hidden = false;
+  // 오늘이 아닌 달을 볼 때 — 헤더는 그대로, 아래는 '오늘로 가기'
   if(!isTodaysMonth()){
-    const t = todayInfo();
-    el.hidden = false;
     el.innerHTML =
-      '<div class="swatch"></div>' +
-      '<div class="big-date">' +
-        '<div class="bd-top">' +
-          '<span class="bd-today"><span class="bd-dot"></span>오늘</span>' +
-          '<span class="bd-year">' + t.y + '</span>' +
-        '</div>' +
-        '<div class="bd-main">' +
-          '<div class="bd-num">' + t.d + '</div>' +
-          '<div class="bd-side">' +
-            '<div class="bd-mon">' + MN[t.m] + '</div>' +
-            '<div class="bd-dow">' + t.dow + '요일</div>' +
-          '</div>' +
-        '</div>' +
-      '</div>' +
+      bigDateHTML(t) +
       '<div class="body-inner">' +
-        '<h2><span class="emoji">🗓️</span>다른 달이에요</h2>' +
-        '<div class="today-empty" style="margin-top:0;line-height:1.55">' +
-          '지금은 오늘이 아닌 달을 보고 있어요.<br/>' +
-          '<span style="font-size:11.5px;color:var(--text-3)">아래 버튼으로 오늘로 돌아갈 수 있어요.</span>' +
-        '</div>' +
+        '<div class="ti-head"><div class="ti-titles"><h2>다른 달을 보고 있어요</h2></div></div>' +
         '<button class="dice-btn" type="button" onclick="jumpToToday()">' +
           '<span class="dice"><i class="ti ti-circle-dot"></i></span>오늘로 가기' +
         '</button>' +
       '</div>';
     return;
   }
-  el.hidden = false;
 
-  const t = todayInfo();
   const entries = getTodayEntries();
   const leader = entries[0];
   const rest   = entries.slice(1, 4);
-  const holName = getHolidayName(t.y, t.m, t.d);
 
   const leaderHTML = leader ? `
     <div class="today-leader" data-entry-id="${leader.id}" onclick="openModalForToday(${t.d})">
-      <div class="rank"><i class="ti ti-trophy"></i>1ST</div>
+      <div class="rank"><i class="ti ti-trophy"></i>1위</div>
       <div class="name">${esc(leader.name)}</div>
       ${leader.memo ? '<div class="memo">'+esc(leader.memo)+'</div>' : ''}
       <div class="vote-row">
@@ -3518,11 +3535,11 @@ function renderSidebarHero(){
       </div>
     </div>
   ` : `
-    <div class="today-empty">
-      <i class="ti ti-tools-kitchen-2" style="display:block;font-size:24px;opacity:.4;margin-bottom:6px;color:var(--text-2)"></i>
-      아직 후보가 없어요<br/>
-      <span style="font-size:11.5px;opacity:.75;">우상단 + 버튼으로 첫 메뉴를 올려보세요</span>
-    </div>
+    <button type="button" class="today-empty" onclick="openModalForToday(${t.d})">
+      <span class="te-icon"><i class="ti ti-tools-kitchen-2"></i></span>
+      <span class="te-title">아직 후보가 없어요</span>
+      <span class="te-sub">눌러서 오늘의 첫 메뉴를 올려보세요</span>
+    </button>
   `;
 
   const listHTML = rest.length > 0 ? `
@@ -3538,25 +3555,11 @@ function renderSidebarHero(){
   ` : '';
 
   el.innerHTML = `
-    <div class="swatch"></div>
-    <div class="big-date">
-      <div class="bd-top">
-        <span class="bd-today"><span class="bd-dot"></span>오늘</span>
-        <span class="bd-year">${t.y}</span>
-      </div>
-      <div class="bd-main">
-        <div class="bd-num">${t.d}</div>
-        <div class="bd-side">
-          <div class="bd-mon">${MN[t.m]}</div>
-          <div class="bd-dow">${t.dow}요일</div>
-        </div>
-      </div>
-      ${holName ? '<div class="bd-holiday"><i class="ti ti-flag-filled"></i>'+esc(holName)+'</div>' : ''}
-    </div>
+    ${bigDateHTML(t)}
     <div class="body-inner">
       <div class="ti-head">
         <div class="ti-titles">
-          <h2><span class="emoji">🍱</span>오늘의 점심</h2>
+          <h2>오늘의 점심${entries.length ? '<span class="ti-count">'+entries.length+'</span>' : ''}</h2>
         </div>
         <button class="ti-add" type="button" onclick="openModalForToday(${t.d})" aria-label="메뉴 추가" title="메뉴 추가">
           <i class="ti ti-plus"></i>
@@ -3566,9 +3569,7 @@ function renderSidebarHero(){
       ${listHTML}
       ${entries.length >= 2
         ? '<button class="dice-btn" id="diceBtnSide" type="button" onclick="rollDice()" aria-label="랜덤 추첨"><span class="dice"><i class="ti ti-dice-5"></i></span>메뉴 정해줘!</button>'
-        : (entries.length === 0
-            ? '<button class="dice-btn" type="button" disabled aria-disabled="true" style="opacity:.55;cursor:not-allowed"><span class="dice"><i class="ti ti-dice-5"></i></span>먼저 후보를 추가하세요</button>'
-            : '<button class="dice-btn" type="button" disabled aria-disabled="true" style="opacity:.55;cursor:not-allowed"><span class="dice"><i class="ti ti-dice-5"></i></span>후보가 2개 이상일 때 굴려요</button>')}
+        : (entries.length === 1 ? '<p class="ti-hint">후보가 2개 이상이면 랜덤으로 골라드려요</p>' : '')}
     </div>
   `;
 }
@@ -5012,7 +5013,7 @@ setInterval(() => { if(isTodaysMonth()){ renderHero(); renderSidebarHero(); } },
      다시 쏙 들어간다. 콘텐츠를 찌그러뜨리는 scale 대신 clip-path 창을 칸 크기에서
      모달 크기로 넓히면서 위치만 옮긴다. 출발점이 없으면(키보드·설정 패널 등)
      살짝 기울어진 채 떠오르는 기본 진입. */
-  const ORIGIN_SEL = '.cell, .hero-row, .more-lnk, .add-btn-ghost, .today-leader, .today-row, .ti-add, .dinner-banner, .dinner-tag, .help-btn, [data-twk-dinner-open]';
+  const ORIGIN_SEL = '.cell, .hero-row, .more-lnk, .add-btn-ghost, .today-leader, .today-row, .ti-add, .today-empty, .bd-wd, .dinner-banner, .dinner-tag, .help-btn, [data-twk-dinner-open]';
   let _lastOrigin = null;   // 마지막 클릭 { el, t } — 모달을 연 클릭인지 시간으로 판별
   let _openOrigin = null;   // 지금 열린 모달의 출발점 — 닫을 때 다시 찾아 들어갈 단서들
   document.addEventListener('click', e => {
