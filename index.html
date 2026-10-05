@@ -1405,13 +1405,13 @@
     transform-origin: 50% 0;
     will-change: transform, opacity;
   }
-  .cal-ghost.flip-away{ z-index: 3; animation: pageFlipAway .42s cubic-bezier(.45, 0, .7, .35) forwards; }
-  .cal-ghost.sink    { z-index: 0; animation: pageSink .36s var(--ease-out) forwards; }
+  .cal-ghost.flip-away{ z-index: 3; animation: pageFlipAway .45s cubic-bezier(.45, 0, .7, .35) forwards; }
+  .cal-ghost.sink    { z-index: 0; animation: pageSink .45s var(--ease-out) forwards; }
   /* 넘어가는 페이지 뒷면 그늘 — 각도가 커질수록 어두워진다 */
   .cal-ghost.flip-away::after{
     content: ''; position: absolute; inset: -2px; border-radius: var(--r-md);
     background: linear-gradient(180deg, transparent 10%, color-mix(in oklch, var(--text) 26%, transparent));
-    opacity: 0; animation: pageShade .42s ease-in forwards;
+    opacity: 0; animation: pageShade .45s ease-in forwards;
   }
   @keyframes pageFlipAway{
     0%   { opacity: 1; transform: perspective(2000px) rotateX(0) translateY(0); }
@@ -1423,8 +1423,8 @@
     to { opacity: 0; transform: translateY(14px) scale(.95); }
   }
   .cal.flip-next .cell{
-    animation: cellReveal .3s var(--ease-out) both;
-    animation-delay: calc(70ms + (var(--rows, 6) - 1 - var(--row, 0)) * 30ms);
+    animation: cellReveal .26s var(--ease-out) both;
+    animation-delay: calc(60ms + (var(--rows, 6) - 1 - var(--row, 0)) * 25ms);
   }
   @keyframes cellReveal{
     from { opacity: 0; transform: translateY(10px) scale(.94); }
@@ -1432,13 +1432,12 @@
   }
   .cal.flip-prev{
     transform-origin: 50% 0;
-    animation: pageFlipDown .48s cubic-bezier(.2, .7, .3, 1) both;
+    animation: pageFlipDown .45s var(--ease-out) both;
   }
+  /* 출렁임(바운스) 없이 한 번에 내려와 멈춘다 */
   @keyframes pageFlipDown{
     0%   { opacity: 0; transform: perspective(1800px) rotateX(-82deg) translateY(-5%); }
     35%  { opacity: 1; }
-    62%  { transform: perspective(1800px) rotateX(7deg); }
-    82%  { transform: perspective(1800px) rotateX(-2.5deg); }
     100% { opacity: 1; transform: perspective(1800px) rotateX(0); }
   }
   .cell:hover{
@@ -1578,8 +1577,31 @@
   .mclose:hover{ background: var(--surface-2); color: var(--text); }
   .mclose:active{ transform: scale(.94); }
 
-  /* 아래 4px 패딩 — 룰렛·당첨 하이라이트(scale 1.03)가 살짝 커져도 스크롤바가 깜빡이지 않게 */
-  .elist{ display:flex; flex-direction:column; gap: 6px; max-height: 300px; overflow-y: auto; overflow-x: hidden; margin-bottom: 12px; padding: 0 2px 4px 0; }
+  /* 후보 목록 — 높이를 후보 3개(60px×3 + 간격) 정도로 고정하고 스크롤바는 숨긴다.
+     후보 수·애니메이션과 상관없이 모달 크기가 변하지 않고 스크롤바도 생기지 않는다.
+     더 있으면 휠·터치로 스크롤되고, 가려진 쪽 가장자리가 흐려진다 (_updateScrollHint).
+     3px 패딩(+ 같은 만큼 음수 마진)은 룰렛·투표 링이 가장자리에서 잘리지 않게 하는 여유 */
+  .elist{
+    display:flex; flex-direction:column; gap: 6px;
+    height: 198px; overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain;
+    padding: 3px; margin: 0 -3px 13px;
+    scrollbar-width: none;
+  }
+  .elist::-webkit-scrollbar{ display: none; }
+  .elist > .erow{ flex-shrink: 0; }
+  .elist > .empty-state{ margin: auto 0; }
+  .elist.can-down{
+    -webkit-mask-image: linear-gradient(180deg, #000 calc(100% - 28px), transparent);
+            mask-image: linear-gradient(180deg, #000 calc(100% - 28px), transparent);
+  }
+  .elist.can-up{
+    -webkit-mask-image: linear-gradient(180deg, transparent, #000 28px);
+            mask-image: linear-gradient(180deg, transparent, #000 28px);
+  }
+  .elist.can-up.can-down{
+    -webkit-mask-image: linear-gradient(180deg, transparent, #000 28px, #000 calc(100% - 28px), transparent);
+            mask-image: linear-gradient(180deg, transparent, #000 28px, #000 calc(100% - 28px), transparent);
+  }
   .erow{
     display:flex; align-items:flex-start; gap: 10px;
     padding: 10px 12px; border-radius: var(--r-sm);
@@ -3587,7 +3609,8 @@ function _spotlightRoulette(rows, pickIdx, onLand){
     clear();
     const winner = rows[pickIdx];
     winner.classList.add('dice-winner');
-    winner.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    // 모달 목록 안이면 즉시 스크롤 — 부드럽게 굴리면 도장·컨페티가 스크롤 전 자리에 찍힌다
+    winner.scrollIntoView({ block: 'nearest', behavior: winner.closest('.elist') ? 'auto' : 'smooth' });
     if(navigator.vibrate){ try { navigator.vibrate([12, 60, 18]); } catch(e){} }
     winner.addEventListener('animationend', () => winner.classList.remove('dice-winner'), { once: true });
     if(window._onDiceWinner) window._onDiceWinner(winner);
@@ -4124,17 +4147,16 @@ function sw(y, m){
     ml.style.transformOrigin = '50% ' + (forward ? '100%' : '0');
     ml.animate(
       [{ opacity: 0, transform: 'perspective(300px) rotateX(' + (forward ? 90 : -90) + 'deg)' },
-       { opacity: 1, transform: 'perspective(300px) rotateX(' + (forward ? -12 : 12) + 'deg)', offset: .7 },
        { opacity: 1, transform: 'perspective(300px) rotateX(0)' }],
-      { duration: 300, easing: 'cubic-bezier(.22, 1, .36, 1)' }
+      { duration: 320, easing: 'cubic-bezier(.22, 1, .36, 1)' }
     );
   }
   // 활성 탭 스프링 팝 — 하이라이트가 미끄러질 땐 그걸로 충분하니 생략
   const at = document.querySelector('.tab.active');
   if(!glided && at && typeof at.animate === 'function' && !prefersReducedMotion()){
     at.animate(
-      [{ transform: 'scale(.86)' }, { transform: 'scale(1)' }],
-      { duration: 320, easing: 'cubic-bezier(.34, 1.56, .64, 1)' }
+      [{ transform: 'scale(.9)' }, { transform: 'scale(1)' }],
+      { duration: 320, easing: 'cubic-bezier(.22, 1, .36, 1)' }
     );
   }
 }
@@ -4195,7 +4217,7 @@ function _glideTabInk(from){
   const anim = ink.animate([
     { transform: 'translate('+dx+'px,'+dy+'px) scaleX('+sx+')' },
     { transform: 'translate(0,0) scaleX(1)' }
-  ], { duration: 320, easing: 'cubic-bezier(.34, 1.36, .64, 1)' });
+  ], { duration: 340, easing: 'cubic-bezier(.22, 1, .36, 1)' });
   const done = () => { to.classList.remove('ink-pending'); ink.remove(); };
   anim.onfinish = done;
   anim.oncancel = done;
@@ -4481,6 +4503,14 @@ function _renderRows(list, html){
     if(first) r.classList.add('enter');
     else if(!prev.has(r.dataset.eid)){ r.classList.add('enter'); r.style.animationDelay = '0ms'; }
   });
+  if(first) list.addEventListener('scroll', () => _updateScrollHint(list), { passive: true });
+  _updateScrollHint(list);
+}
+// 목록은 스크롤바를 숨기므로, 위·아래로 더 볼 게 있으면 그쪽 가장자리를 흐리게 해서 알려준다
+function _updateScrollHint(list){
+  const max = list.scrollHeight - list.clientHeight;
+  list.classList.toggle('can-up', max > 2 && list.scrollTop > 2);
+  list.classList.toggle('can-down', max > 2 && list.scrollTop < max - 2);
 }
 function refreshModalContent(dn, modalEl){
   if(!modalEl) return;
