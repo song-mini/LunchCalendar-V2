@@ -384,8 +384,6 @@
   @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
   @keyframes popIn  { from { opacity: 0; transform: translateY(10px) scale(.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
   @keyframes popOut { from { opacity: 1; transform: translateY(0) scale(1); } to { opacity: 0; transform: translateY(4px) scale(.98); } }
-  @keyframes monthSlideRight { from { opacity: 0; transform: translateX(18px) scale(.992); } to { opacity: 1; transform: translateX(0) scale(1); } }
-  @keyframes monthSlideLeft  { from { opacity: 0; transform: translateX(-18px) scale(.992); } to { opacity: 1; transform: translateX(0) scale(1); } }
   @keyframes sync-pulse { 0%,100% { opacity: 1; } 50% { opacity: .55; } }
   @keyframes dice-roll {
     0%   { transform: rotate(0deg)   scale(1);   }
@@ -394,11 +392,6 @@
     60%  { transform: rotate(360deg) scale(1.12); }
     80%  { transform: rotate(540deg) scale(1.06); }
     100% { transform: rotate(720deg) scale(1);    }
-  }
-  @keyframes spotlight {
-    0%   { transform: scale(.97); box-shadow: 0 0 0 0 var(--teal-glow); }
-    50%  { transform: scale(1.01); box-shadow: 0 0 0 10px transparent; }
-    100% { transform: scale(1);    box-shadow: 0 0 0 0 transparent; }
   }
   @keyframes dice-winner {
     0%   { transform: scale(1);    box-shadow: 0 0 0 0 var(--teal-glow); }
@@ -569,12 +562,21 @@
     line-height: .82; letter-spacing: -3px;
     font-variant-numeric: tabular-nums;
     text-shadow: 0 2px 0 rgba(255,255,255,.55);
-    animation: num-pop .5s var(--ease-spring) both;
+    transform-origin: 50% 0;
+    animation: num-flip .75s var(--ease-out) .12s both;
   }
-  @keyframes num-pop {
-    from { opacity: 0; transform: translateY(12px) scale(.9); }
-    to   { opacity: 1; transform: translateY(0) scale(1); }
+  /* 플립 시계처럼 위 경첩에서 넘어오며 착지 */
+  @keyframes num-flip {
+    0%   { opacity: 0; transform: perspective(420px) rotateX(-100deg); }
+    55%  { opacity: 1; transform: perspective(420px) rotateX(16deg); }
+    78%  { transform: perspective(420px) rotateX(-6deg); }
+    100% { opacity: 1; transform: perspective(420px) rotateX(0); }
   }
+  /* 첫 진입 연출은 한 번만 — 투표·실시간 갱신으로 innerHTML 이 다시
+     그려질 때마다 숫자가 다시 넘어가지 않게 */
+  html.intro-done .big-date .bd-num,
+  html.intro-done .bd-side,
+  html.intro-done .dinner-banner { animation: none; }
   .bd-side {
     display: flex; flex-direction: column; gap: 3px;
     padding: 0 0 5px 14px; min-width: 0;
@@ -1269,7 +1271,6 @@
   .hero-row.enter { animation: fadeUp .25s var(--ease) both; }
   [data-theme="dark"] .hero-row { background: var(--surface-2); }
   .hero-row:hover { border-color: var(--bd-strong); box-shadow: var(--shadow-card); }
-  .hero-row.spotlight { animation: spotlight 1.2s var(--ease-spring); border-color: var(--teal); }
 
   .hero-rank { width: 26px; height: 26px; border-radius: 9999px; display: flex; align-items: center; justify-content: center; font-family: var(--ff-numeric); font-weight: 600; font-variant-numeric: tabular-nums; font-size: 12.5px; flex-shrink: 0; }
   .hero-rank.r0 { background: linear-gradient(135deg, #f2c94c, #d4a02b); color: #fff; box-shadow: inset 0 1px 0 rgba(255,255,255,.4), 0 2px 6px -2px rgba(212,160,43,.5); }
@@ -1305,10 +1306,25 @@
 
   /* === tabs === */
   .tabs-wrap{
+    position: relative;
     display:flex; gap: 2px; flex-wrap:wrap; padding: 4px;
     margin-bottom: 16px; border-radius: var(--r-sm);
     border: 1px solid var(--bd); background: var(--surface-2);
     animation: fadeUp .3s var(--ease) .06s both;
+  }
+  /* 달 전환 시 이전 탭 → 새 탭으로 미끄러지는 하이라이트 (transform 전용) */
+  .tab-ink{
+    position: absolute; z-index: 0;
+    border-radius: 4px;
+    pointer-events: none;
+    transform-origin: 0 50%;
+    background: linear-gradient(180deg, color-mix(in oklch, var(--text) 90%, white), var(--text));
+    box-shadow: 0 2px 6px -2px color-mix(in oklch, var(--text) 55%, transparent), inset 0 1px 0 rgba(255,255,255,.14);
+    will-change: transform;
+  }
+  [data-theme="dark"] .tab-ink{ background: var(--text); }
+  .tab.active.ink-pending{
+    background: transparent; box-shadow: none; color: var(--text-2);
   }
   .tab{
     flex: 1 1 0; min-width: 52px; border: 0; border-radius: 4px;
@@ -1352,8 +1368,6 @@
     display:grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px;
     animation: fadeUp .3s var(--ease) .08s both;
   }
-  .cal.slide-r { animation: monthSlideRight .22s var(--ease); }
-  .cal.slide-l { animation: monthSlideLeft  .22s var(--ease); }
 
   .dow{ padding: 6px 2px 8px; text-align:center; font-family: var(--ff-mono); font-size: 11.5px; font-weight: 500; letter-spacing: .08em; color: var(--text-3); }
   .dow.sun{ color: var(--sun); }
@@ -1368,9 +1382,31 @@
     cursor:pointer; position: relative;
     transition: border-color var(--dur-fast) var(--ease-out), background-color var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out);
   }
+  /* 첫 로드 — 오늘 칸에서 물결처럼 퍼져나가며 등장 (--ripple = 오늘까지 거리) */
   .cal.mounting .cell {
-    animation: popIn .32s var(--ease-spring) both;
-    animation-delay: calc(var(--cell-i, 0) * 9ms);
+    animation: cellRipple .5s var(--ease-spring) both;
+    animation-delay: calc(var(--ripple, 0) * 42ms);
+  }
+  @keyframes cellRipple {
+    from { opacity: 0; transform: translateY(14px) scale(.72); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  /* 달 이동 — 진행 방향으로 칸들이 도미노처럼 밀려 들어온다 */
+  .cal.wave-r .cell, .cal.wave-l .cell {
+    animation: cellWaveR .42s var(--ease) both;
+    animation-delay: calc(var(--col, 0) * 20ms + var(--row, 0) * 14ms);
+  }
+  .cal.wave-l .cell {
+    animation-name: cellWaveL;
+    animation-delay: calc((6 - var(--col, 0)) * 20ms + var(--row, 0) * 14ms);
+  }
+  @keyframes cellWaveR {
+    from { opacity: 0; transform: translateX(34px) scale(.9) rotate(1.5deg); }
+    to   { opacity: 1; transform: translateX(0) scale(1) rotate(0); }
+  }
+  @keyframes cellWaveL {
+    from { opacity: 0; transform: translateX(-34px) scale(.9) rotate(-1.5deg); }
+    to   { opacity: 1; transform: translateX(0) scale(1) rotate(0); }
   }
   .cell:hover{
     border-color: var(--bd-strong);
@@ -1615,9 +1651,6 @@
   .hero-row.flash, .erow.flash { animation: flash-ring 1s var(--ease-out); }
   .chip.flash { animation: flash-ring .9s var(--ease-out); }
   .hero-row.dice-winner { animation: dice-winner 1.4s var(--ease-spring); border-color: var(--teal); }
-  .today-leader.spotlight,
-  .today-row.spotlight,
-  .erow.spotlight { animation: spotlight 1.2s var(--ease-spring); border-color: var(--teal); }
   .today-leader.dice-winner,
   .today-row.dice-winner,
   .erow.dice-winner { animation: dice-winner 1.4s var(--ease-spring); border-color: var(--teal); }
@@ -1933,6 +1966,87 @@
     100% { opacity: 0; transform: translateY(-36px) scale(1); }
   }
 
+  /* 🍻 회식 배너 — 몇 초마다 잔을 부딪히고, D-day 뱃지에 광택이 지나간다 */
+  .dinner-banner .db-emoji{ display: inline-block; animation: clink 4.2s var(--ease-out) 1s infinite; transform-origin: 50% 80%; }
+  .dinner-banner:hover .db-emoji{ animation: none; }
+  @keyframes clink{
+    0%, 14%, 100% { transform: rotate(0) scale(1); }
+    3%            { transform: rotate(-16deg) scale(1.12); }
+    6%            { transform: rotate(12deg) scale(1.12); }
+    9%            { transform: rotate(-6deg) scale(1.04); }
+  }
+  .db-dday{ position: relative; overflow: hidden; }
+  .db-dday::after{
+    content: ''; position: absolute; top: 0; bottom: 0; left: -70%; width: 50%;
+    background: linear-gradient(105deg, transparent, rgba(255,255,255,.55), transparent);
+    transform: translateX(0) skewX(-18deg);
+    animation: btn-shine 3.6s ease-in-out 1.4s infinite;
+    pointer-events: none;
+  }
+
+  /* 🎲 룰렛 — 감속하며 후보를 하나씩 비추다가 당첨자에 멈춘다 */
+  .hero-row.roulette-hit, .today-leader.roulette-hit, .today-row.roulette-hit, .erow.roulette-hit{
+    border-color: var(--accent);
+    background: var(--accent-soft);
+    box-shadow: 0 0 0 3px color-mix(in oklch, var(--accent) 16%, transparent);
+    animation: roulette-hit .2s var(--ease-spring);
+  }
+  @keyframes roulette-hit{
+    0%   { transform: scale(1); }
+    45%  { transform: scale(1.03); }
+    100% { transform: scale(1); }
+  }
+
+  /* 당첨 도장 — 크게 떨어져 쾅 찍히고 잠시 뒤 사라진다 */
+  .win-stamp{
+    position: fixed; z-index: 410;
+    padding: 4px 10px 5px;
+    font-family: var(--ff-display); font-size: 15px; font-weight: 700; letter-spacing: .02em;
+    color: var(--accent);
+    background: color-mix(in oklch, var(--surface-solid) 88%, transparent);
+    border: 2px solid var(--accent);
+    border-radius: 8px;
+    box-shadow: inset 0 0 0 2px color-mix(in oklch, var(--surface-solid) 70%, transparent), inset 0 0 0 3.5px color-mix(in oklch, var(--accent) 55%, transparent), 0 6px 16px -6px color-mix(in oklch, var(--accent) 50%, transparent);
+    white-space: nowrap;
+    pointer-events: none;
+    transform-origin: 50% 50%;
+    animation: stamp-in .5s cubic-bezier(.2, 1.4, .4, 1) both, stamp-out .35s var(--ease-out) 1.9s forwards;
+    will-change: transform, opacity;
+  }
+  @keyframes stamp-in{
+    0%   { opacity: 0; transform: translate(-50%, -50%) scale(2.6) rotate(-24deg); }
+    60%  { opacity: 1; transform: translate(-50%, -50%) scale(.9) rotate(-9deg); }
+    100% { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(-11deg); }
+  }
+  @keyframes stamp-out{
+    to { opacity: 0; transform: translate(-50%, -50%) scale(1.15) rotate(-11deg); }
+  }
+
+  /* 소나 링 — 요소 테두리에서 바깥으로 퍼지는 고리 (opacity·transform 만) */
+  .sonar-ring{
+    position: fixed; z-index: 390;
+    pointer-events: none;
+    box-shadow: 0 0 0 2px var(--ring-c, var(--accent));
+    opacity: 0;
+    animation: sonar .75s var(--ease-out) forwards;
+    will-change: transform, opacity;
+  }
+  @keyframes sonar{
+    0%   { opacity: .85; transform: scale(1, 1); }
+    100% { opacity: 0;   transform: scale(var(--ring-sx, 1.2), var(--ring-sy, 1.2)); }
+  }
+
+  /* 토스트 아이콘 팝 */
+  .toast i{ display: inline-block; animation: vote-pop .55s var(--ease-spring) .08s both; }
+
+  /* 🌓 테마 전환 — View Transitions 로 버튼에서 원형으로 번져나간다.
+     JS 가 ::view-transition-new(root) 의 clip-path 를 애니메이션한다. */
+  ::view-transition-old(root),
+  ::view-transition-new(root){
+    animation: none;
+    mix-blend-mode: normal;
+  }
+
   /* === theme transition (토글 중에만) === */
   html.theme-switching,
   html.theme-switching *,
@@ -2229,6 +2343,7 @@
   @media (prefers-reduced-motion: reduce){
     *, *::before, *::after{
       animation-duration: .01ms !important;
+      animation-delay: 0s !important;
       animation-iteration-count: 1 !important;
       transition-duration: .01ms !important;
       scroll-behavior: auto !important;
@@ -2754,12 +2869,36 @@ function applyTheme(theme){
   if(ic) ic.className = 'ti ' + (theme==='dark' ? 'ti-sun' : 'ti-moon');
   syncThemeColor();
 }
+// 테마 전환 — View Transitions 를 지원하면 origin 요소에서 새 테마가 원형으로
+// 번져나가고, 아니면 기존 색 크로스페이드로 폴백. onApplied 는 실제로 테마가
+// 바뀐 직후 호출된다 (VT 콜백은 비동기라 호출부가 바로 다시 그리면 이전 상태가 보임).
+function switchTheme(theme, origin, onApplied){
+  try{ localStorage.setItem('gtl-theme', theme); }catch(e){}
+  const apply = () => { applyTheme(theme); if(onApplied) onApplied(); };
+  const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(!document.startViewTransition || reduce || document.hidden){
+    document.documentElement.classList.add('theme-switching');
+    apply();
+    setTimeout(() => document.documentElement.classList.remove('theme-switching'), 600);
+    return;
+  }
+  const r = origin && origin.getBoundingClientRect();
+  const x = r && r.width ? r.left + r.width/2 : innerWidth/2;
+  const y = r && r.height ? r.top + r.height/2 : innerHeight/2;
+  const endR = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
+  let vt;
+  try { vt = document.startViewTransition(apply); }
+  catch(e){ apply(); return; }
+  vt.ready.then(() => {
+    document.documentElement.animate(
+      { clipPath: ['circle(0px at '+x+'px '+y+'px)', 'circle('+endR+'px at '+x+'px '+y+'px)'] },
+      { duration: 700, easing: 'cubic-bezier(.5, 0, .3, 1)', pseudoElement: '::view-transition-new(root)' }
+    );
+  }).catch(() => {});
+}
 function toggleTheme(){
-  const cur = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-  try{ localStorage.setItem('gtl-theme', cur); }catch(e){}
-  document.documentElement.classList.add('theme-switching');
-  applyTheme(cur);
-  setTimeout(() => document.documentElement.classList.remove('theme-switching'), 600);
+  const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  switchTheme(next, document.querySelector('.theme-btn'));
 }
 
 /* ---------- supabase init + load ---------- */
@@ -3079,7 +3218,7 @@ function _animateVote(entryId, becameVoted){
       );
       for(const b of btns){
         const r = b.getBoundingClientRect();
-        if(r.width){ _spawnPlusOne(r); break; }
+        if(r.width){ _spawnPlusOne(r); if(window._voteBurst) window._voteBurst(b); break; }
       }
     }
     document.querySelectorAll(
@@ -3350,11 +3489,20 @@ function openModalForToday(day){
   openModal(day);
 }
 
+// 룰렛이 도는 동안 재클릭 무시 — disabled 로 잠그면 버튼이 2초 넘게 회색이 돼서
+// 플래그로 막는다. 혹시 콜백이 유실돼도 안전망 타이머로 풀린다.
+let _diceBusy = false, _diceBusyT = null;
+function _setDiceBusy(on){
+  _diceBusy = on;
+  clearTimeout(_diceBusyT);
+  if(on) _diceBusyT = setTimeout(() => { _diceBusy = false; }, 6000);
+}
 function rollDice(){
+  if(_diceBusy) return;
   const entries = getTodayEntries();
   if(entries.length < 2) return;
   const btn = document.getElementById('diceBtn') || document.getElementById('diceBtnSide');
-  if(btn){ btn.classList.add('rolling'); btn.disabled = true; }
+  if(btn) btn.classList.add('rolling');
 
   // Stacked layout uses #heroList with .hero-row. Sidebar layout uses
   // .today-leader (rank 1) + .today-list .today-row (rank 2+). Pick whichever
@@ -3371,32 +3519,52 @@ function rollDice(){
       rows.push(...sidebar.querySelectorAll('.today-row'));
     }
   }
-  if(!rows.length){ if(btn){ btn.classList.remove('rolling'); btn.disabled = false; } return; }
+  if(!rows.length){ if(btn) btn.classList.remove('rolling'); return; }
+  _setDiceBusy(true);
 
   // 무작위로 한 명 뽑기 — 투표 수와 무관하게 균등 확률 (rows.length로 고정해서
   // 사이드바가 4개만 노출해도 표시된 후보 안에서만 뽑히도록).
   const pickIdx = Math.floor(Math.random() * rows.length);
 
-  // Phase 1: dice rolls solo (~900ms). Phase 2: shuffle-spotlight, then settle on pick.
+  // Phase 1: 주사위가 굴러가는 도중(~450ms)에 룰렛 시작. Phase 2: 감속 룰렛이
+  // 정확히 당첨자에서 멈춘다. 룰렛이 끝날 때까지 _diceBusy 로 연타를 막는다.
+  setTimeout(() => { if(btn) btn.classList.remove('rolling'); }, 900);
   setTimeout(() => {
-    if(btn){ btn.classList.remove('rolling'); btn.disabled = false; }
-    let i = 0;
-    const shuffleCount = 8;
-    const id = setInterval(() => {
-      rows.forEach(r => r.classList.remove('spotlight'));
-      rows[i % rows.length].classList.add('spotlight');
-      i++;
-      if(i >= shuffleCount){
-        clearInterval(id);
-        rows.forEach(r => r.classList.remove('spotlight','dice-winner'));
-        const winner = rows[pickIdx];
-        winner.classList.add('dice-winner');
-        winner.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-        if(navigator.vibrate){ try { navigator.vibrate([12, 60, 18]); } catch(e){} }
-        winner.addEventListener('animationend', () => winner.classList.remove('dice-winner'), { once: true });
-      }
-    }, 80);
-  }, 900);
+    _spotlightRoulette(rows, pickIdx, () => _setDiceBusy(false));
+  }, 450);
+}
+
+// 후보 행들을 차례로 비추며 점점 느려지다가 rows[pickIdx] 에서 정확히 멈춘다.
+// 최소 두 바퀴 이상 돌고, 마지막 몇 칸은 확 느려져 "어디서 멈추지?" 긴장감을 준다.
+function _spotlightRoulette(rows, pickIdx, onLand){
+  const n = rows.length;
+  const reduce = prefersReducedMotion();
+  const clear = () => rows.forEach(r => r.classList.remove('roulette-hit', 'dice-winner'));
+  const land = () => {
+    clear();
+    const winner = rows[pickIdx];
+    winner.classList.add('dice-winner');
+    winner.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    if(navigator.vibrate){ try { navigator.vibrate([12, 60, 18]); } catch(e){} }
+    winner.addEventListener('animationend', () => winner.classList.remove('dice-winner'), { once: true });
+    if(window._onDiceWinner) window._onDiceWinner(winner);
+    if(onLand) onLand(winner);
+  };
+  if(reduce){ land(); return; }
+  const loops = n <= 2 ? 4 : n <= 4 ? 3 : 2;
+  const steps = loops * n + pickIdx + 1;  // 0번부터 비추므로 마지막 스텝이 pickIdx
+  let k = 0;
+  const tick = () => {
+    rows.forEach(r => r.classList.remove('roulette-hit'));
+    const r = rows[k % n];
+    void r.offsetWidth;
+    r.classList.add('roulette-hit');
+    k++;
+    if(k >= steps){ setTimeout(land, 260); return; }
+    const p = k / steps;
+    setTimeout(tick, 42 + Math.pow(p, 2.6) * 300);
+  };
+  tick();
 }
 
 /* =================================================================
@@ -3788,24 +3956,7 @@ function rollDinnerDice(){
   const btn = document.getElementById('dinnerDiceBtn');
   if(btn) btn.disabled = true;
   const pickIdx = Math.floor(Math.random() * rows.length);
-  let i = 0;
-  const shuffleCount = 8;
-  const id = setInterval(() => {
-    rows.forEach(r => r.classList.remove('spotlight'));
-    rows[i % rows.length].classList.add('spotlight');
-    i++;
-    if(i >= shuffleCount){
-      clearInterval(id);
-      rows.forEach(r => r.classList.remove('spotlight','dice-winner'));
-      const winner = rows[pickIdx];
-      winner.classList.add('dice-winner');
-      winner.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-      if(navigator.vibrate){ try { navigator.vibrate([12, 60, 18]); } catch(e){} }
-      winner.addEventListener('animationend', () => winner.classList.remove('dice-winner'), { once: true });
-      if(window._fireConfetti) window._fireConfetti(winner);
-      if(btn) btn.disabled = false;
-    }
-  }, 90);
+  _spotlightRoulette(rows, pickIdx, () => { if(btn) btn.disabled = false; });
 }
 
 /* ---------- jump to today ---------- */
@@ -3902,17 +4053,22 @@ function sw(y, m){
   if(!YEARS.includes(y) || !MONTHS.includes(m)) return;
   if(y === curYear && m === cur) return;
   const prevIdx = _curIdx();
+  const prevTab = document.querySelector('#monthTabs .tab.active');
+  const prevInk = prevTab ? { l: prevTab.offsetLeft, t: prevTab.offsetTop, w: prevTab.offsetWidth } : null;
   curYear = y; cur = m;
   const newIdx = _curIdx();
   renderTabs();
   renderHero();
   renderSidebarHero();
-  render(false); // skip mount stagger; slide handles entrance
+  render(false); // skip mount stagger; wave handles entrance
   const g = document.getElementById('calGrid');
-  g.classList.remove('slide-r', 'slide-l');
   void g.offsetWidth;
-  g.classList.add(newIdx > prevIdx ? 'slide-r' : 'slide-l');
+  const wave = newIdx > prevIdx ? 'wave-r' : 'wave-l';
+  g.classList.add(wave);
+  clearTimeout(g._waveT);
+  g._waveT = setTimeout(() => g.classList.remove(wave), 760);
   updateNavButtons();
+  const glided = _glideTabInk(prevInk);
   // 월 라벨 micro-pop — 달이 실제로 바뀔 때만
   const ml = document.querySelector('.month-label');
   if(ml && typeof ml.animate === 'function' && !prefersReducedMotion()){
@@ -3921,14 +4077,41 @@ function sw(y, m){
       { duration: 220, easing: 'cubic-bezier(0.175, 0.885, 0.32, 1.1)' }
     );
   }
-  // 활성 탭 스프링 팝 — rerender 시 재생되지 않도록 달 전환 시에만 WAAPI 로
+  // 활성 탭 스프링 팝 — 하이라이트가 미끄러질 땐 그걸로 충분하니 생략
   const at = document.querySelector('.tab.active');
-  if(at && typeof at.animate === 'function' && !prefersReducedMotion()){
+  if(!glided && at && typeof at.animate === 'function' && !prefersReducedMotion()){
     at.animate(
       [{ transform: 'scale(.86)' }, { transform: 'scale(1)' }],
       { duration: 320, easing: 'cubic-bezier(.34, 1.56, .64, 1)' }
     );
   }
+}
+
+// 이전 활성 탭 자리(from: offset 좌표)에서 새 활성 탭으로 하이라이트를 미끄러뜨린다.
+// 같은 자리(연도만 바뀜)면 false 를 돌려 호출부가 기존 팝 애니메이션을 쓰게 한다.
+function _glideTabInk(from){
+  const wrap = document.getElementById('monthTabs');
+  const to = wrap && wrap.querySelector('.tab.active');
+  if(!from || !to || prefersReducedMotion() || typeof to.animate !== 'function') return false;
+  const dx = from.l - to.offsetLeft, dy = from.t - to.offsetTop;
+  if(!dx && !dy) return false;
+  const ink = document.createElement('span');
+  ink.className = 'tab-ink';
+  ink.style.left = to.offsetLeft + 'px';
+  ink.style.top = to.offsetTop + 'px';
+  ink.style.width = to.offsetWidth + 'px';
+  ink.style.height = to.offsetHeight + 'px';
+  wrap.prepend(ink);
+  to.classList.add('ink-pending');
+  const sx = from.w / (to.offsetWidth || 1);
+  const anim = ink.animate([
+    { transform: 'translate('+dx+'px,'+dy+'px) scaleX('+sx+')' },
+    { transform: 'translate(0,0) scaleX(1)' }
+  ], { duration: 420, easing: 'cubic-bezier(.34, 1.36, .64, 1)' });
+  const done = () => { to.classList.remove('ink-pending'); ink.remove(); };
+  anim.onfinish = done;
+  anim.oncancel = done;
+  return true;
 }
 
 function changeMonth(delta){
@@ -3951,11 +4134,14 @@ function render(animate){
 
   const g=document.getElementById('calGrid');
   g.setAttribute('aria-label', curYear + '년 ' + MN[cur] + ' 월간 캘린더');
-  g.classList.remove('mounting');
+  // 진행 중인 달 이동 웨이브가 있으면 끊는다 — 투표 등으로 다시 그린 칸이
+  // 웨이브를 처음부터 재생하지 않도록 (sw 는 render 뒤에 클래스를 다시 붙인다)
+  g.classList.remove('mounting', 'wave-r', 'wave-l');
   g.innerHTML='';
   if(animate){
     g.classList.add('mounting');
-    setTimeout(()=> g.classList.remove('mounting'), 700);
+    clearTimeout(g._mountT);
+    g._mountT = setTimeout(()=> g.classList.remove('mounting'), 1100);
   }
 
   DOW_KR.forEach((d,i)=>{
@@ -3984,10 +4170,17 @@ function render(animate){
   const today=new Date();
   const lf=lastFri(curYear,cur);
   const dat=((D[curYear]||{})[cur])||{};
+  // 리플 진원지 — 이번 달이면 오늘 칸, 아니면 1일 칸
+  const viewingToday = today.getFullYear()===curYear && today.getMonth()+1===cur;
+  const originI = firstDay + (viewingToday ? today.getDate() : 1) - 1;
+  const oRow = Math.floor(originI/7), oCol = originI%7;
 
   for(let i=0;i<total;i++){
-    const col=i%7, dn=i-firstDay+1, inMonth=dn>=1&&dn<=dim;
+    const col=i%7, row=Math.floor(i/7), dn=i-firstDay+1, inMonth=dn>=1&&dn<=dim;
     const cell=document.createElement('div');
+    cell.style.setProperty('--col', col);
+    cell.style.setProperty('--row', row);
+    cell.style.setProperty('--ripple', Math.hypot(col-oCol, row-oRow).toFixed(2));
 
     if(!inMonth){ cell.className='cell empty'; g.appendChild(cell); continue; }
 
@@ -4003,9 +4196,7 @@ function render(animate){
     else if(isWeekend) cls+=' wknd';
     cell.className=cls;
     cell.setAttribute('role', 'gridcell');
-    const monthHasToday = today.getFullYear()===curYear && today.getMonth()+1===cur;
-    cell.tabIndex = isToday || (!monthHasToday && dn===1) ? 0 : -1;
-    cell.style.setProperty('--cell-i', i);
+    cell.tabIndex = isToday || (!viewingToday && dn===1) ? 0 : -1;
     cell.onclick=()=>openModal(dn);
     cell.onfocus=()=>{
       g.querySelectorAll('.cell[role="gridcell"]').forEach(el=>{ el.tabIndex = el===cell ? 0 : -1; });
@@ -4088,6 +4279,14 @@ function render(animate){
   document.getElementById('notice').textContent =
     cnt>0 ? curYear+'년 '+MN[cur]+' · 총 '+cnt+'개 기록 · 팀원 모두와 실시간 공유 중'
           : '날짜 칸을 클릭해서 이번 달을 기록해보세요!';
+
+  if(animate){
+    // 리플이 퍼지기 시작할 때 진원지(오늘 칸)에서 소나 링을 쏜다
+    const tc = g.querySelector('.cell.today');
+    if(tc) setTimeout(() => { if(tc.isConnected && window._sonar) window._sonar(tc, 'var(--teal)', 2); }, 240);
+    // 빅데이트 플립 등 첫 진입 연출은 한 번만
+    setTimeout(() => document.documentElement.classList.add('intro-done'), 1200);
+  }
 }
 
 /* ---------- modal ---------- */
@@ -4541,15 +4740,54 @@ setInterval(() => { if(isTodaysMonth()){ renderHero(); renderSidebarHero(); } },
       setTimeout(() => w.remove(), 2400);
     }
   }
-  // Wrap rollDice so we can fire confetti + steam after the winner reveals
-  const _rollDiceOrig = rollDice;
-  rollDice = function(){
-    _rollDiceOrig.apply(this, arguments);
-    setTimeout(() => {
-      const w = document.querySelector('.hero-row.dice-winner, .today-leader.dice-winner, .today-row.dice-winner');
-      if(w){ spawnSteam(w); fireConfetti(w); }
-    }, 1700);
+  // 요소 테두리에서 바깥으로 퍼지는 링 — 가로·세로 모두 같은 px 만큼 번지도록
+  // 축별 scale 을 따로 계산한다 (작은 버튼은 덜, 큰 칸은 더 — 최대 사방 22px).
+  // count 개를 시간차로 쏘면 소나처럼 보인다.
+  function sonar(el, color, count){
+    if(REDUCE || !el || !el.isConnected) return;
+    const r = el.getBoundingClientRect();
+    if(!r.width) return;
+    const host = getHost();
+    const radius = getComputedStyle(el).borderRadius || '12px';
+    const grow = Math.max(18, Math.min(44, Math.min(r.width, r.height) * .7));
+    for(let i = 0; i < (count || 1); i++){
+      const ring = document.createElement('div');
+      ring.className = 'sonar-ring';
+      ring.style.left = r.left + 'px';
+      ring.style.top = r.top + 'px';
+      ring.style.width = r.width + 'px';
+      ring.style.height = r.height + 'px';
+      ring.style.borderRadius = radius;
+      if(color) ring.style.setProperty('--ring-c', color);
+      ring.style.setProperty('--ring-sx', ((r.width + grow) / r.width).toFixed(3));
+      ring.style.setProperty('--ring-sy', ((r.height + grow) / r.height).toFixed(3));
+      ring.style.animationDelay = (i * 0.18) + 's';
+      host.appendChild(ring);
+      setTimeout(() => ring.remove(), 1000 + i * 180);
+    }
+  }
+  // 당첨 도장 — 당첨 카드 오른쪽에 쾅 찍힌다
+  const STAMP_TEXTS = ['당첨!', '오늘은 여기!', '이걸로 가자!', 'PICK!'];
+  function stamp(el){
+    if(REDUCE || !el || !el.isConnected) return;
+    const r = el.getBoundingClientRect();
+    if(!r.width) return;
+    const s = document.createElement('div');
+    s.className = 'win-stamp';
+    s.textContent = STAMP_TEXTS[Math.floor(Math.random() * STAMP_TEXTS.length)];
+    s.style.left = Math.max(60, Math.min(innerWidth - 60, r.right - Math.min(70, r.width * .25))) + 'px';
+    s.style.top = (r.top + Math.min(r.height / 2, 28)) + 'px';
+    getHost().appendChild(s);
+    setTimeout(() => s.remove(), 2400);
+  }
+  // 룰렛이 당첨자에 멈춘 순간 (점심·회식 공통) — 도장 쾅 → 링 → 김 + 컨페티
+  window._onDiceWinner = function(w){
+    if(!w || !w.isConnected) return;
+    stamp(w);
+    setTimeout(() => sonar(w, 'var(--accent)', 2), 120);
+    setTimeout(() => { if(w.isConnected){ spawnSteam(w); fireConfetti(w); } }, 200);
   };
+  window._sonar = sonar;
 
   function spawnVoteBurst(btn){
     if(REDUCE) return;
@@ -4557,26 +4795,33 @@ setInterval(() => { if(isTodaysMonth()){ renderHero(); renderSidebarHero(); } },
     const host = getHost();
     const cx = r.left + r.width/2;
     const cy = r.top + r.height/2;
-    for(let i = 0; i < 8; i++){
+    // 팔레트 색을 섞어 터뜨린다 — 액센트 위주 + 하이라이트/세컨더리 포인트
+    const cs = getComputedStyle(document.documentElement);
+    const COLORS = [
+      cs.getPropertyValue('--accent').trim(),
+      cs.getPropertyValue('--highlight').trim(),
+      cs.getPropertyValue('--accent').trim(),
+      cs.getPropertyValue('--secondary').trim(),
+    ];
+    for(let i = 0; i < 12; i++){
       const p = document.createElement('div');
       p.className = 'vote-burst';
       p.style.left = (cx - 2.5) + 'px';
       p.style.top  = (cy - 2.5) + 'px';
-      const angle = -Math.PI/2 + (i - 3.5) * 0.32;
-      const dist = 26 + Math.random()*16;
+      p.style.background = COLORS[i % COLORS.length] || '';
+      const angle = (i / 12) * Math.PI * 2 + Math.random() * 0.3;
+      const dist = 24 + Math.random()*18;
       p.style.setProperty('--bx', Math.cos(angle)*dist + 'px');
-      p.style.setProperty('--by', Math.sin(angle)*dist + 'px');
-      p.style.animationDelay = (i*0.03) + 's';
+      p.style.setProperty('--by', (Math.sin(angle)*dist - 6) + 'px');
+      p.style.animationDelay = (i*0.015) + 's';
       host.appendChild(p);
       setTimeout(() => p.remove(), 800);
     }
+    sonar(btn, 'var(--accent)', 1);
   }
-  document.addEventListener('click', e => {
-    const btn = e.target.closest && e.target.closest('.evote, .hero-vote');
-    if(!btn) return;
-    // burst only when transitioning INTO voted
-    setTimeout(() => { if(btn.classList.contains('voted')) spawnVoteBurst(btn); }, 60);
-  });
+  // 투표 확정 시 _animateVote 가 +1 과 함께 호출한다. (예전엔 document click
+  // 리스너였는데, 투표 버튼들이 stopPropagation 을 해서 한 번도 발동하지 않았다)
+  window._voteBurst = spawnVoteBurst;
 
   // Click ripple on the dice button — radial flare originating from the
   // cursor. Respects reduced motion via the global keyframes override.
@@ -4612,12 +4857,14 @@ setInterval(() => { if(isTodaysMonth()){ renderHero(); renderSidebarHero(); } },
         const oy = _lastXY.y - r.top;
         m.style.transformOrigin = ox + 'px ' + oy + 'px';
       }
+      // 클릭한 칸에서 튀어나오듯 — 작게 시작해 살짝 오버슈트 후 안착
       const openAnim = m.animate([
-        { opacity: 0, transform: 'scale(0.95) translateY(8px)' },
+        { opacity: 0, transform: 'scale(0.82) translateY(14px)' },
+        { opacity: 1, offset: 0.45 },
         { opacity: 1, transform: 'scale(1) translateY(0)' }
       ], {
-        duration: 280,
-        easing: 'cubic-bezier(0.175, 0.885, 0.32, 1.1)'
+        duration: 420,
+        easing: 'cubic-bezier(.22, 1.22, .36, 1)'
       });
       openAnim.onfinish = () => {
         m.style.transformOrigin = '50% 50%';
@@ -4768,10 +5015,7 @@ setInterval(() => { if(isTodaysMonth()){ renderHero(); renderSidebarHero(); } },
     }
     if(typeof part.dark === 'boolean'){
       const t = part.dark ? 'dark' : 'light';
-      try { localStorage.setItem('gtl-theme', t); } catch(e){}
-      document.documentElement.classList.add('theme-switching');
-      applyTheme(t);
-      setTimeout(() => document.documentElement.classList.remove('theme-switching'), 600);
+      switchTheme(t, document.querySelector('.twk-panel [data-twk-act="dark"] .twk-switch'), renderTweaks);
     }
     renderTweaks();
   }
