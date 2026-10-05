@@ -1550,12 +1550,19 @@
     background: radial-gradient(900px circle at var(--bx, 50%) var(--by, 50%), rgba(20,15,10,.32), rgba(20,15,10,.58));
     display:flex; align-items:center; justify-content:center;
     z-index: 200; padding: 16px;
+    /* 화면이 모달보다 짧으면(가로 모드 폰·키보드) 배경 안에서 스크롤해 끝까지 닿게 한다.
+       스크롤바는 숨김 — 열고 닫는 애니메이션 중에 깜빡이지 않도록 */
+    overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none;
     /* ⚠️ backdrop-filter: blur 제거 — 열림/닫힘 페이드 동안 매 프레임
        화면 전체를 재블러해 모달 애니메이션이 통째로 버벅였다
        (실측 35fps → 제거 후 50fps). 어둡기를 살짝 올려 분리감으로 보상. */
     animation: backdrop-in .22s var(--ease-out);
   }
   .backdrop.closing { animation: backdrop-out .32s var(--ease-out) forwards; }
+  .backdrop::-webkit-scrollbar{ display: none; }
+  /* 남는 공간이 있으면 가운데, 화면보다 크면 위에서부터 놓여 스크롤로 전부 닿는다
+     (align-items:center 만 쓰면 넘친 위쪽이 화면 밖으로 잘려 닫기 버튼에 못 닿았다) */
+  .backdrop > .modal{ margin: auto; }
   [data-theme="dark"] .backdrop { background: radial-gradient(900px circle at var(--bx, 50%) var(--by, 50%), rgba(0,0,0,.48), rgba(0,0,0,.7)); }
 
   .modal{
@@ -1588,6 +1595,8 @@
     scrollbar-width: none;
   }
   .elist::-webkit-scrollbar{ display: none; }
+  /* 짧은 화면에서는 후보 2개 높이로 줄여 모달이 화면 안에 들어오게 */
+  @media (max-height: 640px){ .elist{ height: 132px; } }
   .elist > .erow{ flex-shrink: 0; }
   .elist > .empty-state{ margin: auto 0; }
   .elist.can-down{
@@ -3907,7 +3916,8 @@ function openDinnerModal(id){
   document.getElementById('mw').innerHTML = buildDinnerModalShellHTML(d);
   refreshDinnerModalContent(d);
   document.body.classList.add('modal-open');
-  setTimeout(() => { const el = document.getElementById('dpName'); if(el) el.focus(); }, 30);
+  // preventScroll — 열리는 애니메이션 중(모달이 칸 쪽으로 옮겨져 있을 때) 포커스가 배경을 스크롤시키지 않게
+  setTimeout(() => { const el = document.getElementById('dpName'); if(el) el.focus({ preventScroll: true }); }, 30);
 }
 
 function buildDinnerModalShellHTML(d){
@@ -4434,7 +4444,8 @@ function renderModal(dn){
   // Full mount: build shell + list, animations run once.
   mw.innerHTML = buildModalShellHTML(dn);
   refreshModalContent(dn, mw.querySelector('.modal'));
-  setTimeout(()=>{ const el=document.getElementById('nName'); if(el) el.focus(); }, 30);
+  // preventScroll — 열리는 애니메이션 중(모달이 칸 쪽으로 옮겨져 있을 때) 포커스가 배경을 스크롤시키지 않게
+  setTimeout(()=>{ const el=document.getElementById('nName'); if(el) el.focus({ preventScroll: true }); }, 30);
 }
 
 function buildModalShellHTML(dn){
