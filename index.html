@@ -1578,13 +1578,21 @@
   .mclose:hover{ background: var(--surface-2); color: var(--text); }
   .mclose:active{ transform: scale(.94); }
 
-  .elist{ display:flex; flex-direction:column; gap: 6px; max-height: 300px; overflow-y: auto; overflow-x: hidden; margin-bottom: 16px; padding-right: 2px; }
+  /* 아래 4px 패딩 — 룰렛·당첨 하이라이트(scale 1.03)가 살짝 커져도 스크롤바가 깜빡이지 않게 */
+  .elist{ display:flex; flex-direction:column; gap: 6px; max-height: 300px; overflow-y: auto; overflow-x: hidden; margin-bottom: 12px; padding: 0 2px 4px 0; }
   .erow{
     display:flex; align-items:flex-start; gap: 10px;
     padding: 10px 12px; border-radius: var(--r-sm);
     background: var(--surface-2); border: 1px solid var(--bd);
     transition: border-color var(--dur-fast) var(--ease-out), background-color var(--dur-fast) var(--ease-out);
-    animation: fadeUp .2s var(--ease) both;
+  }
+  /* 등장은 .enter 행만 (처음 열 때 전체, 이후엔 새로 생긴 행만 — _renderRows).
+     위에서 내려오며 커지고 오버슈트도 없어서, 목록(overflow-y:auto) 아래로
+     삐져나가 스크롤바를 깜빡이게 하지 않는다 */
+  .erow.enter{ animation: rowIn .26s var(--ease-out) both; }
+  @keyframes rowIn{
+    from { opacity: 0; transform: translateY(-6px) scale(.98); }
+    to   { opacity: 1; transform: none; }
   }
   .erow:hover{ border-color: var(--bd-strong); }
   .edot{ width: 7px; height: 7px; border-radius: 9999px; margin-top: 6px; background: var(--teal-2); flex-shrink: 0; }
@@ -1853,12 +1861,12 @@
     .erow:hover .eacts, .erow:focus-within .eacts{ opacity: 1; }
   }
   /* 리스트 스태거 — 위에서부터 살짝 시간차 등장 */
-  .elist .erow:nth-child(1){ animation-delay: 0ms; }
-  .elist .erow:nth-child(2){ animation-delay: 30ms; }
-  .elist .erow:nth-child(3){ animation-delay: 60ms; }
-  .elist .erow:nth-child(4){ animation-delay: 90ms; }
-  .elist .erow:nth-child(5){ animation-delay: 120ms; }
-  .elist .erow:nth-child(n+6){ animation-delay: 150ms; }
+  .elist .erow.enter:nth-child(1){ animation-delay: 0ms; }
+  .elist .erow.enter:nth-child(2){ animation-delay: 30ms; }
+  .elist .erow.enter:nth-child(3){ animation-delay: 60ms; }
+  .elist .erow.enter:nth-child(4){ animation-delay: 90ms; }
+  .elist .erow.enter:nth-child(5){ animation-delay: 120ms; }
+  .elist .erow.enter:nth-child(n+6){ animation-delay: 150ms; }
 
   /* 하단 입력폼 — 라벨 있는 클래식 2필드 + 전폭 추가 버튼 */
   .lm-fields{ display: flex; gap: 8px; margin-bottom: 10px; }
@@ -3977,7 +3985,7 @@ function refreshDinnerModalContent(d, modalEl){
   }).join('') : '<div class="empty-state"><i class="ti ti-map-pin"></i>아직 장소 후보가 없어요<br/>첫 후보를 올려보세요!</div>';
 
   const list = modalEl.querySelector('#dinnerList');
-  if(list) list.innerHTML = html;
+  if(list) _renderRows(list, html);
   const dice = modalEl.querySelector('#dinnerDiceBtn');
   if(dice) dice.style.display = sorted.length >= 2 ? '' : 'none';
 }
@@ -4460,6 +4468,20 @@ function buildModalShellHTML(dn){
     </div>`;
 }
 
+// 후보 목록을 다시 그린다. 처음 그릴 때만 모든 행이 차례로 등장하고, 투표·수정·
+// 실시간 갱신으로 다시 그릴 땐 기존 행은 가만히 두고 새로 생긴 행만 등장한다.
+// (예전엔 매번 전체가 등장 애니메이션을 다시 재생해서, 아래로 밀려 있던 행 때문에
+//  목록 스크롤바가 생겼다 사라졌다)
+function _renderRows(list, html){
+  const first = !list.dataset.mounted;
+  const prev = first ? null : new Set([...list.querySelectorAll('.erow[data-eid]')].map(r => r.dataset.eid));
+  list.innerHTML = html;
+  list.dataset.mounted = '1';
+  list.querySelectorAll('.erow[data-eid]').forEach(r => {
+    if(first) r.classList.add('enter');
+    else if(!prev.has(r.dataset.eid)){ r.classList.add('enter'); r.style.animationDelay = '0ms'; }
+  });
+}
 function refreshModalContent(dn, modalEl){
   if(!modalEl) return;
   const entries=(((D[curYear]||{})[cur]||{})[dn]&&D[curYear][cur][dn].entries)||[];
@@ -4508,7 +4530,7 @@ function refreshModalContent(dn, modalEl){
   }).join('') : '<div class="empty-state"><i class="ti ti-clipboard-list"></i>아직 후보가 없어요<br/>아래에서 첫 후보를 올려보세요!</div>';
 
   const list = modalEl.querySelector('#modalList');
-  if(list) list.innerHTML = eHTML;
+  if(list) _renderRows(list, eHTML);
   const cntEl = modalEl.querySelector('#mCount');
   if(cntEl) cntEl.textContent = sorted.length;
   const vWrap = modalEl.querySelector('#mVotesWrap');
