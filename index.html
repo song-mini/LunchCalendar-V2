@@ -534,20 +534,51 @@
   .big-date {
     position: relative;
     overflow: hidden;
+    isolation: isolate;   /* 떠다니는 빛(::before/::after)을 배경과 글자 사이에 둔다 */
     padding: 18px 20px 14px;
     text-align: center;
     color: var(--text);
-    background: linear-gradient(180deg, color-mix(in oklch, var(--accent) 6%, var(--surface-solid)), var(--surface-solid) 72%);
+    /* 팔레트 색으로 만든 은은한 메시 그라데이션 — 위쪽은 액센트·하이라이트·세컨더리가
+       번지고, 아래(이번 주 줄)로 갈수록 카드 색으로 가라앉아 글자가 잘 읽힌다 */
+    background:
+      radial-gradient(130% 95% at -10% -20%, color-mix(in oklch, var(--accent) 24%, transparent), transparent 58%),
+      radial-gradient(100% 85% at 110% -10%, color-mix(in oklch, var(--highlight) 30%, transparent), transparent 60%),
+      radial-gradient(90% 70% at 105% 88%, color-mix(in oklch, var(--teal) 15%, transparent), transparent 65%),
+      linear-gradient(180deg, color-mix(in oklch, var(--accent-soft) 55%, var(--surface-solid)) 0%, var(--surface-solid) 88%);
     border-bottom: 1px solid var(--bd);
   }
-  /* 오른쪽 위 은은한 액센트 빛 하나 */
-  .big-date::before {
-    content: ''; position: absolute; pointer-events: none;
-    width: 220px; height: 220px; right: -90px; top: -110px; border-radius: 50%;
-    background: radial-gradient(circle, color-mix(in oklch, var(--accent) 16%, transparent), transparent 70%);
-  }
   [data-theme="dark"] .big-date {
-    background: linear-gradient(180deg, color-mix(in oklch, var(--accent) 11%, var(--surface-solid)), var(--surface-solid) 72%);
+    background:
+      radial-gradient(130% 95% at -10% -20%, color-mix(in oklch, var(--accent) 26%, transparent), transparent 58%),
+      radial-gradient(100% 85% at 110% -10%, color-mix(in oklch, var(--highlight) 17%, transparent), transparent 60%),
+      radial-gradient(90% 70% at 105% 88%, color-mix(in oklch, var(--teal) 13%, transparent), transparent 65%),
+      var(--surface-solid);
+  }
+  /* 천천히 떠다니는 빛 두 개 (transform 만 움직여 가볍다) */
+  .big-date::before, .big-date::after {
+    content: ''; position: absolute; z-index: -1; pointer-events: none;
+    border-radius: 50%;
+    will-change: transform;
+  }
+  .big-date::before {
+    width: 260px; height: 260px; right: -110px; top: -130px;
+    background: radial-gradient(circle, color-mix(in oklch, var(--highlight) 34%, transparent), transparent 68%);
+    animation: bd-glow-drift 14s ease-in-out infinite alternate;
+  }
+  .big-date::after {
+    width: 210px; height: 210px; left: -100px; top: 30px;
+    background: radial-gradient(circle, color-mix(in oklch, var(--accent) 22%, transparent), transparent 68%);
+    animation: bd-glow-drift 11s ease-in-out infinite alternate-reverse;
+  }
+  [data-theme="dark"] .big-date::before {
+    background: radial-gradient(circle, color-mix(in oklch, var(--highlight) 20%, transparent), transparent 68%);
+  }
+  [data-theme="dark"] .big-date::after {
+    background: radial-gradient(circle, color-mix(in oklch, var(--accent) 18%, transparent), transparent 68%);
+  }
+  @keyframes bd-glow-drift {
+    from { transform: translate(0, 0) scale(1); }
+    to   { transform: translate(-26px, 18px) scale(1.15); }
   }
   .bd-top { position: relative; }
   .bd-dow {
