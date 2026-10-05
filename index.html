@@ -3916,8 +3916,10 @@ function openDinnerModal(id){
   document.getElementById('mw').innerHTML = buildDinnerModalShellHTML(d);
   refreshDinnerModalContent(d);
   document.body.classList.add('modal-open');
-  // preventScroll — 열리는 애니메이션 중(모달이 칸 쪽으로 옮겨져 있을 때) 포커스가 배경을 스크롤시키지 않게
+  // preventScroll — 열리는 애니메이션 중(모달이 칸 쪽으로 옮겨져 있을 때) 포커스가 배경을 스크롤시키지 않게.
+  // 대신 애니메이션이 끝나면 가려진 경우에만 보이게 스크롤 (_revealFocusedField)
   setTimeout(() => { const el = document.getElementById('dpName'); if(el) el.focus({ preventScroll: true }); }, 30);
+  setTimeout(_revealFocusedField, 600);
 }
 
 function buildDinnerModalShellHTML(d){
@@ -4419,6 +4421,21 @@ function openModal(dn){
   renderModal(dn);
   document.body.classList.add('modal-open');
 }
+// 모달 안 입력칸에 포커스가 있는데 보이는 영역(키보드가 올라오면 줄어드는 visualViewport)
+// 밖에 있으면 모달 배경 안에서 보이게 스크롤한다. 이미 보이면 아무것도 안 한다.
+function _revealFocusedField(){
+  const el = document.activeElement;
+  if(!el || !el.matches || !el.matches('#mw .modal input, #mw .modal textarea')) return;
+  const vv = window.visualViewport;
+  const top = vv ? vv.offsetTop : 0;
+  const bottom = top + (vv ? vv.height : innerHeight);
+  const r = el.getBoundingClientRect();
+  if(r.top < top + 8 || r.bottom > bottom - 8) el.scrollIntoView({ block: 'nearest' });
+}
+// 키보드가 올라오거나 내려가면 (보이는 영역 크기 변화) 포커스된 입력칸을 다시 확인
+if(window.visualViewport){
+  window.visualViewport.addEventListener('resize', () => setTimeout(_revealFocusedField, 60));
+}
 function closeMod(ev, ov){
   if(ev && ov && ev.target !== ov) return;
   const mw = document.getElementById('mw');
@@ -4444,8 +4461,10 @@ function renderModal(dn){
   // Full mount: build shell + list, animations run once.
   mw.innerHTML = buildModalShellHTML(dn);
   refreshModalContent(dn, mw.querySelector('.modal'));
-  // preventScroll — 열리는 애니메이션 중(모달이 칸 쪽으로 옮겨져 있을 때) 포커스가 배경을 스크롤시키지 않게
+  // preventScroll — 열리는 애니메이션 중(모달이 칸 쪽으로 옮겨져 있을 때) 포커스가 배경을 스크롤시키지 않게.
+  // 대신 애니메이션이 끝나면 가려진 경우에만 보이게 스크롤 (_revealFocusedField)
   setTimeout(()=>{ const el=document.getElementById('nName'); if(el) el.focus({ preventScroll: true }); }, 30);
+  setTimeout(_revealFocusedField, 600);
 }
 
 function buildModalShellHTML(dn){
