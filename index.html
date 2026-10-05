@@ -577,6 +577,9 @@
   html.intro-done .big-date .bd-num,
   html.intro-done .bd-side,
   html.intro-done .dinner-banner { animation: none; }
+  /* 그리드의 첫 페이드업도 — 안 막으면 페이지 넘김 클래스(flip-prev)를 뗄 때
+     원래 animation 으로 되돌아가면서 페이드업이 다시 재생돼 한 번 깜빡인다 */
+  html.intro-done .cal:not(.flip-prev):not(.cal-ghost) { animation: none; }
   .bd-side {
     display: flex; flex-direction: column; gap: 3px;
     padding: 0 0 5px 14px; min-width: 0;
@@ -1391,22 +1394,52 @@
     from { opacity: 0; transform: translateY(14px) scale(.72); }
     to   { opacity: 1; transform: translateY(0) scale(1); }
   }
-  /* 달 이동 — 진행 방향으로 칸들이 도미노처럼 밀려 들어온다 */
-  .cal.wave-r .cell, .cal.wave-l .cell {
-    animation: cellWaveR .42s var(--ease) both;
-    animation-delay: calc(var(--col, 0) * 20ms + var(--row, 0) * 14ms);
+  /* 달 이동 — 벽걸이 달력처럼 페이지를 넘긴다.
+     다음 달: 지난달(.cal-ghost, 복제본)이 위쪽 경첩을 축으로 젖혀지며 날아가고,
+              밑에 깔린 새 달 칸들이 아래 줄부터 차례로 드러난다.
+     이전 달: 새 달 페이지가 위에서 펄럭 내려와 덮고, 지난달은 뒤로 가라앉는다.
+     페이지 단위는 grid 하나가 한 레이어로 움직여 칸 수와 무관하게 가볍다. */
+  .cal-ghost{
+    position: absolute; margin: 0;
+    pointer-events: none;
+    transform-origin: 50% 0;
+    will-change: transform, opacity;
   }
-  .cal.wave-l .cell {
-    animation-name: cellWaveL;
-    animation-delay: calc((6 - var(--col, 0)) * 20ms + var(--row, 0) * 14ms);
+  .cal-ghost.flip-away{ z-index: 3; animation: pageFlipAway .62s cubic-bezier(.45, 0, .7, .35) forwards; }
+  .cal-ghost.sink    { z-index: 0; animation: pageSink .5s var(--ease-out) forwards; }
+  /* 넘어가는 페이지 뒷면 그늘 — 각도가 커질수록 어두워진다 */
+  .cal-ghost.flip-away::after{
+    content: ''; position: absolute; inset: -2px; border-radius: var(--r-md);
+    background: linear-gradient(180deg, transparent 10%, color-mix(in oklch, var(--text) 26%, transparent));
+    opacity: 0; animation: pageShade .62s ease-in forwards;
   }
-  @keyframes cellWaveR {
-    from { opacity: 0; transform: translateX(34px) scale(.9) rotate(1.5deg); }
-    to   { opacity: 1; transform: translateX(0) scale(1) rotate(0); }
+  @keyframes pageFlipAway{
+    0%   { opacity: 1; transform: perspective(2000px) rotateX(0) translateY(0); }
+    45%  { opacity: 1; }
+    100% { opacity: 0; transform: perspective(2000px) rotateX(72deg) translateY(-4%); }
   }
-  @keyframes cellWaveL {
-    from { opacity: 0; transform: translateX(-34px) scale(.9) rotate(-1.5deg); }
-    to   { opacity: 1; transform: translateX(0) scale(1) rotate(0); }
+  @keyframes pageShade{ to { opacity: 1; } }
+  @keyframes pageSink{
+    to { opacity: 0; transform: translateY(14px) scale(.95); }
+  }
+  .cal.flip-next .cell{
+    animation: cellReveal .42s var(--ease-out) both;
+    animation-delay: calc(120ms + (var(--rows, 6) - 1 - var(--row, 0)) * 45ms);
+  }
+  @keyframes cellReveal{
+    from { opacity: 0; transform: translateY(10px) scale(.94); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .cal.flip-prev{
+    transform-origin: 50% 0;
+    animation: pageFlipDown .7s cubic-bezier(.2, .7, .3, 1) both;
+  }
+  @keyframes pageFlipDown{
+    0%   { opacity: 0; transform: perspective(1800px) rotateX(-82deg) translateY(-5%); }
+    35%  { opacity: 1; }
+    62%  { transform: perspective(1800px) rotateX(7deg); }
+    82%  { transform: perspective(1800px) rotateX(-2.5deg); }
+    100% { opacity: 1; transform: perspective(1800px) rotateX(0); }
   }
   .cell:hover{
     border-color: var(--bd-strong);
@@ -1513,7 +1546,9 @@
     to   { opacity: 0; }
   }
   .backdrop{
-    position:fixed; inset:0; background: rgba(20,15,10,.48);
+    position:fixed; inset:0;
+    /* 모달이 출발한 지점(--bx/--by, JS 가 설정)이 살짝 밝은 비네트 */
+    background: radial-gradient(900px circle at var(--bx, 50%) var(--by, 50%), rgba(20,15,10,.32), rgba(20,15,10,.58));
     display:flex; align-items:center; justify-content:center;
     z-index: 200; padding: 16px;
     /* ⚠️ backdrop-filter: blur 제거 — 열림/닫힘 페이드 동안 매 프레임
@@ -1521,8 +1556,8 @@
        (실측 35fps → 제거 후 50fps). 어둡기를 살짝 올려 분리감으로 보상. */
     animation: backdrop-in .22s var(--ease-out);
   }
-  .backdrop.closing { animation: backdrop-out .18s var(--ease-out) forwards; }
-  [data-theme="dark"] .backdrop { background: rgba(0,0,0,.62); }
+  .backdrop.closing { animation: backdrop-out .32s var(--ease-out) forwards; }
+  [data-theme="dark"] .backdrop { background: radial-gradient(900px circle at var(--bx, 50%) var(--by, 50%), rgba(0,0,0,.48), rgba(0,0,0,.7)); }
 
   .modal{
     width: min(480px, 100%); background: var(--surface-solid);
@@ -4053,28 +4088,37 @@ function sw(y, m){
   if(!YEARS.includes(y) || !MONTHS.includes(m)) return;
   if(y === curYear && m === cur) return;
   const prevIdx = _curIdx();
+  const g = document.getElementById('calGrid');
+  const forward = (YEARS.indexOf(y) * 12 + (m - 1)) > prevIdx;
+  const placeGhost = _cloneCalGhost(g, forward);  // 지난달 페이지 복제본 — 새 달을 그리기 전에 떠둔다
   const prevTab = document.querySelector('#monthTabs .tab.active');
   const prevInk = prevTab ? { l: prevTab.offsetLeft, t: prevTab.offsetTop, w: prevTab.offsetWidth } : null;
   curYear = y; cur = m;
-  const newIdx = _curIdx();
   renderTabs();
   renderHero();
   renderSidebarHero();
-  render(false); // skip mount stagger; wave handles entrance
-  const g = document.getElementById('calGrid');
-  void g.offsetWidth;
-  const wave = newIdx > prevIdx ? 'wave-r' : 'wave-l';
-  g.classList.add(wave);
-  clearTimeout(g._waveT);
-  g._waveT = setTimeout(() => g.classList.remove(wave), 760);
+  render(false); // skip mount stagger; page flip handles entrance
+  // 위쪽 카드(오늘의 점심 등)가 달에 따라 높이가 바뀌어 그리드가 움직이므로,
+  // 복제본은 새 달을 다 그린 뒤 새 그리드 자리에 맞춰 붙인다
+  placeGhost();
+  if(!prefersReducedMotion()){
+    void g.offsetWidth;
+    const flip = forward ? 'flip-next' : 'flip-prev';
+    g.classList.add(flip);
+    clearTimeout(g._flipT);
+    g._flipT = setTimeout(() => g.classList.remove(flip), 900);
+  }
   updateNavButtons();
   const glided = _glideTabInk(prevInk);
-  // 월 라벨 micro-pop — 달이 실제로 바뀔 때만
+  // 월 라벨도 페이지와 같은 방향으로 넘어간다 (플립 시계처럼)
   const ml = document.querySelector('.month-label');
   if(ml && typeof ml.animate === 'function' && !prefersReducedMotion()){
+    ml.style.transformOrigin = '50% ' + (forward ? '100%' : '0');
     ml.animate(
-      [{ opacity: .35, transform: 'translateY(-3px)' }, { opacity: 1, transform: 'translateY(0)' }],
-      { duration: 220, easing: 'cubic-bezier(0.175, 0.885, 0.32, 1.1)' }
+      [{ opacity: 0, transform: 'perspective(300px) rotateX(' + (forward ? 90 : -90) + 'deg)' },
+       { opacity: 1, transform: 'perspective(300px) rotateX(' + (forward ? -12 : 12) + 'deg)', offset: .7 },
+       { opacity: 1, transform: 'perspective(300px) rotateX(0)' }],
+      { duration: 420, easing: 'cubic-bezier(.22, 1, .36, 1)' }
     );
   }
   // 활성 탭 스프링 팝 — 하이라이트가 미끄러질 땐 그걸로 충분하니 생략
@@ -4085,6 +4129,42 @@ function sw(y, m){
       { duration: 320, easing: 'cubic-bezier(.34, 1.56, .64, 1)' }
     );
   }
+}
+
+// 달을 넘기기 직전의 그리드를 복제해 두고, 돌려준 place() 를 새 달 render 뒤에 부르면
+// 새 그리드 자리에 겹쳐 붙인다. 페이지 넘김 애니메이션이 끝나면 스스로 사라진다.
+// 다음 달이면 복제본이 앞으로 젖혀지며 날아가고(위에 깔림), 이전 달이면 뒤로 가라앉는다(밑에 깔림).
+function _cloneCalGhost(g, forward){
+  const noop = () => {};
+  document.querySelectorAll('.cal-ghost').forEach(n => n.remove());  // 연타 시 이전 것 정리
+  if(!g || prefersReducedMotion() || !g.querySelector('.cell')) return noop;
+  const r0 = g.getBoundingClientRect();
+  if(!r0.width || !r0.height) return noop;
+  const ghost = g.cloneNode(true);
+  ghost.removeAttribute('id');
+  ghost.removeAttribute('role');
+  ghost.removeAttribute('aria-label');
+  ghost.removeAttribute('aria-busy');
+  ghost.setAttribute('aria-hidden', 'true');
+  ghost.inert = true;
+  ghost.querySelectorAll('[id],[tabindex],[data-eid],[role]').forEach(n => {
+    n.removeAttribute('id'); n.removeAttribute('tabindex'); n.removeAttribute('data-eid'); n.removeAttribute('role');
+  });
+  ghost.className = 'cal cal-ghost ' + (forward ? 'flip-away' : 'sink');
+  ghost.style.width = r0.width + 'px';
+  ghost.style.height = r0.height + 'px';
+  return () => {
+    if(!g.isConnected) return;
+    const r = g.getBoundingClientRect();
+    g.parentNode.insertBefore(ghost, g);
+    // 가장 가까운 positioned 조상 기준으로 새 그리드의 왼쪽 위에 정확히 겹친다
+    const op = ghost.offsetParent || document.body;
+    const pr = op.getBoundingClientRect();
+    ghost.style.left = (r.left - pr.left - op.clientLeft + op.scrollLeft) + 'px';
+    ghost.style.top  = (r.top  - pr.top  - op.clientTop  + op.scrollTop) + 'px';
+    ghost.addEventListener('animationend', e => { if(e.target === ghost) ghost.remove(); });
+    setTimeout(() => ghost.remove(), 1000);
+  };
 }
 
 // 이전 활성 탭 자리(from: offset 좌표)에서 새 활성 탭으로 하이라이트를 미끄러뜨린다.
@@ -4134,9 +4214,9 @@ function render(animate){
 
   const g=document.getElementById('calGrid');
   g.setAttribute('aria-label', curYear + '년 ' + MN[cur] + ' 월간 캘린더');
-  // 진행 중인 달 이동 웨이브가 있으면 끊는다 — 투표 등으로 다시 그린 칸이
-  // 웨이브를 처음부터 재생하지 않도록 (sw 는 render 뒤에 클래스를 다시 붙인다)
-  g.classList.remove('mounting', 'wave-r', 'wave-l');
+  // 진행 중인 페이지 넘김이 있으면 끊는다 — 투표 등으로 다시 그린 칸이
+  // 등장 애니메이션을 처음부터 재생하지 않도록 (sw 는 render 뒤에 클래스를 다시 붙인다)
+  g.classList.remove('mounting', 'flip-next', 'flip-prev');
   g.innerHTML='';
   if(animate){
     g.classList.add('mounting');
@@ -4167,6 +4247,7 @@ function render(animate){
   const firstDay=new Date(curYear,cur-1,1).getDay();
   const dim=new Date(curYear,cur,0).getDate();
   const total=Math.ceil((firstDay+dim)/7)*7;
+  g.style.setProperty('--rows', total/7);
   const today=new Date();
   const lf=lastFri(curYear,cur);
   const dat=((D[curYear]||{})[cur])||{};
@@ -4837,38 +4918,108 @@ setInterval(() => { if(isTodaysMonth()){ renderHero(); renderSidebarHero(); } },
     setTimeout(() => btn.classList.remove('ripple'), 600);
   });
 
-  /* (5) Modal opens FROM clicked cell — transform-origin 을 클릭 지점으로.
-     Geist 모션: 300ms 이하, 짧고 물리적인 스케일 인만 남긴다. */
-  let _lastXY = null;
+  /* (5) 모달 — 클릭한 칸에서 자라나오고(container transform), 닫으면 그 칸으로
+     다시 쏙 들어간다. 콘텐츠를 찌그러뜨리는 scale 대신 clip-path 창을 칸 크기에서
+     모달 크기로 넓히면서 위치만 옮긴다. 출발점이 없으면(키보드·설정 패널 등)
+     살짝 기울어진 채 떠오르는 기본 진입. */
+  const ORIGIN_SEL = '.cell, .hero-row, .more-lnk, .add-btn-ghost, .today-leader, .today-row, .ti-add, .dinner-banner, .dinner-tag, .help-btn, [data-twk-dinner-open]';
+  let _lastOrigin = null;   // 마지막 클릭 { el, t } — 모달을 연 클릭인지 시간으로 판별
+  let _openOrigin = null;   // 지금 열린 모달의 출발점 — 닫을 때 다시 찾아 들어갈 단서들
   document.addEventListener('click', e => {
-    if(e.target.closest('.cell, .hero-row, .more-lnk, .add-btn-ghost, .today-leader, .today-row, .ti-add, .dinner-banner, .dinner-tag, .help-btn, [data-twk-dinner-open]')){
-      _lastXY = { x: e.clientX, y: e.clientY };
-    }
+    const el = e.target.closest && e.target.closest(ORIGIN_SEL);
+    if(el) _lastOrigin = { el, t: Date.now() };
   }, true);
 
-  // Shared open animation — lunch/dinner/help 모달이 같은 방식으로 진입.
+  function cellForDay(day){
+    return [...document.querySelectorAll('#calGrid .cell:not(.empty)')]
+      .find(c => { const d = c.querySelector('.dn'); return d && +d.textContent === day; }) || null;
+  }
+  function describeOrigin(el){
+    // 투표·추가로 rerender 되면 원래 요소는 사라지므로 다시 찾을 단서를 함께 저장
+    const host = el.closest('.cell');
+    const dn = host && host.querySelector('.dn');
+    const row = el.closest('[data-entry-id]');
+    return {
+      el,
+      day: dn ? +dn.textContent : null,
+      entryId: row ? row.getAttribute('data-entry-id') : null,
+      cls: el.classList.contains('dinner-banner') ? '.dinner-banner'
+         : el.classList.contains('ti-add') ? '.today-card .ti-add'
+         : el.classList.contains('add-btn-ghost') ? '.today-hero .add-btn-ghost'
+         : el.classList.contains('help-btn') ? '.help-btn' : null,
+    };
+  }
+  function visibleRect(el){
+    if(!el || !el.isConnected) return null;
+    const r = el.getBoundingClientRect();
+    if(!r.width || !r.height || r.bottom < 0 || r.top > innerHeight || r.right < 0 || r.left > innerWidth) return null;
+    return r;
+  }
+  function resolveOrigin(o){
+    if(!o) return null;
+    const tries = [
+      () => o.el,
+      () => o.entryId && document.querySelector('[data-entry-id="' + o.entryId + '"]'),
+      () => o.day && cellForDay(o.day),
+      () => o.cls && document.querySelector(o.cls),
+    ];
+    for(const f of tries){ const el = f(); const r = visibleRect(el); if(r) return { el, r }; }
+    return null;
+  }
+  // 모달 rect(mr)와 출발 rect(or) → 출발점에 겹치는 transform + clip 창
+  function morphFrom(mr, or){
+    const dx = (or.left + or.width/2) - (mr.left + mr.width/2);
+    const dy = (or.top + or.height/2) - (mr.top + mr.height/2);
+    const ih = Math.max(0, (mr.height - or.height) / 2);
+    const iw = Math.max(0, (mr.width - or.width) / 2);
+    return {
+      transform: 'translate(' + dx + 'px, ' + dy + 'px) scale(.98)',
+      clipPath: 'inset(' + ih + 'px ' + iw + 'px round 12px)',
+    };
+  }
+  // 그림자까지 보이도록 끝 상태는 바깥으로 넉넉히 연 inset
+  const MORPH_OPEN = { transform: 'translate(0px, 0px) scale(1)', clipPath: 'inset(-48px -48px round 16px)' };
+
   function animateModalOpen(){
     requestAnimationFrame(() => {
-      const m = document.querySelector('.modal');
-      if(!m) return;
-      if(_lastXY){
-        const r = m.getBoundingClientRect();
-        const ox = _lastXY.x - r.left;
-        const oy = _lastXY.y - r.top;
-        m.style.transformOrigin = ox + 'px ' + oy + 'px';
+      const m = document.querySelector('#mw .modal');
+      if(!m || REDUCE || typeof m.animate !== 'function') return;
+      const bd = m.closest('.backdrop');
+      const mr = m.getBoundingClientRect();
+      const fresh = _lastOrigin && Date.now() - _lastOrigin.t < 800 ? _lastOrigin.el : null;
+      const src = fresh || (document.activeElement && document.activeElement.closest && document.activeElement.closest(ORIGIN_SEL));
+      _openOrigin = src ? describeOrigin(src) : null;
+      _lastOrigin = null;
+      const or = src && visibleRect(src);
+      if(bd){
+        // 배경 비네트의 밝은 중심을 출발점에 둔다
+        const cx = or ? or.left + or.width/2 : innerWidth/2;
+        const cy = or ? or.top + or.height/2 : innerHeight/2;
+        bd.style.setProperty('--bx', cx + 'px');
+        bd.style.setProperty('--by', cy + 'px');
       }
-      // 클릭한 칸에서 튀어나오듯 — 작게 시작해 살짝 오버슈트 후 안착
-      const openAnim = m.animate([
-        { opacity: 0, transform: 'scale(0.82) translateY(14px)' },
-        { opacity: 1, offset: 0.45 },
-        { opacity: 1, transform: 'scale(1) translateY(0)' }
-      ], {
-        duration: 420,
-        easing: 'cubic-bezier(.22, 1.22, .36, 1)'
+      if(or){
+        const from = morphFrom(mr, or);
+        m.animate([
+          { ...from, opacity: 0 },
+          { opacity: 1, offset: .2 },
+          { ...MORPH_OPEN, opacity: 1 }
+        ], { duration: 520, easing: 'cubic-bezier(.2, .85, .25, 1)' });
+      } else {
+        m.style.transformOrigin = '50% 0';
+        m.animate([
+          { opacity: 0, transform: 'perspective(1000px) rotateX(-14deg) translateY(28px) scale(.92)' },
+          { opacity: 1, transform: 'perspective(1000px) rotateX(2deg) translateY(-3px) scale(1.005)', offset: .7 },
+          { opacity: 1, transform: 'perspective(1000px) rotateX(0) translateY(0) scale(1)' }
+        ], { duration: 460, easing: 'cubic-bezier(.22, 1, .36, 1)' }).onfinish = () => { m.style.transformOrigin = ''; };
+      }
+      // 내용은 창이 거의 열렸을 때 위에서부터 차례로 떠오른다
+      [...m.children].forEach((c, i) => {
+        c.animate([
+          { opacity: 0, transform: 'translateY(10px)' },
+          { opacity: 1, transform: 'translateY(0)' }
+        ], { duration: 340, delay: (or ? 110 : 80) + i * 45, easing: 'cubic-bezier(.22, 1, .36, 1)', fill: 'backwards' });
       });
-      openAnim.onfinish = () => {
-        m.style.transformOrigin = '50% 50%';
-      };
     });
   }
 
@@ -4897,35 +5048,57 @@ setInterval(() => { if(isTodaysMonth()){ renderHero(); renderSidebarHero(); } },
     const bd = mw.querySelector('.backdrop');
     const m  = mw.querySelector('.modal');
     if(!bd || !m){ return _closeModOrig.apply(this, arguments); }
+    if(bd.classList.contains('closing')) return;   // 닫히는 중 연타 무시
 
     bd.classList.add('closing');
     // Cancel any running animations on the modal (a still-running open
     // animation, or a leftover one from before) so this close starts from a
     // clean transform stack and isn't visually absorbed by them.
     if(typeof m.getAnimations === 'function'){
-      m.getAnimations().forEach(a => { try { a.cancel(); } catch(e){} });
+      m.getAnimations({ subtree: true }).forEach(a => { try { a.cancel(); } catch(e){} });
     }
-    // Close animation — 짧게 접히는 스케일 아웃.
-    const anim = m.animate([
-      { opacity: 1, transform: 'scale(1) translateY(0)' },
-      { opacity: 0, transform: 'scale(0.97) translateY(4px)' }
-    ], {
-      duration: 200,
-      easing: 'cubic-bezier(.45, .05, .55, .95)',
-      fill: 'forwards'
-    });
+    // 출발한 칸이 아직 화면에 있으면 그 칸으로 빨려 들어가고, 없으면 기울며 가라앉는다
+    const target = REDUCE ? null : resolveOrigin(_openOrigin);
+    _openOrigin = null;
+    let anim, dur;
+    if(target){
+      dur = 400;
+      anim = m.animate([
+        { ...MORPH_OPEN, opacity: 1 },
+        { opacity: 1, offset: .72 },
+        { ...morphFrom(m.getBoundingClientRect(), target.r), opacity: 0 }
+      ], { duration: dur, easing: 'cubic-bezier(.5, 0, .2, 1)', fill: 'forwards' });
+    } else {
+      dur = 260;
+      m.style.transformOrigin = '50% 100%';
+      anim = m.animate([
+        { opacity: 1, transform: 'perspective(1000px) rotateX(0) translateY(0) scale(1)' },
+        { opacity: 0, transform: 'perspective(1000px) rotateX(12deg) translateY(26px) scale(.93)' }
+      ], { duration: dur, easing: 'cubic-bezier(.55, 0, .75, .3)', fill: 'forwards' });
+    }
     // Only clear mw if this closing backdrop still owns it — if the user
     // opened another modal (help/dinner/cell) within the close animation
     // window, wiping innerHTML here would silently kill the new modal.
+    let done = false;
     const finalizeClose = () => {
+      if(done) return;
+      done = true;
       if(!mw.contains(bd)) return;
       mw.innerHTML = '';
       openDay = null; helpOpen = false; openDinnerId = null;
       document.body.classList.remove('modal-open');
+      // 들어간 자리가 살짝 받아주는 착지 반응
+      if(target && target.el.isConnected && typeof target.el.animate === 'function'){
+        target.el.animate(
+          [{ transform: 'scale(.96)' }, { transform: 'scale(1.025)', offset: .5 }, { transform: 'scale(1)' }],
+          { duration: 380, easing: 'cubic-bezier(.34, 1.56, .64, 1)' }
+        );
+        sonar(target.el, 'var(--accent)', 1);
+      }
     };
     anim.onfinish = finalizeClose;
     // Safety net — if onfinish doesn't fire (e.g. WAA bug), clean up anyway.
-    setTimeout(finalizeClose, 320);
+    setTimeout(finalizeClose, dur + 150);
   };
 
   // Expose confetti (dinner dice) + modal-open animation (dinner scheduler).
