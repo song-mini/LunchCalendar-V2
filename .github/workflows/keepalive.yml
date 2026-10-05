@@ -1,9 +1,17 @@
 # Render 무료 인스턴스는 15분간 요청이 없으면 잠들어서 첫 접속이 수십 초 느려진다.
-# 팀이 실제로 쓰는 시간대(평일 08:07~14시 KST)에만 10분 간격으로 /healthz 를 핑해서
+# 팀이 실제로 쓰는 시간대(평일 08:07~14시 KST)에 10분 간격으로 /healthz 를 핑해서
 # 항상 깨어 있게 유지한다. 주말 · 한국 공휴일 · 매달 마지막 금요일(공동 휴무)은 쉰다.
+#
+# ⚠️ GitHub Actions 의 schedule 은 best-effort 라 대부분 버려진다.
+#   (실측: 평일 하루 36번 요청 → 실제 실행 2~3번, 1~5시간 지연, 08시대는 0번)
+#   그래서 주 스케줄러는 Supabase pg_cron(supabase/keepalive.sql)이고, 이 워크플로는 백업이다.
+#   한 번이라도 실행되면 그 자리에서 14시까지 10분마다 핑하는 루프를 돌아서,
+#   스케줄이 몇 개 버려져도 남은 시간대를 끝까지 커버한다.
+#   (뒤늦게 도착한 트리거는 루프가 도는 동안 대기했다가, 시간대 밖이면 바로 끝난다)
 #
 # - 대상 URL 은 리포 Settings → Variables 에 KEEPALIVE_URL 을 만들면 바꿀 수 있음.
 # - 비용: public 리포라 Actions 무료 · Render 는 월 ~140 인스턴스시간 추가 (무료 750h 내).
+# - 수동 실행(workflow_dispatch)은 시간·요일 체크 없이 핑 1회만 한다 (동작 확인용).
 # - 주의: 리포에 60일간 커밋이 없으면 GitHub 이 스케줄 워크플로를 자동으로 끈다.
 #   (꺼지면 Actions 탭에서 Enable 한 번 눌러주면 됨)
 name: keepalive
@@ -12,32 +20,69 @@ on:
   workflow_dispatch:
   schedule:
     # cron 은 UTC 기준 (KST = UTC+9). 정각은 혼잡해서 7분 오프셋 사용.
-    - cron: '7,17,27,37,47,57 23 * * 0-4'  # 월~금 08:07~08:57 KST — 8:10 전에 깨워서 유지
-    - cron: '7,17,27,37,47,57 0-4 * * 1-5' # 월~금 09:07~13:57 KST — 10분 간격 유지
+    # 트리거가 많을수록 루프를 일찍 시작할 확률이 올라간다.
+    - cron: '7,17,27,37,47,57 23 * * 0-4'  # 월~금 08:07~08:57 KST
+    - cron: '7,17,27,37,47,57 0-4 * * 1-5' # 월~금 09:07~13:57 KST
 
 permissions: {}
 
 concurrency:
   group: keepalive
-  cancel-in-progress: true
+  # 돌고 있는 루프를 새 트리거가 끊지 않게 — 새 트리거는 대기열에서 기다린다
+  cancel-in-progress: false
 
 jobs:
   ping:
     runs-on: ubuntu-latest
-    timeout-minutes: 6
+    timeout-minutes: 340
     steps:
-      - name: 평일·공휴일·마지막 금요일 체크 후 핑
+      - name: 평일·공휴일·마지막 금요일·시간대 체크 후 14시까지 핑 루프
         env:
           TARGET_URL: ${{ vars.KEEPALIVE_URL || 'https://lunchcalendar-v2.onrender.com/healthz' }}
+          EVENT: ${{ github.event_name }}
         run: |
           node --input-type=module <<'EOF'
-          const kst = new Date(Date.now() + 9 * 3600 * 1000);
+          const START = 7 * 60 + 50, END = 14 * 60;   // KST 07:50 ~ 14:00 (분)
+          const INTERVAL = 10 * 60 * 1000;            // Render 는 15분 무요청이면 잠든다
+          const kstNow = () => new Date(Date.now() + 9 * 3600 * 1000);
+          const kstMin = () => { const k = kstNow(); return k.getUTCHours() * 60 + k.getUTCMinutes(); };
+          const hhmm = m => String(Math.floor(m / 60)).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0');
+          const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+          // 콜드 스타트(수십 초)를 고려한 넉넉한 타임아웃 + 재시도
+          async function ping() {
+            for (let i = 1; i <= 3; i++) {
+              try {
+                const t0 = Date.now();
+                const res = await fetch(process.env.TARGET_URL, { signal: AbortSignal.timeout(90000) });
+                console.log('[' + hhmm(kstMin()) + ' KST] ping → ' + res.status + ' (' + (Date.now() - t0) + 'ms)');
+                if (res.ok) return true;
+              } catch (e) {
+                console.warn('ping 시도 ' + i + '/3 실패:', e.message);
+              }
+              if (i < 3) await sleep(5000);
+            }
+            return false;
+          }
+
+          if (process.env.EVENT === 'workflow_dispatch') {
+            console.log('수동 실행 — 체크 없이 1회 핑');
+            process.exit((await ping()) ? 0 : 1);
+          }
+
+          const kst = kstNow();
           const y = kst.getUTCFullYear(), m = kst.getUTCMonth() + 1, d = kst.getUTCDate();
           const dow = kst.getUTCDay(); // 0=일 … 6=토
           const today = y + '-' + String(m).padStart(2, '0') + '-' + String(d).padStart(2, '0');
 
           if (dow === 0 || dow === 6) {
             console.log('skip: 주말 (' + today + ')');
+            process.exit(0);
+          }
+
+          // 스케줄이 몇 시간씩 밀려 도착하는 경우가 많다 — 시간대 밖이면 깨우지 않는다
+          if (kstMin() < START || kstMin() >= END) {
+            console.log('skip: 핑 시간대(' + hhmm(START) + '~' + hhmm(END) + ') 밖 — 지연 도착한 실행 (' + hhmm(kstMin()) + ' KST)');
             process.exit(0);
           }
 
@@ -63,16 +108,13 @@ jobs:
             console.warn('공휴일 조회 실패 — 핑은 계속함:', e.message);
           }
 
-          // 콜드 스타트(수십 초)를 고려한 넉넉한 타임아웃 + 재시도
-          for (let i = 1; i <= 3; i++) {
-            try {
-              const res = await fetch(process.env.TARGET_URL, { signal: AbortSignal.timeout(90000) });
-              console.log('ping ' + process.env.TARGET_URL + ' → ' + res.status);
-              process.exit(res.ok ? 0 : 1);
-            } catch (e) {
-              console.warn('ping 시도 ' + i + '/3 실패:', e.message);
-              if (i < 3) await new Promise(r => setTimeout(r, 5000));
-            }
+          // 14시까지 10분마다 핑 — 다음 핑이 시간대를 넘기면 종료
+          let failures = 0;
+          for (;;) {
+            if (!(await ping())) failures++;
+            if (kstMin() + 10 >= END) break;
+            await sleep(INTERVAL);
           }
-          process.exit(1);
+          console.log('루프 종료 (' + hhmm(kstMin()) + ' KST) — 실패 ' + failures + '회');
+          process.exit(failures ? 1 : 0);
           EOF
