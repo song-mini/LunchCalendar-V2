@@ -59,13 +59,23 @@ language plpgsql
 set search_path = ''
 as $$
 declare
+  -- Nager.Date 가 date.nager.at → nagerholidays.com 으로 이사 중이라 새 주소 먼저, 안 되면 옛 주소
+  urls text[] := array['https://nagerholidays.com/api/v3/publicholidays/',
+                       'https://date.nager.at/api/v3/PublicHolidays/'];
+  u text;
   r extensions.http_response;
   n int;
 begin
-  r := extensions.http_get(   -- http 확장 기본 타임아웃 5초
-    'https://date.nager.at/api/v3/PublicHolidays/' || y || '/KR');
-  if r.status <> 200 then
-    raise exception 'Nager.Date % → HTTP %', y, r.status;
+  foreach u in array urls loop
+    begin
+      r := extensions.http_get(u || y || '/KR');   -- http 확장 기본 타임아웃 5초
+    exception when others then
+      r := null;
+    end;
+    exit when r.status = 200;
+  end loop;
+  if r.status is distinct from 200 then
+    raise exception 'Nager.Date % → %', y, coalesce('HTTP ' || r.status, '연결 실패');
   end if;
   n := jsonb_array_length(r.content::jsonb);
   if n = 0 then
