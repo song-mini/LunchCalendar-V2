@@ -19,8 +19,10 @@
      원칙: 위계는 보더+표면 톤으로, 그림자는 아주 절제. radius 는
      6 / 12 / 16px 3단계. 모션은 150/200/300ms + Geist easing.
      팔레트 6종의 색 정체성(따뜻한 톤)은 그대로 유지.
+     기본 팔레트(살구)의 색도 여기 있다. [data-palette="apricot"] 을 같이 걸어 두는 건
+     설정 패널의 팔레트 미리보기(.pc-preview[data-palette])가 이 값을 그대로 쓰게 하려고.
      ============================================================ */
-  :root {
+  :root, [data-palette="apricot"] {
     color-scheme: light dark;
 
     /* motion — Geist: 짧고 물리적인 모션만 */
@@ -29,16 +31,14 @@
     --ease-spring: cubic-bezier(.34, 1.56, .64, 1);
     --dur-fast: .15s;
     --dur:      .2s;
-    --dur-slow: .3s;
 
     /* radius family */
     --r-sm: 6px;
     --r-md: 12px;
     --r-lg: 16px;
 
-    /* === Apricot (default) — cream + coral + sage === */
+    /* === 살구 🍑 (기본) — 크림 · 코랄 · 세이지 === */
     --bg:#f6f1e9;
-    --bg-2:#efe8db;
     --surface:#fffdf9;
     --surface-solid:#fffdf9;
     --surface-2:#f6f1e8;
@@ -56,11 +56,9 @@
     --coral:#d0603c;
     --coral-2:#fae5db;
     --accent: var(--coral);
-    --accent-strong:#bc5232;
     --accent-soft: var(--coral-2);
     --accent-bd:#eec4b0;
     --secondary: var(--teal);
-    --secondary-soft: var(--teal-3);
     --highlight:#e0a23e;
     --highlight-soft:#f9ebcb;
 
@@ -78,10 +76,6 @@
     --shadow-modal: 0 1px 1px rgba(0,0,0,.02), 0 8px 16px -4px rgba(0,0,0,.04), 0 24px 32px -8px rgba(0,0,0,.06);
     /* 앱 셸(window)용 — 카드보다 한 단계 깊게, 여전히 절제 */
     --shadow-window: inset 0 1px 0 rgba(255,255,255,.65), 0 1px 1px rgba(0,0,0,.03), 0 12px 24px -8px rgba(0,0,0,.07), 0 32px 56px -16px rgba(0,0,0,.10);
-    /* 하위호환 별칭 */
-    --shadow: var(--shadow-window);
-    --shadow-soft: var(--shadow-card);
-    --shadow-lift: var(--shadow-pop);
 
     /* 스큐어모피즘 터치 — 상단 인셋 하이라이트 (다크에서 재정의) */
     --hi: rgba(255,255,255,.55);
@@ -101,6 +95,7 @@
      (예전엔 전부 크림 배경에 액센트만 달라 고르는 맛이 없었다)
      라떼 ☕ 갈색 단색조 카페 / 말차 🍵 싱그러운 초록 + 꿀 / 베리 🫐 보라 + 핑크
      잉크 🖋️ 차갑고 선명한 파랑 + 코랄 / 로즈 🌹 분홍 + 잎사귀 초록
+     설정 패널 미리보기도 이 값을 그대로 읽는다 — 색은 여기만 고치면 된다.
      ============================================================ */
   [data-palette] {
     --page-bg:
@@ -108,23 +103,23 @@
       radial-gradient(1100px 800px at 105% 115%, color-mix(in oklch, var(--teal) 12%, transparent), transparent 60%),
       var(--bg);
   }
-  [data-palette="buttercream"] {
+  [data-palette="apricot"] {
     --page-bg:
       radial-gradient(1800px 1100px at 50% -30%, color-mix(in oklch, var(--accent) 6%, transparent), transparent 72%),
       var(--bg);
   }
 
   /* === 라떼 ☕ — 에스프레소 · 캐러멜 · 우유 거품 === */
-  [data-palette="mango"] {
-    --bg:#ece1d3; --bg-2:#e2d4c1;
+  [data-palette="latte"] {
+    --bg:#ece1d3;
     --surface:#fbf6ef; --surface-solid:#fbf6ef;
     --surface-2:#f2e8da; --surface-3:#e7d9c5;
     --bd:rgba(58,34,16,.12); --bd-strong:rgba(58,34,16,.24);
     --text:#2b1c11; --text-2:#5e4733; --text-3:#927a63;
     --teal:#b2763e; --teal-2:#c38a52; --teal-3:#f4e4cf; --teal-glow: rgba(178,118,62,.22);
     --coral:#74442a; --coral-2:#eedccb;
-    --accent: var(--coral); --accent-strong:#5f361f; --accent-soft: var(--coral-2); --accent-bd:#d2b08f;
-    --secondary: var(--teal); --secondary-soft: var(--teal-3);
+    --accent: var(--coral); --accent-soft: var(--coral-2); --accent-bd:#d2b08f;
+    --secondary: var(--teal);
     --highlight:#d39a4c; --highlight-soft:#f5e3c7;
     --hol-bg:#f1dfcd; --hol-bd:#d7b392; --hol-t:#6e3d1f;
     --off-bg:#f3e6cb; --off-bd:#d9bf87; --off-t:#6d4d15;
@@ -134,16 +129,16 @@
   }
 
   /* === 말차 🍵 — 진한 녹차 · 꿀 · 연두 === */
-  [data-palette="forest"] {
-    --bg:#e8f0dc; --bg-2:#d9e6c8;
+  [data-palette="matcha"] {
+    --bg:#e8f0dc;
     --surface:#f9fcf3; --surface-solid:#f9fcf3;
     --surface-2:#edf4e1; --surface-3:#e0ead0;
     --bd:rgba(24,48,14,.11); --bd-strong:rgba(24,48,14,.22);
     --text:#17260f; --text-2:#45583a; --text-3:#78896b;
     --teal:#d2862f; --teal-2:#de994a; --teal-3:#f8e5cb; --teal-glow: rgba(210,134,47,.2);
     --coral:#3a7a35; --coral-2:#d9eccf;
-    --accent: var(--coral); --accent-strong:#2f672b; --accent-soft: var(--coral-2); --accent-bd:#acd29c;
-    --secondary: var(--teal); --secondary-soft: var(--teal-3);
+    --accent: var(--coral); --accent-soft: var(--coral-2); --accent-bd:#acd29c;
+    --secondary: var(--teal);
     --highlight:#c8ad2e; --highlight-soft:#f0eabf;
     --hol-bg:#e1eed4; --hol-bd:#a9cb92; --hol-t:#2c5e22;
     --off-bg:#f3ecc9; --off-bd:#d5c37c; --off-t:#665413;
@@ -153,16 +148,16 @@
   }
 
   /* === 베리 🫐 — 블루베리 보라 · 라즈베리 핑크 === */
-  [data-palette="linen"] {
-    --bg:#efe8f8; --bg-2:#e3d8f1;
+  [data-palette="berry"] {
+    --bg:#efe8f8;
     --surface:#fcfaff; --surface-solid:#fcfaff;
     --surface-2:#f2ebfa; --surface-3:#e7dcf3;
     --bd:rgba(46,22,74,.11); --bd-strong:rgba(46,22,74,.22);
     --text:#25163a; --text-2:#574870; --text-3:#8a7ca0;
     --teal:#de4f8c; --teal-2:#e76b9f; --teal-3:#fbe0ec; --teal-glow: rgba(222,79,140,.18);
     --coral:#7f3dba; --coral-2:#ecdffa;
-    --accent: var(--coral); --accent-strong:#6b31a0; --accent-soft: var(--coral-2); --accent-bd:#cfb2ec;
-    --secondary: var(--teal); --secondary-soft: var(--teal-3);
+    --accent: var(--coral); --accent-soft: var(--coral-2); --accent-bd:#cfb2ec;
+    --secondary: var(--teal);
     --highlight:#ef9c43; --highlight-soft:#fbe8cf;
     --hol-bg:#f3e3fb; --hol-bd:#d4b0ec; --hol-t:#6a2c9e;
     --off-bg:#f9ead7; --off-bd:#e2c08d; --off-t:#7a4f17;
@@ -172,16 +167,16 @@
   }
 
   /* === 잉크 🖋️ — 선명한 잉크 블루 · 코랄 · 차가운 종이 === */
-  [data-palette="midnight"] {
-    --bg:#e6ecf6; --bg-2:#d6e0ef;
+  [data-palette="ink"] {
+    --bg:#e6ecf6;
     --surface:#f8fbff; --surface-solid:#f8fbff;
     --surface-2:#ecf1f9; --surface-3:#dfe7f3;
     --bd:rgba(14,30,66,.11); --bd-strong:rgba(14,30,66,.22);
     --text:#0f1a33; --text-2:#41506e; --text-3:#7584a2;
     --teal:#ee7448; --teal-2:#f28a64; --teal-3:#fde4d9; --teal-glow: rgba(238,116,72,.18);
     --coral:#2552c8; --coral-2:#dce5fb;
-    --accent: var(--coral); --accent-strong:#1e44a9; --accent-soft: var(--coral-2); --accent-bd:#aec3f0;
-    --secondary: var(--teal); --secondary-soft: var(--teal-3);
+    --accent: var(--coral); --accent-soft: var(--coral-2); --accent-bd:#aec3f0;
+    --secondary: var(--teal);
     --highlight:#f0b032; --highlight-soft:#fcefcd;
     --hol-bg:#e1e9fb; --hol-bd:#aabfec; --hol-t:#1f48b0;
     --off-bg:#fbefcf; --off-bd:#e2c57c; --off-t:#6e5310;
@@ -191,16 +186,16 @@
   }
 
   /* === 로즈 🌹 — 장미 분홍 · 잎사귀 초록 · 복숭아 === */
-  [data-palette="sakura"] {
-    --bg:#fbebef; --bg-2:#f5dae1;
+  [data-palette="rose"] {
+    --bg:#fbebef;
     --surface:#fffafb; --surface-solid:#fffafb;
     --surface-2:#fcf0f3; --surface-3:#f6e0e6;
     --bd:rgba(70,18,34,.10); --bd-strong:rgba(70,18,34,.21);
     --text:#33141d; --text-2:#6a424f; --text-3:#a07683;
     --teal:#5f9450; --teal-2:#73a763; --teal-3:#e3f0dc; --teal-glow: rgba(95,148,80,.18);
     --coral:#db3f6b; --coral-2:#fddde6;
-    --accent: var(--coral); --accent-strong:#c2335c; --accent-soft: var(--coral-2); --accent-bd:#f2b0c2;
-    --secondary: var(--teal); --secondary-soft: var(--teal-3);
+    --accent: var(--coral); --accent-soft: var(--coral-2); --accent-bd:#f2b0c2;
+    --secondary: var(--teal);
     --highlight:#ef9a45; --highlight-soft:#fce9d3;
     --hol-bg:#fde0e8; --hol-bd:#efadbf; --hol-t:#b02a51;
     --off-bg:#fbebd5; --off-bd:#e6c38c; --off-t:#7c5219;
@@ -239,7 +234,6 @@
      ============================================================ */
   [data-theme="dark"] {
     --bg:#0c0b09;
-    --bg-2:#111009;
     --surface:#161411;
     --surface-solid:#161411;
     --surface-2:#1f1d19;
@@ -257,10 +251,9 @@
     --coral:#e8815b;
     --coral-2:rgba(232,129,91,.15);
     --accent: var(--coral);
-    --accent-strong:#f1926e;
     --accent-soft: var(--coral-2);
     --accent-bd:rgba(232,129,91,.38);
-    --secondary: var(--teal); --secondary-soft: var(--teal-3);
+    --secondary: var(--teal);
     --highlight:#dba84c; --highlight-soft:rgba(219,168,76,.15);
 
     --sat:#7fa3e8;
@@ -275,9 +268,6 @@
     --shadow-pop:   0 1px 1px rgba(0,0,0,.02), 0 4px 8px -4px rgba(0,0,0,.04), 0 16px 24px -8px rgba(0,0,0,.06);
     --shadow-modal: 0 1px 1px rgba(0,0,0,.02), 0 8px 16px -4px rgba(0,0,0,.04), 0 24px 32px -8px rgba(0,0,0,.06);
     --shadow-window: 0 1px 0 rgba(255,255,255,.03) inset, 0 16px 32px -12px rgba(0,0,0,.5);
-    --shadow: var(--shadow-window);
-    --shadow-soft: var(--shadow-card);
-    --shadow-lift: var(--shadow-pop);
 
     --hi: rgba(255,245,230,.05);
 
@@ -287,51 +277,46 @@
   }
 
   /* 다크에서도 팔레트 정체성 유지 — 액센트만 밝은 톤으로 재지정 */
-  [data-theme="dark"][data-palette="mango"] {
-    --bg:#0f0b08; --bg-2:#150f0b; --surface:#1a1410; --surface-solid:#1a1410; --surface-2:#241c16; --surface-3:#2e241c;
+  [data-theme="dark"][data-palette="latte"] {
+    --bg:#0f0b08; --surface:#1a1410; --surface-solid:#1a1410; --surface-2:#241c16; --surface-3:#2e241c;
     --coral:#d39b67; --teal:#e0a868; --highlight:#e3b26a;
-    --coral-2:rgba(211,155,103,.15); --teal-3:rgba(224,168,104,.14);
-    --accent-strong:#e0ae7f; --accent-bd:rgba(211,155,103,.4);
+    --coral-2:rgba(211,155,103,.15); --teal-3:rgba(224,168,104,.14); --accent-bd:rgba(211,155,103,.4);
     --highlight-soft:rgba(227,178,106,.14);
     --sun:#d39b67; --sat:#e0a868;
     --hol-bg:rgba(211,155,103,.11); --hol-bd:rgba(211,155,103,.32); --hol-t:#e0ae7f;
     --today-bg:rgba(224,168,104,.13);
   }
-  [data-theme="dark"][data-palette="forest"] {
-    --bg:#090d08; --bg-2:#0d120b; --surface:#121810; --surface-solid:#121810; --surface-2:#1a2217; --surface-3:#222c1e;
+  [data-theme="dark"][data-palette="matcha"] {
+    --bg:#090d08; --surface:#121810; --surface-solid:#121810; --surface-2:#1a2217; --surface-3:#222c1e;
     --coral:#79c06c; --teal:#e8a656; --highlight:#d9c055;
-    --coral-2:rgba(121,192,108,.14); --teal-3:rgba(232,166,86,.14);
-    --accent-strong:#8fcf83; --accent-bd:rgba(121,192,108,.4);
+    --coral-2:rgba(121,192,108,.14); --teal-3:rgba(232,166,86,.14); --accent-bd:rgba(121,192,108,.4);
     --highlight-soft:rgba(217,192,85,.14);
     --sun:#e8a656; --sat:#79c06c;
     --hol-bg:rgba(121,192,108,.11); --hol-bd:rgba(121,192,108,.32); --hol-t:#8fcf83;
     --today-bg:rgba(232,166,86,.13);
   }
-  [data-theme="dark"][data-palette="linen"] {
-    --bg:#0d0a12; --bg-2:#120e19; --surface:#17121f; --surface-solid:#17121f; --surface-2:#201929; --surface-3:#292133;
+  [data-theme="dark"][data-palette="berry"] {
+    --bg:#0d0a12; --surface:#17121f; --surface-solid:#17121f; --surface-2:#201929; --surface-3:#292133;
     --coral:#b789ec; --teal:#f07aac; --highlight:#f0ae62;
-    --coral-2:rgba(183,137,236,.15); --teal-3:rgba(240,122,172,.14);
-    --accent-strong:#c79ff1; --accent-bd:rgba(183,137,236,.4);
+    --coral-2:rgba(183,137,236,.15); --teal-3:rgba(240,122,172,.14); --accent-bd:rgba(183,137,236,.4);
     --highlight-soft:rgba(240,174,98,.14);
     --sun:#f07aac; --sat:#b789ec;
     --hol-bg:rgba(183,137,236,.11); --hol-bd:rgba(183,137,236,.32); --hol-t:#c79ff1;
     --today-bg:rgba(240,122,172,.13);
   }
-  [data-theme="dark"][data-palette="midnight"] {
-    --bg:#080b12; --bg-2:#0c1019; --surface:#10151f; --surface-solid:#10151f; --surface-2:#171e2b; --surface-3:#1f2736;
+  [data-theme="dark"][data-palette="ink"] {
+    --bg:#080b12; --surface:#10151f; --surface-solid:#10151f; --surface-2:#171e2b; --surface-3:#1f2736;
     --coral:#6e9bff; --teal:#f5936c; --highlight:#f0bf55;
-    --coral-2:rgba(110,155,255,.15); --teal-3:rgba(245,147,108,.14);
-    --accent-strong:#8bb0ff; --accent-bd:rgba(110,155,255,.4);
+    --coral-2:rgba(110,155,255,.15); --teal-3:rgba(245,147,108,.14); --accent-bd:rgba(110,155,255,.4);
     --highlight-soft:rgba(240,191,85,.14);
     --sun:#6e9bff; --sat:#f5936c;
     --hol-bg:rgba(110,155,255,.11); --hol-bd:rgba(110,155,255,.32); --hol-t:#8bb0ff;
     --today-bg:rgba(245,147,108,.13);
   }
-  [data-theme="dark"][data-palette="sakura"] {
-    --bg:#110a0c; --bg-2:#170e11; --surface:#1c1215; --surface-solid:#1c1215; --surface-2:#26191d; --surface-3:#302026;
+  [data-theme="dark"][data-palette="rose"] {
+    --bg:#110a0c; --surface:#1c1215; --surface-solid:#1c1215; --surface-2:#26191d; --surface-3:#302026;
     --coral:#f2708f; --teal:#8fc07a; --highlight:#f0aa62;
-    --coral-2:rgba(242,112,143,.15); --teal-3:rgba(143,192,122,.14);
-    --accent-strong:#f68ba5; --accent-bd:rgba(242,112,143,.4);
+    --coral-2:rgba(242,112,143,.15); --teal-3:rgba(143,192,122,.14); --accent-bd:rgba(242,112,143,.4);
     --highlight-soft:rgba(240,170,98,.14);
     --sun:#f2708f; --sat:#8fc07a;
     --hol-bg:rgba(242,112,143,.11); --hol-bd:rgba(242,112,143,.32); --hol-t:#f68ba5;
@@ -496,26 +481,19 @@
     position: relative;
   }
 
+  /* 왼쪽 오늘 카드 + 오른쪽 달력. 좁은 화면(≤720px)에선 카드가 달력 위로 쌓인다 */
   .window-body {
     padding: 20px 24px 24px;
-  }
-  .window-body[data-layout="sidebar"] {
     display: grid;
     grid-template-columns: 320px 1fr;
     gap: 24px;
-    padding-top: 20px;
   }
-  .today-card, .today-hero { transition: opacity var(--dur) var(--ease-out); }
-  .window-body[data-layout="sidebar"] #todayHero { display: none !important; }
-  .window-body[data-layout="sidebar"] .today-card { display: flex; }
-  .window-body[data-layout="sidebar"] .sidebar-col { min-width: 0; }
-  .window-body[data-layout="sidebar"] .main-col { min-width: 0; }
-  .window-body[data-layout="stacked"] .sidebar-col { display: none; }
-  .window-body[data-layout="stacked"] .today-card { display: none; }
-  .window-body[data-layout="stacked"] .main-col { display: contents; }
+  .sidebar-col, .main-col { min-width: 0; }
 
   /* === Sidebar today card === */
   .today-card {
+    display: flex;
+    transition: opacity var(--dur) var(--ease-out);
     position: relative;
     border-radius: var(--r-md);
     background: var(--surface-solid);
@@ -676,14 +654,6 @@
     gap: 8px; margin-bottom: 12px;
   }
   .today-card .ti-head .ti-titles { min-width: 0; }
-  .today-card .eyebrow {
-    font-family: var(--ff-mono);
-    font-size: 10.5px; letter-spacing: .14em;
-    text-transform: uppercase;
-    color: var(--accent);
-    font-weight: 500;
-    margin-bottom: 4px;
-  }
   .today-card h2 {
     display: flex; align-items: center; gap: 8px;
     font-family: var(--ff-display);
@@ -719,7 +689,8 @@
   .today-card .ti-add:hover { background: var(--accent); color: #fff; }
   [data-theme="dark"] .today-card .ti-add:hover { color: var(--bg); }
   .today-card .ti-add:active { transform: scale(.95); }
-  .today-card .ti-add .ti { font-size: 16px; }
+  .today-card .ti-add .ti { font-size: 16px; transition: transform .35s var(--ease-spring); }
+  .today-card .ti-add:hover .ti { transform: rotate(90deg); }
 
   .today-leader {
     position: relative;
@@ -746,6 +717,11 @@
     letter-spacing: 0;
     border-radius: 9999px;
     box-shadow: inset 0 1px 0 rgba(255,255,255,.3), 0 3px 8px -3px color-mix(in oklch, var(--accent) 60%, transparent);
+    animation: rank-float 3.2s ease-in-out infinite;   /* 둥실 */
+  }
+  @keyframes rank-float{
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-2px); }
   }
   [data-theme="dark"] .today-leader .rank { color: var(--bg); }
   .today-leader .rank .ti { font-size: 11px; }
@@ -897,33 +873,11 @@
   .title-grip span:nth-child(3) { background: #28c840; }
   .title-grip:hover span { filter: brightness(1.08); }
 
-  /* === Settings FAB === */
-  .settings-fab {
-    position: fixed;
-    right: 24px; bottom: 24px;
-    z-index: 95;
-    width: 44px; height: 44px;
-    border-radius: 9999px;
-    background: var(--surface-solid);
-    border: 1px solid var(--bd);
-    box-shadow: var(--shadow-pop);
-    color: var(--text-2);
-    display: grid; place-items: center;
-    cursor: pointer;
-    transition: all var(--dur-fast) var(--ease-out);
-  }
-  .settings-fab:hover { color: var(--text); border-color: var(--bd-strong); background: var(--surface-2); }
-  .settings-fab:active { transform: scale(.95); }
-  .settings-fab .ti { font-size: 20px; }
-  @media (max-width: 720px) {
-    .settings-fab { right: 16px; bottom: 16px; width: 40px; height: 40px; }
-    .settings-fab .ti { font-size: 18px; }
-  }
-
   /* === Tweaks panel === */
+  /* 위치는 JS(placePanel)가 누른 설정 버튼 바로 아래로 잡는다 — 아래 값은 기본값 */
   .twk-panel {
     position: fixed;
-    right: 24px; bottom: 24px;
+    left: 24px; top: 72px;
     z-index: 100;
     width: min(336px, calc(100vw - 28px));
     max-height: min(640px, calc(100vh - 44px));
@@ -934,16 +888,16 @@
     overflow: hidden;
     display: flex; flex-direction: column;
     animation: twk-in .2s var(--ease) both;
-    transform-origin: bottom right;
+    transform-origin: top left;
   }
   .twk-panel.closing { animation: twk-out .15s var(--ease-out) forwards; }
   @keyframes twk-in {
-    from { opacity: 0; transform: translateY(8px) scale(.97); }
-    to   { opacity: 1; transform: translateY(0)   scale(1); }
+    from { opacity: 0; transform: translateY(-6px) scale(.97); }
+    to   { opacity: 1; transform: translateY(0)    scale(1); }
   }
   @keyframes twk-out {
-    from { opacity: 1; transform: translateY(0)   scale(1); }
-    to   { opacity: 0; transform: translateY(6px) scale(.98); }
+    from { opacity: 1; transform: translateY(0)    scale(1); }
+    to   { opacity: 0; transform: translateY(-4px) scale(.98); }
   }
   .twk-head {
     display: flex; align-items: center; justify-content: space-between;
@@ -976,43 +930,6 @@
     color: var(--text-3); font-weight: 600;
     margin-bottom: 8px;
   }
-  .twk-row {
-    display: flex; align-items: center; gap: 8px;
-    margin-bottom: 8px;
-  }
-  .twk-radio {
-    display: flex; gap: 3px;
-    padding: 3px;
-    background: var(--surface-2); border: 1px solid var(--bd);
-    border-radius: var(--r-sm);
-    width: 100%;
-  }
-  .twk-radio button {
-    flex: 1;
-    min-width: 0;
-    padding: 6px 6px;
-    border-radius: 4px;
-    border: 0;
-    background: transparent;
-    color: var(--text-2);
-    font-family: var(--ff);
-    font-size: 12px; font-weight: 500;
-    letter-spacing: -.2px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    cursor: pointer;
-    transition: all var(--dur-fast) var(--ease-out);
-  }
-  .twk-radio button:hover { color: var(--text); }
-  .twk-radio button.on {
-    background: var(--surface-solid);
-    color: var(--text);
-    box-shadow: var(--shadow-card);
-    border: 1px solid var(--bd);
-    padding: 5px 5px;
-  }
-
   .twk-toggle {
     display: flex; align-items: center; justify-content: space-between;
     padding: 10px 12px;
@@ -1065,12 +982,13 @@
   }
   .palette-chip:hover { border-color: var(--bd-strong); background: var(--surface-2); }
   .palette-chip.on { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
-  /* 미리보기 — 그 팔레트의 배경·카드 위에 액센트 알약과 포인트 점, 대표 이모지 */
+  /* 미리보기 — 그 팔레트의 배경·카드 위에 액센트 알약과 포인트 점, 대표 이모지.
+     .pc-preview 에 data-palette 가 붙어 있어서 아래 var() 는 그 팔레트의 (라이트) 색이 된다 */
   .palette-chip .pc-preview {
     position: relative;
     height: 40px; margin-bottom: 6px;
     border-radius: 6px;
-    background: linear-gradient(140deg, var(--pc-bg) 0 55%, var(--pc-sf) 55%);
+    background: linear-gradient(140deg, var(--bg) 0 55%, var(--surface) 55%);
     box-shadow: inset 0 0 0 1px rgba(0,0,0,.07);
     display: flex; align-items: flex-end; gap: 4px;
     padding: 6px;
@@ -1085,10 +1003,11 @@
   .palette-chip .pc-pill {
     margin-left: auto;
     width: 26px; height: 9px; border-radius: 9999px;
-    background: var(--pc-ac);
-    box-shadow: 0 2px 4px -1px color-mix(in oklch, var(--pc-ac) 60%, transparent);
+    background: var(--accent);
+    box-shadow: 0 2px 4px -1px color-mix(in oklch, var(--accent) 60%, transparent);
   }
-  .palette-chip .pc-dot { width: 9px; height: 9px; border-radius: 50%; }
+  .palette-chip .pc-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--teal); }
+  .palette-chip .pc-dot.hl { background: var(--highlight); }
   .palette-chip .pc-label {
     font-size: 11.5px; font-weight: 600; color: var(--text-2);
     letter-spacing: -.2px; line-height: 1.2;
@@ -1135,10 +1054,6 @@
   .palette-chip .pc-check svg { display: block; }
 
   /* === brand (title-bar 내부) === */
-  .topbar{
-    display:flex; align-items:center; justify-content:space-between;
-    gap: 12px; flex-wrap:wrap; margin-bottom: 16px;
-  }
   .brand{ display:flex; align-items:center; gap: 10px; min-width: 0; }
   .brand-icon{
     width: 34px; height: 34px; border-radius: var(--r-sm);
@@ -1182,8 +1097,6 @@
     max-width: 100%;
   }
 
-  .topbar-right{ display:flex; align-items:center; gap: 8px; flex-wrap:wrap; }
-
   .nav-btn{
     width: 30px; height: 30px; border: 0; border-radius: 4px;
     background: transparent; cursor: pointer; color: var(--text-2);
@@ -1218,49 +1131,7 @@
   .icon-btn:active { transform: scale(.94); }
   .settings-icon-btn { display: none; }
 
-  /* === today hero (stacked layout) === */
-  .today-hero{
-    position: relative;
-    border-radius: var(--r-md);
-    border: 1px solid var(--bd);
-    background:
-      linear-gradient(150deg,
-        color-mix(in oklch, var(--accent-soft) 55%, var(--surface-solid)) 0%,
-        var(--surface-solid) 55%);
-    box-shadow: var(--shadow-card);
-    padding: 20px 22px 18px;
-    margin-bottom: 16px;
-    overflow: hidden;
-    animation: fadeUp .3s var(--ease) .04s both;
-  }
-  [data-theme="dark"] .today-hero{
-    background:
-      linear-gradient(150deg,
-        color-mix(in oklch, var(--accent) 10%, transparent) 0%,
-        transparent 55%),
-      var(--surface-solid);
-  }
-  .hero-head {
-    display:flex; align-items:flex-end; justify-content:space-between; gap: 16px;
-    margin-bottom: 14px; position: relative;
-  }
-  .hero-title-wrap { min-width: 0; }
-  .hero-eyebrow {
-    display: inline-flex; align-items: center; gap: 6px;
-    font-family: var(--ff-mono);
-    font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase;
-    font-weight: 500; color: var(--accent);
-    margin-bottom: 6px;
-  }
-  .hero-eyebrow .ti { font-size: 13px; }
-  .hero-title { font-family: var(--ff-display); font-size: 24px; font-weight: 600; letter-spacing: -.7px; color: var(--text); line-height: 1.1; text-wrap: balance; }
-  .hero-sub { margin-top: 8px; font-size: 13px; color: var(--text-2); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-  .hero-sub b { font-weight: 600; color: var(--text); }
-  .hero-count-pill { display:inline-flex; align-items: center; gap:5px; padding: 2px 9px; border-radius: 9999px; background: var(--secondary-soft); color: var(--secondary); font-weight: 500; font-size: 11.5px; border: 1px solid color-mix(in oklch, var(--secondary) 25%, transparent); }
-  [data-theme="dark"] .hero-count-pill { color: var(--teal-2); }
-  .hero-count-pill .ti { font-size: 12px; }
-
-  .hero-actions { display:flex; align-items:center; gap: 8px; flex-shrink: 0; }
+  /* === 주사위(메뉴 정해줘) 버튼 === */
   .dice-btn{
     display:flex; align-items:center; gap: 8px;
     padding: 0 16px; height: 40px; border-radius: var(--r-sm);
@@ -1283,9 +1154,6 @@
   [data-theme="dark"] .dice-btn:hover,
   [data-theme="dark"] .btn-primary {
     box-shadow: 0 6px 14px -6px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.55), inset 0 -2px 3px rgba(0,0,0,.10);
-  }
-  [data-theme="dark"] .tab.active {
-    box-shadow: 0 2px 6px -2px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.45);
   }
   .dice-btn[disabled] { opacity: .5; cursor: not-allowed; animation: none !important; }
   .dice-btn:not([disabled]):not(.rolling) .dice { animation: dice-idle 4s var(--ease-spring) infinite; transform-origin: 50% 60%; }
@@ -1324,61 +1192,6 @@
     92%           { transform: rotate(8deg)  scale(1.05); }
     97%           { transform: rotate(-2deg) scale(1.01); }
   }
-  .add-btn-ghost {
-    display:flex; align-items:center; gap: 6px;
-    padding: 0 14px; height: 40px; border-radius: var(--r-sm);
-    border: 1px solid var(--bd); background: var(--surface-solid);
-    color: var(--text); font-family: var(--ff); font-size: 13px; font-weight: 500;
-    cursor: pointer;
-    transition: all var(--dur-fast) var(--ease-out);
-  }
-  .add-btn-ghost:hover { background: var(--surface-2); border-color: var(--bd-strong); }
-  .add-btn-ghost:active { transform: scale(.98); }
-
-  .hero-list { display: flex; flex-direction: column; gap: 6px; position: relative; }
-  .hero-row {
-    display:flex; align-items:center; gap: 12px;
-    padding: 11px 14px; border-radius: var(--r-sm);
-    background: var(--surface-solid); border: 1px solid var(--bd);
-    cursor: pointer;
-    opacity: 1;
-    transition: border-color var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast) var(--ease-out);
-  }
-  .hero-row.enter { animation: fadeUp .25s var(--ease) both; }
-  [data-theme="dark"] .hero-row { background: var(--surface-2); }
-  .hero-row:hover { border-color: var(--bd-strong); box-shadow: var(--shadow-card); }
-
-  .hero-rank { width: 26px; height: 26px; border-radius: 9999px; display: flex; align-items: center; justify-content: center; font-family: var(--ff-numeric); font-weight: 600; font-variant-numeric: tabular-nums; font-size: 12.5px; flex-shrink: 0; }
-  .hero-rank.r0 { background: linear-gradient(135deg, #f2c94c, #d4a02b); color: #fff; box-shadow: inset 0 1px 0 rgba(255,255,255,.4), 0 2px 6px -2px rgba(212,160,43,.5); }
-  [data-theme="dark"] .hero-rank.r0 { color: var(--bg); }
-  .hero-rank.r1 { background: var(--surface-3); color: var(--text-2); }
-  .hero-rank.r2 { background: var(--surface-3); color: var(--text-2); }
-  .hero-rank.rN { background: transparent; color: var(--text-3); font-weight: 500; }
-
-  .hero-name-wrap { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
-  .hero-name { font-size: 14px; font-weight: 600; letter-spacing: -.2px; color: var(--text); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; word-break: break-word; }
-  .hero-memo { font-size: 12px; color: var(--text-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-  .hero-vote {
-    display:inline-flex; align-items:center; gap: 5px;
-    padding: 0 12px; height: 32px; border-radius: 9999px;
-    background: var(--surface-solid); border: 1px solid var(--bd);
-    color: var(--text-2); font-family: var(--ff); font-size: 13px; font-weight: 500;
-    font-variant-numeric: tabular-nums;
-    cursor: pointer; flex-shrink: 0;
-    transition: all var(--dur-fast) var(--ease-out);
-  }
-  .hero-vote:hover { border-color: var(--bd-strong); background: var(--surface-2); }
-  .hero-vote:active { transform: scale(.95); }
-  .hero-vote.voted { background: var(--accent-soft); border-color: var(--accent-bd); color: var(--accent); font-weight: 600; }
-  .hero-vote i { font-size: 14px; transition: transform var(--dur) var(--ease-spring); }
-  .hero-vote:hover i { transform: scale(1.1) rotate(-6deg); }
-
-  .hero-empty {
-    text-align: center; padding: 22px 16px 16px;
-    color: var(--text-3); font-size: 13.5px;
-  }
-  .hero-empty i { display:block; font-size: 30px; opacity: .35; margin-bottom: 10px; }
 
   /* === tabs === */
   .tabs-wrap{
@@ -1407,16 +1220,20 @@
     background: transparent; color: var(--text-2);
     font-family: var(--ff); font-size: 13px; font-weight: 500;
     padding: 8px 8px; cursor: pointer;
-    transition: background-color var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+    transition: background-color var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out);
     position: relative; white-space: nowrap;
   }
-  .tab:hover{ background: var(--surface-solid); color: var(--text); }
+  .tab:hover{ background: var(--surface-solid); color: var(--text); transform: translateY(-1px); }
+  .tab:active{ transform: scale(.96); }
   .tab.active{
     background: linear-gradient(180deg, color-mix(in oklch, var(--text) 90%, white), var(--text));
     color: var(--surface-solid);
     box-shadow: 0 2px 6px -2px color-mix(in oklch, var(--text) 55%, transparent), inset 0 1px 0 rgba(255,255,255,.14);
   }
-  [data-theme="dark"] .tab.active{ background: var(--text); color: var(--bg); }
+  [data-theme="dark"] .tab.active{
+    background: var(--text); color: var(--bg);
+    box-shadow: 0 2px 6px -2px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.45);
+  }
   .tab.has-data::after{
     content:''; position:absolute; top: 6px; right: 7px;
     width: 5px; height: 5px; border-radius: 50%; background: var(--accent);
@@ -1572,10 +1389,10 @@
     padding: 4px 8px; border-radius: var(--r-sm);
     background: var(--surface-2); border: 1px solid var(--bd);
     cursor:pointer;
-    transition: background-color var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out);
+    transition: background-color var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out);
   }
   [data-theme="dark"] .chip{ background: var(--surface-3); }
-  .chip:hover{ border-color: var(--bd-strong); }
+  .chip:hover{ border-color: var(--bd-strong); transform: translateY(-1px); }
   .chip.voted { background: var(--accent-soft); border-color: var(--accent-bd); }
   .chip-dot{ width: 6px; height: 6px; border-radius: 9999px; background: var(--teal-2); flex-shrink: 0; margin-top: 4px; }
   .chip.voted .chip-dot { background: var(--accent); }
@@ -1586,10 +1403,9 @@
     display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
     overflow: hidden;
   }
-  .chip-count{ margin-top: 2px; }
-  .chip-count { font-family: var(--ff-numeric); font-size: 10.5px; color: var(--text-3); font-weight: 500; font-variant-numeric: tabular-nums; flex-shrink: 0; display: inline-flex; align-items: center; gap: 2px; }
+  .chip-count { margin-top: 2px; font-family: var(--ff-numeric); font-size: 10.5px; color: var(--text-3); font-weight: 500; font-variant-numeric: tabular-nums; flex-shrink: 0; display: inline-flex; align-items: center; gap: 2px; }
   .chip-count.voted { color: var(--accent); }
-  .chip-crown { font-size: 10px; flex-shrink: 0; line-height: 1; }
+  .chip-crown { font-size: 10px; flex-shrink: 0; line-height: 1; display: inline-block; animation: crown-bob 2.8s ease-in-out infinite; }
   .vote-num { display: inline-block; vertical-align: bottom; overflow: hidden; }
   .vote-num.rolling { animation: vote-roll .25s var(--ease-spring); }
 
@@ -1717,7 +1533,8 @@
   .evote:hover{ border-color: var(--bd-strong); }
   .evote:active{ transform: scale(.95); }
   .evote.voted{ background: var(--accent-soft); border-color: var(--accent-bd); color: var(--accent); font-weight: 600; }
-  .evote i{ font-size: 12px; }
+  .evote i{ font-size: 12px; transition: transform .3s var(--ease-spring); }
+  .evote:hover i{ transform: scale(1.15) rotate(-8deg); }
 
   .edel{
     width: 26px; height: 26px; border: 0; border-radius: var(--r-sm);
@@ -1788,7 +1605,7 @@
     from { opacity: 0; transform: translateY(16px) scale(.9); }
     to   { opacity: 1; transform: translateY(0) scale(1); }
   }
-  .toast i { font-size: 15px; }
+  .toast i { font-size: 15px; display: inline-block; animation: vote-pop .55s var(--ease-spring) .08s both; }
   .toast.err { border-color: var(--hol-bd); color: var(--hol-t); }
   .toast.ok { border-color: color-mix(in oklch, var(--teal) 45%, transparent); color: var(--teal); }
   .toast.leave { animation: popOut .15s var(--ease-out) forwards; }
@@ -1798,19 +1615,18 @@
   .modal-sm .ctitle { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 14px; line-height: 1.5; }
 
   /* === interaction animations === */
-  .hero-row.flash, .erow.flash { animation: flash-ring 1s var(--ease-out); }
+  .today-leader.flash, .today-row.flash, .erow.flash { animation: flash-ring 1s var(--ease-out); }
   .chip.flash { animation: flash-ring .9s var(--ease-out); }
-  .hero-row.dice-winner { animation: dice-winner 1.4s var(--ease-spring); border-color: var(--teal); }
   .today-leader.dice-winner,
   .today-row.dice-winner,
   .erow.dice-winner { animation: dice-winner 1.4s var(--ease-spring); border-color: var(--teal); }
-  .evote.popping i, .hero-vote.popping i { animation: vote-pop .5s var(--ease-spring); display: inline-block; }
-  .evote.bumping, .hero-vote.bumping { animation: count-bump .35s var(--ease-spring); }
+  .evote.popping i { animation: vote-pop .5s var(--ease-spring); display: inline-block; }
+  .evote.bumping { animation: count-bump .35s var(--ease-spring); }
   .erow.removing {
     animation: row-collapse .28s var(--ease-out) forwards;
     overflow: hidden; pointer-events: none;
   }
-  .chip.removing, .hero-row.removing {
+  .chip.removing {
     animation: chip-collapse .22s var(--ease-out) forwards;
     overflow: hidden; pointer-events: none;
   }
@@ -1881,6 +1697,7 @@
     font-family: var(--ff-mono); font-size: 10px; font-weight: 500; letter-spacing: .06em;
     padding: 2px 8px; border-radius: 9999px; background: var(--accent); color: #fff;
     flex-shrink: 0;
+    position: relative; overflow: hidden;   /* 광택(::after)이 지나가는 창 */
   }
   [data-theme="dark"] .db-dday{ color: var(--bg); }
   .db-sub{ font-size: 12px; color: var(--text-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -1918,9 +1735,6 @@
   [data-theme="dark"] .twk-dinner-row .tdr-btn.primary{ color: var(--bg); }
   .twk-dinner-row .tdr-btn.primary:hover{ opacity: .88; }
   .twk-dinner-row .tdr-btn.danger:hover{ background: var(--hol-bg); color: var(--hol-t); border-color: var(--hol-bd); }
-  .twk-dinner-form{ display: flex; flex-direction: column; gap: 6px; }
-  .twk-dinner-form .inp{ padding: 0 10px; height: 36px; font-size: 12.5px; }
-  .twk-dinner-form input[type="date"].inp{ appearance: none; -webkit-appearance: none; }
   .twk-btn-wide{
     width: 100%; height: 36px; border-radius: var(--r-sm); border: 1px solid transparent;
     background: var(--accent); color: #fff;
@@ -1934,19 +1748,10 @@
   .twk-hint{ font-size: 11px; color: var(--text-3); line-height: 1.55; }
 
   /* ============================================================
-     기록 관리 모달 v2 — 상단 퀵 추가 바 + 투표 비율 바 리스트
+     기록 모달 — 후보 목록(순위 · 수정/삭제 · 투표) + 하단 입력폼
      ============================================================ */
   .mhdr-titles{ flex: 1; min-width: 0; }
   .lm-dow{ color: var(--text-3); font-weight: 500; font-size: 13px; margin-left: 2px; }
-  .msub-chips{ display: flex; gap: 5px; flex-wrap: wrap; margin-top: 6px; }
-  .mchip{
-    display: inline-flex; align-items: center; gap: 4px;
-    font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 9999px;
-    background: var(--surface-2); border: 1px solid var(--bd); color: var(--text-2);
-  }
-  .mchip.accent{ background: var(--accent-soft); border-color: var(--accent-bd); color: var(--accent); }
-  .mchip.hol{ background: var(--hol-bg); border-color: var(--hol-bd); color: var(--hol-t); }
-  .mchip.off{ background: var(--off-bg); border-color: var(--off-bd); color: var(--off-t); }
 
   .erank{
     width: 26px; height: 26px; flex-shrink: 0; border-radius: 9999px;
@@ -1959,6 +1764,7 @@
     background: linear-gradient(135deg, #f2c94c, #d4a02b);
     box-shadow: inset 0 1px 0 rgba(255,255,255,.4), 0 2px 6px -2px rgba(212,160,43,.5);
     font-size: 13px;
+    animation: crown-bob 3.4s ease-in-out infinite;   /* 👑 바운스 (keyframes 는 아래 '추가 애니메이션') */
   }
   .einfo{ flex: 1; min-width: 0; }
   .eacts{ display: flex; gap: 2px; flex-shrink: 0; align-items: center; }
@@ -2060,44 +1866,19 @@
   }
 
   /* 아이콘 회전 손맛 */
-  .theme-btn .ti, .settings-icon-btn .ti, .settings-fab .ti, .mclose .ti{
+  .theme-btn .ti, .settings-icon-btn .ti, .mclose .ti{
     transition: transform .4s var(--ease-spring);
   }
   .theme-btn:hover .ti{ transform: rotate(180deg); }
-  .settings-icon-btn:hover .ti, .settings-fab:hover .ti{ transform: rotate(60deg); }
+  .settings-icon-btn:hover .ti{ transform: rotate(60deg); }
   .mclose:hover .ti{ transform: rotate(90deg); }
-  .today-card .ti-add .ti{ transition: transform .35s var(--ease-spring); }
-  .today-card .ti-add:hover .ti{ transform: rotate(90deg); }
-
-  /* 칩·탭·투표 마이크로 인터랙션 */
-  .chip{ transition: background-color var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out); }
-  .chip:hover{ transform: translateY(-1px); }
-  .tab{ transition: background-color var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out); }
-  .tab:hover{ transform: translateY(-1px); }
-  .tab:active{ transform: scale(.96); }
-  .evote i{ transition: transform .3s var(--ease-spring); }
-  .evote:hover i{ transform: scale(1.15) rotate(-8deg); }
-  .dinner-banner .db-emoji{ transition: transform .3s var(--ease-spring); }
-  .dinner-banner:hover .db-emoji{ transform: rotate(-10deg) scale(1.15); }
-
-  /* 1위 뱃지 둥실 */
-  .today-leader .rank{ animation: rank-float 3.2s ease-in-out infinite; }
-  @keyframes rank-float{
-    0%, 100% { transform: translateY(0); }
-    50%      { transform: translateY(-2px); }
-  }
 
   /* 👑 왕관 바운스 — 1위 표시가 살아 움직인다 (transform 전용) */
-  .chip-crown, .erow.winner .erank{
-    display: inline-block;
-    animation: crown-bob 2.8s ease-in-out infinite;
-  }
   @keyframes crown-bob{
     0%, 100% { transform: translateY(0) rotate(0deg); }
     30%      { transform: translateY(-1.5px) rotate(-7deg); }
     60%      { transform: translateY(.5px) rotate(5deg); }
   }
-  .erow.winner .erank{ animation-duration: 3.4s; }
 
   /* 투표 시 떠오르는 +1 */
   .plus-one{
@@ -2117,15 +1898,14 @@
   }
 
   /* 🍻 회식 배너 — 몇 초마다 잔을 부딪히고, D-day 뱃지에 광택이 지나간다 */
-  .dinner-banner .db-emoji{ display: inline-block; animation: clink 4.2s var(--ease-out) 1s infinite; transform-origin: 50% 80%; }
-  .dinner-banner:hover .db-emoji{ animation: none; }
+  .dinner-banner .db-emoji{ display: inline-block; animation: clink 4.2s var(--ease-out) 1s infinite; transform-origin: 50% 80%; transition: transform .3s var(--ease-spring); }
+  .dinner-banner:hover .db-emoji{ animation: none; transform: rotate(-10deg) scale(1.15); }
   @keyframes clink{
     0%, 14%, 100% { transform: rotate(0) scale(1); }
     3%            { transform: rotate(-16deg) scale(1.12); }
     6%            { transform: rotate(12deg) scale(1.12); }
     9%            { transform: rotate(-6deg) scale(1.04); }
   }
-  .db-dday{ position: relative; overflow: hidden; }
   .db-dday::after{
     content: ''; position: absolute; top: 0; bottom: 0; left: -70%; width: 50%;
     background: linear-gradient(105deg, transparent, rgba(255,255,255,.55), transparent);
@@ -2135,7 +1915,7 @@
   }
 
   /* 🎲 룰렛 — 감속하며 후보를 하나씩 비추다가 당첨자에 멈춘다 */
-  .hero-row.roulette-hit, .today-leader.roulette-hit, .today-row.roulette-hit, .erow.roulette-hit{
+  .today-leader.roulette-hit, .today-row.roulette-hit, .erow.roulette-hit{
     border-color: var(--accent);
     background: var(--accent-soft);
     box-shadow: 0 0 0 3px color-mix(in oklch, var(--accent) 16%, transparent);
@@ -2185,9 +1965,6 @@
     0%   { opacity: .85; transform: scale(1, 1); }
     100% { opacity: 0;   transform: scale(var(--ring-sx, 1.2), var(--ring-sy, 1.2)); }
   }
-
-  /* 토스트 아이콘 팝 */
-  .toast i{ display: inline-block; animation: vote-pop .55s var(--ease-spring) .08s both; }
 
   /* 🌓 테마 전환 — View Transitions 로 버튼에서 원형으로 번져나간다.
      JS 가 ::view-transition-new(root) 의 clip-path 를 애니메이션한다. */
@@ -2327,21 +2104,15 @@
   /* === RESPONSIVE === */
   @media (max-width: 960px){
     .stage { padding: 20px 14px 72px; }
-    .window-body { padding: 16px 16px 22px; }
+    .window-body { padding: 20px 16px 22px; }
     .brand-text .name{ font-size: 13.5px; }
     .cell{ min-height: 104px; }
-    .hero-title { font-size: 20px; }
   }
 
   @media (max-width: 720px){
     .stage { padding: 12px 10px 32px; }
-    .window-body { padding: 14px 12px 20px; }
+    .window-body { padding: 20px 12px 20px; grid-template-columns: 1fr; gap: 14px; }
     .window { border-radius: var(--r-md); }
-
-    .window-body[data-layout="sidebar"] {
-      grid-template-columns: 1fr;
-      gap: 14px;
-    }
 
     .today-card { border-radius: var(--r-md); }
     .big-date { padding: 14px 16px 12px; }
@@ -2389,21 +2160,6 @@
     }
     .sync-pill span:last-child { display: none; }
     .sync-pill .sync-dot { margin: 0; width: 7px; height: 7px; box-shadow: 0 0 0 3px color-mix(in oklch, currentColor 18%, transparent); }
-
-    .settings-fab { display: none !important; }
-
-
-    .today-hero { padding: 16px 14px 14px; }
-    .hero-title { font-size: 19px; letter-spacing: -.5px; }
-    .hero-sub { font-size: 12px; gap: 6px; }
-    .hero-head { flex-direction: column; align-items: stretch; gap: 12px; margin-bottom: 12px; }
-    .hero-actions { width: 100%; }
-    .dice-btn { flex: 1; justify-content: center; font-size: 13.5px; }
-    .hero-row { padding: 10px 12px; gap: 10px; }
-    .hero-rank { width: 24px; height: 24px; font-size: 12px; }
-    .hero-name { font-size: 13.5px; }
-    .hero-memo { font-size: 11.5px; }
-    .hero-vote { height: 30px; padding: 0 10px; font-size: 12px; }
 
     .tabs-wrap { padding: 3px; gap: 2px; }
     .tab { font-size: 12px; padding: 7px 5px; min-width: 0; }
@@ -2465,11 +2221,9 @@
       display: flex; flex-direction: column;
       min-height: 0;
     }
-    .window-body { flex: 1; min-height: 0; padding-bottom: 16px; }
-    .window-body[data-layout="sidebar"] { grid-template-rows: minmax(0, 1fr); }
+    .window-body { flex: 1; min-height: 0; padding-bottom: 16px; grid-template-rows: minmax(0, 1fr); }
     .sidebar-col { min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
     .main-col { display: flex; flex-direction: column; min-height: 0; height: 100%; }
-    .window-body[data-layout="stacked"] .main-col { display: flex; }
     /* 첫 행(요일 라벨)은 auto, 날짜 행들만 1fr 로 균등 배분 */
     .cal { flex: 1; min-height: 0; grid-template-rows: auto; grid-auto-rows: minmax(0, 1fr); }
     .cell { min-height: 0; overflow: hidden; }
@@ -2495,7 +2249,7 @@
   }
 </style>
 
-<!-- Pre-flash theme + palette + font + layout: read saved prefs before paint -->
+<!-- Pre-flash theme + palette + font: read saved prefs before paint -->
 <script>
 (function() {
   try {
@@ -2503,16 +2257,21 @@
     var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
     var theme = saved || (prefersDark ? 'dark' : 'light');
     document.documentElement.setAttribute('data-theme', theme);
-    var pal = localStorage.getItem('gtl-palette') || 'buttercream';
+    // 팔레트 id 를 화면 이름에 맞춰 바꿨다 (살구 apricot · 라떼 latte · 말차 matcha · 베리 berry ·
+    // 잉크 ink · 로즈 rose) — 예전 저장값은 새 id 로 옮기고, 모르는 값이면 기본으로
+    var PAL_IDS = ['apricot', 'latte', 'matcha', 'berry', 'ink', 'rose'];
+    var pal = localStorage.getItem('gtl-palette') || 'apricot';
+    pal = ({ buttercream: 'apricot', mango: 'latte', forest: 'matcha', linen: 'berry', midnight: 'ink', sakura: 'rose' })[pal] || pal;
+    if(PAL_IDS.indexOf(pal) < 0) pal = 'apricot';
+    localStorage.setItem('gtl-palette', pal);
     document.documentElement.setAttribute('data-palette', pal);
     var fnt = localStorage.getItem('gtl-font') || 'default';
     // 없어진 폰트 → 가장 비슷한 새 폰트로 (바탕·송명 = 명조, 돋움 = 동글)
     fnt = ({ batang: 'hahmlet', song: 'hahmlet', dodum: 'round' })[fnt] || fnt;
+    if(['default', 'hahmlet', 'hand', 'round', 'poster'].indexOf(fnt) < 0) fnt = 'default';
     document.documentElement.setAttribute('data-font', fnt);
-    // Layout is applied later (window-body lives in <body>), but stash on
-    // <html> so the body markup can read it via getAttribute on load.
-    var lay = localStorage.getItem('gtl-layout') || 'sidebar';
-    document.documentElement.setAttribute('data-layout', lay);
+    // 예전 '상단 카드' 레이아웃 설정은 없어졌다 — 남은 저장값 정리
+    localStorage.removeItem('gtl-layout');
   } catch(e) {}
 })();
 </script>
@@ -2535,7 +2294,7 @@
 
 <div class="stage">
   <div class="window">
-    <h1 class="sr-only">팀 GTL 월간 캘린더 2026–2030</h1>
+    <h1 class="sr-only" id="pageTitle">팀 GTL 월간 캘린더</h1>
 
     <!-- === Title bar (top row): brand + sync + theme + help === -->
     <header class="title-bar">
@@ -2546,7 +2305,7 @@
         <button class="brand-icon" type="button" onclick="location.reload()" aria-label="새로고침" title="새로고침">GTL</button>
         <button class="brand-text" type="button" onclick="location.reload()" aria-label="새로고침" title="새로고침">
           <span class="name">팀 GTL 캘린더</span>
-          <span class="sub">2026 – 2030</span>
+          <span class="sub" id="yearRange"></span>
         </button>
       </div>
       <div class="title-spacer"></div>
@@ -2558,7 +2317,7 @@
         <button class="icon-btn theme-btn" type="button" onclick="toggleTheme()" aria-label="다크 모드 전환" title="다크 모드">
           <i class="ti" id="themeIcon"></i>
         </button>
-        <!-- Settings icon — visible on mobile only (FAB hides on small screens) -->
+        <!-- Settings icon — 모바일 전용 (데스크톱은 왼쪽 위 ●●● 가 설정 버튼) -->
         <button class="icon-btn settings-icon-btn" type="button" onclick="openTweaks()" aria-label="설정" title="설정">
           <i class="ti ti-settings"></i>
         </button>
@@ -2573,23 +2332,13 @@
          상단 툴바(월 라벨 + 오늘 버튼)는 중복이라 없앴고, 스크린리더용 월 안내만 남긴다 -->
     <span class="sr-only" id="monthTitle" aria-live="polite" aria-atomic="true"></span>
 
-    <!-- === Body (hero + tabs + calendar + notice) === -->
-    <!-- data-layout switches between "stacked" (horizontal hero on top) and
-         "sidebar" (big-date today card on the left). The layout is set on
-         page load from localStorage by the pre-paint script and can be
-         changed via the Tweaks panel. -->
-    <div class="window-body" id="windowBody" data-layout="sidebar">
-      <!-- Sidebar column: only visible in sidebar layout -->
+    <!-- === Body: 왼쪽 오늘 카드 + 오른쪽 (회식 배너 · 월 탭 · 달력) === -->
+    <div class="window-body" id="windowBody">
       <div class="sidebar-col">
         <aside class="today-card" id="todaySidebar" hidden></aside>
       </div>
 
-      <!-- Main column: stacked = contents (laid out vertically inside
-           window-body), sidebar = nested grid item taking the right side. -->
       <div class="main-col">
-        <!-- Today hero (horizontal, used in stacked layout) -->
-        <section class="today-hero" id="todayHero" hidden></section>
-
         <!-- Upcoming 회식 banner — shows the nearest scheduled team dinner -->
         <div id="dinnerBanner" hidden></div>
 
@@ -2603,11 +2352,6 @@
   </div>
 </div>
 
-<!-- Floating settings button — auto-hides while the panel is open -->
-<button id="settingsFab" class="settings-fab" type="button" onclick="openTweaks()" title="설정" aria-label="설정 열기">
-  <i class="ti ti-settings"></i>
-</button>
-
 <!-- Tweaks panel container — populated by JS when opened -->
 <div id="tweaksRoot"></div>
 
@@ -2615,8 +2359,9 @@
 <div id="cw"></div>
 <div id="tw" class="toast-wrap" aria-live="polite"></div>
 
-<!-- Supabase JS SDK -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- Supabase JS SDK — 버전을 고정한다 (@2 처럼 열어두면 새 릴리스가 자동으로 적용돼, 버그가 있으면 사이트가 그대로 멈춘다).
+     올릴 땐 npm 에서 최신 버전을 확인하고 숫자만 바꾸면 된다. -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2"></script>
 
 <!-- Server-injected env -->
 <script src="/config.js"></script>
@@ -2631,7 +2376,7 @@
   window.SUPABASE_URL = 'mock';
   window.SUPABASE_ANON_KEY = 'mock';
 
-  // Today is seeded with a 4-way vote so the hero card is interesting.
+  // 오늘 카드가 심심하지 않게 오늘 후보 4개 + 투표를 넣어 둔다
   const TODAY = new Date();
   const TY = TODAY.getFullYear(), TM = TODAY.getMonth()+1, TD = TODAY.getDate();
   const lastFri = (() => { const d=new Date(TY,TM,0); while(d.getDay()!==5) d.setDate(d.getDate()-1); return d.getDate(); })();
@@ -2677,6 +2422,8 @@
       select(){ return api; },
       in(col, vals){ ctx.rows = ctx.rows.filter(r => vals.includes(r[col])); return api; },
       eq(col, v){ ctx.rows = ctx.rows.filter(r => r[col] === v); ctx.filters.push([col,v]); return api; },
+      order(){ return api; },
+      range(from, to){ ctx.rows = ctx.rows.slice(from, to + 1); return api; },
       then(cb){ return Promise.resolve({ data: ctx.rows, error: null }).then(cb); },
     };
     return api;
@@ -2739,6 +2486,7 @@
         const filters = [];
         const api = {
           eq(col, v){ filters.push([col,v]); return api; },
+          match(obj){ Object.keys(obj).forEach(k => filters.push([k, obj[k]])); return api; },
           then(cb){
             const removed = arr.filter(r => filters.every(([c,v]) => r[c] === v));
             filterInPlace(arr, r => !filters.every(([c,v]) => r[c] === v));
@@ -2786,7 +2534,7 @@
 
 <script>
 /* =================================================================
-   팀 GTL 캘린더 v3 — Supabase + Today hero + Dark mode
+   팀 GTL 캘린더 — 메인 스크립트 (데이터 로드 · 실시간 · 렌더 · 모달)
 ================================================================== */
 
 const YEAR_START = 2026;
@@ -2801,8 +2549,6 @@ const DOW_KR = ['일','월','화','수','목','금','토'];
 let HOLIDAYS = {};
 YEARS.forEach(y => { HOLIDAYS[y] = {}; });
 
-const HERO_HIDE_HOUR = 13;  // 13시 이후 히어로 숨김
-
 let curYear = (() => {
   const y = new Date().getFullYear();
   return YEARS.includes(y) ? y : YEAR_START;
@@ -2816,7 +2562,7 @@ let cur = (() => {
 let D = {};
 YEARS.forEach(y => { D[y] = {}; MONTHS.forEach(m => { D[y][m] = {}; }); });
 
-let openDay = null, helpOpen = false, es = null;
+let openDay = null, es = null;
 let sb = null, MY_VOTER_ID = '';
 let _loaded = false;          // turns true after first loadAll() resolves
 let _editingId = null;        // entry id currently in edit mode in modal
@@ -2862,7 +2608,9 @@ async function loadHolidaysForYear(y){
   } catch(e) {}
 
   try {
-    const res = await fetch('/api/holidays/' + y);
+    // 서버(KASI)가 늦으면 첫 화면 전체가 기다리게 되므로 끊는다 — 위 캐시나 빈 값으로 진행
+    const res = await fetch('/api/holidays/' + y,
+      (window.AbortSignal && AbortSignal.timeout) ? { signal: AbortSignal.timeout(6000) } : undefined);
     if(res.ok){
       const data = await res.json();
       if(data && typeof data === 'object' && !data.error){
@@ -3048,27 +2796,41 @@ function initSupabase(){
   });
 }
 
+// Supabase(PostgREST)는 요청 한 번에 최대 1000줄만 돌려주고, 넘는 건 에러 없이 잘라 버린다.
+// 기록·투표가 쌓여도 빠지지 않게 끝까지 나눠 받는다. build(opts) 는 매번 새 쿼리를 만들어야 한다
+// (supabase 쿼리 빌더는 한 번 await 하면 재사용할 수 없음). 순서가 고정돼야 페이지가 겹치지 않으므로
+// 호출부에서 기본키로 order 를 건다.
+async function fetchAllRows(build){
+  const PAGE = 1000;
+  const first = await build({ count: 'exact' }).range(0, PAGE - 1);
+  if(first.error) return first;
+  const rows = (first.data || []).slice();
+  const total = typeof first.count === 'number' ? first.count : rows.length;
+  while(rows.length < total){
+    const { data, error } = await build().range(rows.length, rows.length + PAGE - 1);
+    if(error) return { data: null, error };
+    if(!data || !data.length) break;   // 그 사이 지워져서 total 보다 적을 수 있다
+    rows.push(...data);
+  }
+  return { data: rows, error: null };
+}
+
 async function loadAll(){
   setSyncState('load');
   YEARS.forEach(y => { D[y] = {}; MONTHS.forEach(m => { D[y][m] = {}; }); });
 
-  // entries + votes + dinners from supabase, holidays from server proxy — in parallel
-  const [entriesRes] = await Promise.all([
-    sb.from('entries').select('id,year,month,day,name,memo').in('year', YEARS),
+  // entries + votes + dinners from supabase, holidays from server proxy — in parallel.
+  // 투표는 entry id 목록으로 거르지 않고 전부 받는다 — id 가 수천 개면 URL 이 너무 길어져 요청이 깨진다.
+  const [entriesRes, votesRes] = await Promise.all([
+    fetchAllRows(o => sb.from('entries').select('id,year,month,day,name,memo', o).in('year', YEARS).order('id')),
+    fetchAllRows(o => sb.from('votes').select('entry_id,voter_id', o).order('entry_id').order('voter_id')),
     loadAllHolidays(),
     loadDinners()
   ]);
   const { data: entries, error: e1 } = entriesRes;
   if(e1){ setSyncState('err'); console.error(e1); return; }
-
-  const ids = entries.map(e=>e.id);
-  let votes=[];
-  if(ids.length){
-    const { data: vrows, error: e2 } = await sb.from('votes')
-      .select('entry_id,voter_id').in('entry_id', ids);
-    if(e2){ setSyncState('err'); console.error(e2); return; }
-    votes = vrows;
-  }
+  const { data: votes, error: e2 } = votesRes;
+  if(e2){ setSyncState('err'); console.error(e2); return; }
 
   const byEntry={};
   votes.forEach(v => (byEntry[v.entry_id] = byEntry[v.entry_id]||new Set()).add(v.voter_id));
@@ -3099,32 +2861,21 @@ function subscribe(){
 /* ---------- 회식: load + realtime ---------- */
 async function loadDinners(){
   try{
-    const { data: rows, error } = await sb.from('dinners')
-      .select('id,year,month,day,title').in('year', YEARS);
-    if(error) throw error;
-    const list = (rows||[]).map(r => ({
+    const [dRes, pRes, vRes] = await Promise.all([
+      fetchAllRows(o => sb.from('dinners').select('id,year,month,day,title', o).in('year', YEARS).order('id')),
+      fetchAllRows(o => sb.from('dinner_places').select('id,dinner_id,name,memo', o).order('id')),
+      fetchAllRows(o => sb.from('dinner_votes').select('place_id,voter_id', o).order('place_id').order('voter_id')),
+    ]);
+    for(const r of [dRes, pRes, vRes]) if(r.error) throw r.error;
+    const list = dRes.data.map(r => ({
       id:r.id, year:r.year, month:r.month, day:r.day, title:r.title||'', places:[]
     }));
-    const ids = list.map(d => d.id);
-    if(ids.length){
-      const { data: pls, error: e2 } = await sb.from('dinner_places')
-        .select('id,dinner_id,name,memo').in('dinner_id', ids);
-      if(e2) throw e2;
-      const pids = (pls||[]).map(p => p.id);
-      let dvs = [];
-      if(pids.length){
-        const { data: vr, error: e3 } = await sb.from('dinner_votes')
-          .select('place_id,voter_id').in('place_id', pids);
-        if(e3) throw e3;
-        dvs = vr || [];
-      }
-      const byPlace = {};
-      dvs.forEach(v => (byPlace[v.place_id] = byPlace[v.place_id]||new Set()).add(v.voter_id));
-      (pls||[]).forEach(p => {
-        const d = list.find(x => x.id === p.dinner_id);
-        if(d) d.places.push({ id:p.id, name:p.name, memo:p.memo||'', voters: byPlace[p.id]||new Set() });
-      });
-    }
+    const byPlace = {};
+    vRes.data.forEach(v => (byPlace[v.place_id] = byPlace[v.place_id]||new Set()).add(v.voter_id));
+    pRes.data.forEach(p => {
+      const d = list.find(x => x.id === p.dinner_id);
+      if(d) d.places.push({ id:p.id, name:p.name, memo:p.memo||'', voters: byPlace[p.id]||new Set() });
+    });
     list.forEach(d => d.places.sort((a,b)=>a.id-b.id));
     DINNERS = list;
     sortDinners();
@@ -3177,9 +2928,9 @@ function dinnerDday(d){
   return diff === 0 ? 'D-Day' : 'D-' + diff;
 }
 function getAllDinnerPlaceNames(){
-  const s = new Set();
-  DINNERS.forEach(d => d.places.forEach(p => { if(p.name) s.add(p.name); }));
-  return Array.from(s).sort((a,b)=>a.localeCompare(b,'ko'));
+  const names = [];
+  DINNERS.forEach(d => d.places.forEach(p => names.push(p.name)));
+  return uniqueSortedNames(names);
 }
 
 function onDinnerChange(p){
@@ -3219,11 +2970,8 @@ function onDinnerPlaceChange(p){
 }
 function onDinnerVoteChange(p){
   const v = p.eventType === 'DELETE' ? p.old : p.new;
-  const f = findDinnerPlace(v.place_id); if(!f) return;
-  if(p.eventType === 'INSERT') f.place.voters.add(v.voter_id);
-  else if(p.eventType === 'DELETE') f.place.voters.delete(v.voter_id);
-  rerender();
-  if(v.voter_id !== MY_VOTER_ID) flashEntry('d'+v.place_id);
+  const f = findDinnerPlace(v.place_id);
+  _applyVoteEvent(p.eventType, v.voter_id, f && f.place, 'd' + v.place_id);
 }
 function flashEntry(id){
   requestAnimationFrame(() => {
@@ -3264,26 +3012,43 @@ function onEntryChange(p){
 }
 function onVoteChange(p){
   const v = p.eventType==='DELETE' ? p.old : p.new;
-  const f = findEntry(v.entry_id); if(!f) return;
-  if(p.eventType==='INSERT') f.entry.voters.add(v.voter_id);
-  else if(p.eventType==='DELETE') f.entry.voters.delete(v.voter_id);
+  const f = findEntry(v.entry_id);
+  _applyVoteEvent(p.eventType, v.voter_id, f && f.entry, v.entry_id);
+}
+// 투표 실시간 반영 (점심 후보·회식 장소 공통). rowId 는 화면 행의 data-eid (회식은 'd'+id)
+function _applyVoteEvent(type, voterId, item, rowId){
+  if(!item) return;
+  if(type === 'INSERT') item.voters.add(voterId);
+  else if(type === 'DELETE') item.voters.delete(voterId);
   rerender();
-  if(v.voter_id !== MY_VOTER_ID) flashEntry(v.entry_id);
+  if(voterId !== MY_VOTER_ID) flashEntry(rowId);
 }
 
 /* ---------- mutations ---------- */
 function normalizeName(s){ return String(s||'').trim().toLowerCase().replace(/\s+/g,' '); }
-function getAllRestaurantNames(){
-  const set = new Set();
-  YEARS.forEach(y => MONTHS.forEach(m => Object.values((D[y]||{})[m]||{}).forEach(d =>
-    (d.entries||[]).forEach(e => { if(e.name) set.add(e.name); })
-  )));
-  return Array.from(set).sort((a,b)=>a.localeCompare(b,'ko'));
-}
-function isDuplicateOnDay(day, name, ignoreId){
-  const list = (((D[curYear]||{})[cur]||{})[day] || {}).entries || [];
+// 같은 목록에 (공백·대소문자 무시) 같은 이름이 있는지 — 점심 후보·회식 장소 공통
+function hasSameName(list, name, ignoreId){
   const norm = normalizeName(name);
   return list.some(e => e.id !== ignoreId && normalizeName(e.name) === norm);
+}
+function uniqueSortedNames(names){
+  return Array.from(new Set(names.filter(Boolean))).sort((a,b)=>a.localeCompare(b,'ko'));
+}
+// 입력칸 자동완성 목록 (<input list="id">)
+function datalistHTML(id, names){
+  return names.length
+    ? '<datalist id="'+id+'">'+names.map(n=>'<option value="'+esc(n)+'"></option>').join('')+'</datalist>'
+    : '';
+}
+function getAllRestaurantNames(){
+  const names = [];
+  YEARS.forEach(y => MONTHS.forEach(m => Object.values((D[y]||{})[m]||{}).forEach(d =>
+    (d.entries||[]).forEach(e => names.push(e.name))
+  )));
+  return uniqueSortedNames(names);
+}
+function isDuplicateOnDay(day, name, ignoreId){
+  return hasSameName((((D[curYear]||{})[cur]||{})[day] || {}).entries || [], name, ignoreId);
 }
 
 async function addEntryAsync(day, name, memo){
@@ -3308,30 +3073,31 @@ async function updateEntryAsync(entryId, name, memo){
   setSyncState('ok');
   return true;
 }
-async function deleteEntryAsync(entryId){
-  // animate out first so the row collapses instead of vanishing
-  const els = document.querySelectorAll(
-    '[data-eid="'+entryId+'"], [data-entry-id="'+entryId+'"]'
-  );
+// 행 삭제 (점심 후보·회식 장소 공통) — 줄이 접히는 애니메이션 뒤 화면에서 먼저 빼고,
+// 저장이 실패하면 제자리에 되돌린다. detach() 는 로컬 데이터에서 빼고 되돌리는 함수를 돌려준다.
+async function _deleteRow(rowId, table, id, detach){
+  const els = document.querySelectorAll('[data-eid="'+rowId+'"], [data-entry-id="'+rowId+'"]');
   els.forEach(el => el.classList.add('removing'));
   if(els.length){ await new Promise(r => setTimeout(r, 240)); }
-
-  const f = findEntry(entryId);
-  let restore=null;
-  if(f){
-    restore = { y:f.y, m:f.m, d:f.d, idx:f.idx, entry:f.entry };
-    D[f.y][f.m][f.d].entries.splice(f.idx, 1);
-    rerender();
-  }
+  const restore = detach();
+  if(restore) rerender();
   setSyncState('sv');
-  const { error } = await sb.from('entries').delete().eq('id', entryId);
+  const { error } = await sb.from(table).delete().eq('id', id);
   if(error){
-    if(restore) D[restore.y][restore.m][restore.d].entries.splice(restore.idx, 0, restore.entry);
-    rerender(); setSyncState('err'); showToast('삭제 실패: '+error.message, 'err'); return;
+    if(restore) restore();
+    rerender(); setSyncState('err'); showToast('삭제 실패: '+error.message, 'err');
+    return;
   }
   setSyncState('ok');
 }
-const _votingIds = new Set();
+function deleteEntryAsync(entryId){
+  return _deleteRow(entryId, 'entries', entryId, () => {
+    const f = findEntry(entryId); if(!f) return null;
+    const list = D[f.y][f.m][f.d].entries;
+    list.splice(f.idx, 1);
+    return () => list.splice(f.idx, 0, f.entry);
+  });
+}
 // 투표 확정 순간 버튼 위로 +1 이 떠오른다 — 화면에 보이는 첫 버튼 하나에만
 function _spawnPlusOne(rect){
   const el = document.createElement('span');
@@ -3347,17 +3113,13 @@ function _animateVote(entryId, becameVoted){
   if(becameVoted && navigator.vibrate){ try { navigator.vibrate(10); } catch(e){} }
   requestAnimationFrame(() => {
     if(becameVoted){
-      const btns = document.querySelectorAll(
-        '[data-eid="'+entryId+'"] .evote, [data-entry-id="'+entryId+'"] .hero-vote'
-      );
+      const btns = document.querySelectorAll('[data-eid="'+entryId+'"] .evote');
       for(const b of btns){
         const r = b.getBoundingClientRect();
         if(r.width){ _spawnPlusOne(r); if(window._voteBurst) window._voteBurst(b); break; }
       }
     }
-    document.querySelectorAll(
-      '[data-eid="'+entryId+'"] .evote, [data-entry-id="'+entryId+'"] .hero-vote'
-    ).forEach(btn => {
+    document.querySelectorAll('[data-eid="'+entryId+'"] .evote').forEach(btn => {
       btn.classList.remove('popping','bumping');
       void btn.offsetWidth;
       btn.classList.add('popping','bumping');
@@ -3373,50 +3135,49 @@ function _animateVote(entryId, becameVoted){
     });
   });
 }
-async function toggleVoteAsync(entryId){
-  if(_votingIds.has(entryId)) return;
-  _votingIds.add(entryId);
+// 투표 토글 (점심 후보·회식 장소 공통) — 화면 먼저 바꾸고, 저장이 실패하면 되돌린다.
+// row 는 투표 테이블의 한 줄(기본키 전체), rowId 는 화면 행의 data-eid (회식은 'd'+id)
+const _votingRows = new Set();
+async function _toggleVote(item, table, row, rowId){
+  if(!item || _votingRows.has(rowId)) return;   // 저장 중 연타 무시
+  _votingRows.add(rowId);
   try{
-    const f = findEntry(entryId); if(!f) return;
-    const was = f.entry.voters.has(MY_VOTER_ID);
-    if(was) f.entry.voters.delete(MY_VOTER_ID); else f.entry.voters.add(MY_VOTER_ID);
+    const was = item.voters.has(MY_VOTER_ID);
+    const set = on => { if(on) item.voters.add(MY_VOTER_ID); else item.voters.delete(MY_VOTER_ID); };
+    set(!was);
     rerender();
-    _animateVote(entryId, !was);
+    _animateVote(rowId, !was);
     setSyncState('sv');
     const { error } = was
-      ? await sb.from('votes').delete().eq('entry_id', entryId).eq('voter_id', MY_VOTER_ID)
-      : await sb.from('votes').insert({ entry_id: entryId, voter_id: MY_VOTER_ID });
+      ? await sb.from(table).delete().match(row)
+      : await sb.from(table).insert(row);
     if(error){
-      if(was) f.entry.voters.add(MY_VOTER_ID); else f.entry.voters.delete(MY_VOTER_ID);
+      set(was);
       rerender(); setSyncState('err'); showToast('투표 처리 실패', 'err'); return;
     }
     setSyncState('ok');
   } finally {
-    _votingIds.delete(entryId);
+    _votingRows.delete(rowId);
   }
 }
+function toggleVoteAsync(entryId){
+  const f = findEntry(entryId);
+  return _toggleVote(f && f.entry, 'votes', { entry_id: entryId, voter_id: MY_VOTER_ID }, entryId);
+}
 
-/* ---------- today hero ---------- */
+/* ---------- 오늘 카드 (왼쪽 사이드바) ---------- */
 function todayInfo(){
   const now = new Date();
   return {
     y: now.getFullYear(),
     m: now.getMonth()+1,
     d: now.getDate(),
-    hour: now.getHours(),
     dow: DOW_KR[now.getDay()]
   };
 }
 function isTodaysMonth(){
   const t = todayInfo();
   return t.y===curYear && t.m===cur;
-}
-function shouldShowHero(){
-  const t = todayInfo();
-  // Only show on today's month + before HERO_HIDE_HOUR
-  if(!isTodaysMonth()) return false;
-  if(t.hour >= HERO_HIDE_HOUR) return false;
-  return true;
 }
 function getTodayEntries(){
   const t = todayInfo();
@@ -3425,71 +3186,6 @@ function getTodayEntries(){
   if(!day) return [];
   // sort by votes desc, then by id asc
   return day.entries.slice().sort((a,b) => (b.voters.size - a.voters.size) || (a.id - b.id));
-}
-
-function renderHero(){
-  const el = document.getElementById('todayHero');
-  if(!el) return;
-  // Sidebar layout owns the today widget — skip the horizontal hero entirely
-  // so no stale DOM and no flash on layout swap.
-  const wb = document.getElementById('windowBody');
-  if(wb && wb.getAttribute('data-layout') === 'sidebar'){
-    el.hidden = true; el.innerHTML = ''; return;
-  }
-  if(!_loaded || !shouldShowHero()){ el.hidden = true; el.innerHTML=''; return; }
-  el.hidden = false;
-
-  const t = todayInfo();
-  const entries = getTodayEntries();
-  const count = entries.length;
-
-  let listHTML;
-  if(count===0){
-    listHTML = `
-      <div class="hero-empty">
-        <i class="ti ti-bowl"></i>
-        아직 오늘 후보가 없어요.<br/>
-        팀원이 추천을 시작해보세요!
-      </div>`;
-  } else {
-    listHTML = '<div class="hero-list" id="heroList">' + entries.map((e,i) => {
-      const v = e.voters.size;
-      const my = e.voters.has(MY_VOTER_ID);
-      const rankCls = i===0 ? 'r0' : i<3 ? 'r'+i : 'rN';
-      return `
-        <div class="hero-row" data-entry-id="${e.id}" onclick="openModalForToday(${t.d})">
-          <div class="hero-rank ${rankCls}">${i+1}</div>
-          <div class="hero-name-wrap">
-            <div class="hero-name">${esc(e.name)}</div>
-            ${e.memo?'<div class="hero-memo">'+esc(e.memo)+'</div>':''}
-          </div>
-          <button class="hero-vote${my?' voted':''}" type="button"
-                  onclick="event.stopPropagation(); toggleVoteAsync(${e.id})"
-                  aria-pressed="${my}" aria-label="투표">
-            <i class="ti ti-thumb-up"></i><span class="vote-num">${v}</span>
-          </button>
-        </div>`;
-    }).join('') + '</div>';
-  }
-
-  el.innerHTML = `
-    <div class="hero-head">
-      <div class="hero-title-wrap">
-        <div class="hero-title">오늘 뭐 먹지?</div>
-        <div class="hero-sub">
-          <b>${t.y}년 ${MN[t.m]} ${t.d}일 (${t.dow})</b>
-          ${count>0 ? '<span class="hero-count-pill"><i class="ti ti-flame" style="font-size:11px"></i>후보 '+count+'</span>' : ''}
-        </div>
-      </div>
-      <div class="hero-actions">
-        ${count>=2 ? '<button class="dice-btn" id="diceBtn" type="button" onclick="rollDice()" aria-label="랜덤 추첨"><span class="dice">🎲</span>골라줘</button>' : ''}
-        <button class="add-btn-ghost" type="button" onclick="openModalForToday(${t.d})">
-          <i class="ti ti-plus"></i>후보 추가
-        </button>
-      </div>
-    </div>
-    ${listHTML}
-  `;
 }
 
 // 오늘 카드 헤더 — 애플 캘린더 위젯처럼: 액센트색 '10월 · 월요일', 아주 큰 날짜 숫자,
@@ -3605,20 +3301,10 @@ function renderSidebarHero(){
   `;
 }
 
-// Apply the current layout setting to the window-body element. Called on
-// boot and whenever the user changes the layout in the Tweaks panel.
-function applyLayout(layout){
-  const el = document.getElementById('windowBody');
-  if(el) el.setAttribute('data-layout', layout);
-  // Re-render whichever today widget is now visible
-  renderHero();
-  renderSidebarHero();
-}
-
-function openModalForToday(day){
+function openModalForToday(day, opts){
   const t = todayInfo();
   if(t.y !== curYear || t.m !== cur) sw(t.y, t.m);
-  openModal(day);
+  openModal(day, opts);
 }
 
 // 룰렛이 도는 동안 재클릭 무시 — disabled 로 잠그면 버튼이 2초 넘게 회색이 돼서
@@ -3633,37 +3319,30 @@ function rollDice(){
   if(_diceBusy) return;
   const entries = getTodayEntries();
   if(entries.length < 2) return;
-  const btn = document.getElementById('diceBtn') || document.getElementById('diceBtnSide');
-  if(btn) btn.classList.add('rolling');
-
-  // Stacked layout uses #heroList with .hero-row. Sidebar layout uses
-  // .today-leader (rank 1) + .today-list .today-row (rank 2+). Pick whichever
-  // exists in the current DOM so the animation works in both layouts.
-  let rows = [];
-  const heroList = document.getElementById('heroList');
-  if(heroList){
-    rows = Array.from(heroList.querySelectorAll('.hero-row'));
-  } else {
-    const sidebar = document.getElementById('todaySidebar');
-    if(sidebar){
-      const leader = sidebar.querySelector('.today-leader');
-      if(leader) rows.push(leader);
-      rows.push(...sidebar.querySelectorAll('.today-row'));
-    }
-  }
-  if(!rows.length){ if(btn) btn.classList.remove('rolling'); return; }
+  // 사이드바엔 1~4위만 보인다. 그 안에서만 뽑으면 5번째 후보부터는 절대 안 뽑히므로,
+  // 후보가 더 있으면 전부 나오는 오늘 모달을 열고 거기서 돌린다.
+  const sidebar = document.getElementById('todaySidebar');
+  const shown = sidebar
+    ? [sidebar.querySelector('.today-leader'), ...sidebar.querySelectorAll('.today-row')].filter(Boolean)
+    : [];
+  const inModal = shown.length < entries.length;
   _setDiceBusy(true);
 
-  // 무작위로 한 명 뽑기 — 투표 수와 무관하게 균등 확률 (rows.length로 고정해서
-  // 사이드바가 4개만 노출해도 표시된 후보 안에서만 뽑히도록).
-  const pickIdx = Math.floor(Math.random() * rows.length);
-
-  // Phase 1: 주사위가 굴러가는 도중(~450ms)에 룰렛 시작. Phase 2: 감속 룰렛이
-  // 정확히 당첨자에서 멈춘다. 룰렛이 끝날 때까지 _diceBusy 로 연타를 막는다.
+  const btn = document.getElementById('diceBtnSide');
+  if(btn) btn.classList.add('rolling');
   setTimeout(() => { if(btn) btn.classList.remove('rolling'); }, 900);
+  // 추첨을 보러 여는 거라 입력칸에 포커스를 주지 않는다 (모바일에서 키보드가 올라오지 않게)
+  if(inModal) openModalForToday(todayInfo().d, { focus: false });
+
+  // 주사위가 굴러가는 도중(모달이면 다 열린 뒤)에 룰렛 시작 → 감속하다 당첨자에서 정확히 멈춘다.
+  // 룰렛이 끝날 때까지 _diceBusy 로 연타를 막는다.
   setTimeout(() => {
+    const rows = inModal ? Array.from(document.querySelectorAll('#modalList .erow[data-eid]')) : shown;
+    if(rows.length < 2){ _setDiceBusy(false); return; }
+    // 무작위로 하나 — 투표 수와 무관하게 모든 후보가 같은 확률
+    const pickIdx = Math.floor(Math.random() * rows.length);
     _spotlightRoulette(rows, pickIdx, () => _setDiceBusy(false));
-  }, 450);
+  }, inModal ? 600 : 450);
 }
 
 // 후보 행들을 차례로 비추며 점점 느려지다가 rows[pickIdx] 에서 정확히 멈춘다.
@@ -3692,6 +3371,8 @@ function _spotlightRoulette(rows, pickIdx, onLand){
     const r = rows[k % n];
     void r.offsetWidth;
     r.classList.add('roulette-hit');
+    // 모달 목록은 3줄 남짓만 보이므로, 가려진 행을 비출 땐 보이게 굴린다 (이미 보이면 그대로)
+    if(r.closest('.elist')) r.scrollIntoView({ block: 'nearest' });
     k++;
     if(k >= steps){ setTimeout(land, 260); return; }
     const p = k / steps;
@@ -3718,7 +3399,7 @@ function openDinnerScheduler(){
   dscView = { y, m };
   dscSel = null;
   dscTitle = '';
-  openDay = null; openDinnerId = null; helpOpen = false;
+  openDay = null; openDinnerId = null;
   document.getElementById('mw').innerHTML = `
     <div class="backdrop" onclick="closeMod(event,this)">
       <div class="modal" onclick="event.stopPropagation()" role="dialog" aria-modal="true">
@@ -3748,9 +3429,8 @@ function openDinnerScheduler(){
         </div>
       </div>
     </div>`;
-  document.body.classList.add('modal-open');
   renderDscCal();
-  if(window._animateModalOpen) window._animateModalOpen();
+  _modalOpened();
 }
 
 function renderDscCal(){
@@ -3867,8 +3547,7 @@ async function onAddDinnerPlaceClick(dinnerId){
   const memo = (ds.memo||'').trim();
   if(!name){ _shakeInput('dpName'); return; }
   const d = findDinner(dinnerId); if(!d) return;
-  const norm = normalizeName(name);
-  if(d.places.some(p => normalizeName(p.name) === norm)){
+  if(hasSameName(d.places, name, null)){
     _shakeInput('dpName');
     showToast('이미 같은 장소가 있어요', 'err');
     return;
@@ -3890,49 +3569,16 @@ async function onAddDinnerPlaceClick(dinnerId){
 async function onDeleteDinnerPlaceClick(placeId){
   const ok = await showConfirm('이 장소 후보를 삭제할까요?', '삭제');
   if(!ok) return;
-  const els = document.querySelectorAll('[data-eid="d'+placeId+'"]');
-  els.forEach(el => el.classList.add('removing'));
-  if(els.length){ await new Promise(r => setTimeout(r, 240)); }
-  const f = findDinnerPlace(placeId);
-  let restore = null;
-  if(f){
-    restore = { dinner: f.dinner, idx: f.idx, place: f.place };
+  await _deleteRow('d'+placeId, 'dinner_places', placeId, () => {
+    const f = findDinnerPlace(placeId); if(!f) return null;
     f.dinner.places.splice(f.idx, 1);
-    rerender();
-  }
-  setSyncState('sv');
-  const { error } = await sb.from('dinner_places').delete().eq('id', placeId);
-  if(error){
-    if(restore) restore.dinner.places.splice(restore.idx, 0, restore.place);
-    rerender(); setSyncState('err'); showToast('삭제 실패: ' + error.message, 'err');
-    return;
-  }
-  setSyncState('ok');
+    return () => f.dinner.places.splice(f.idx, 0, f.place);
+  });
 }
 
-const _dinnerVotingIds = new Set();
-async function toggleDinnerVoteAsync(placeId){
-  if(_dinnerVotingIds.has(placeId)) return;
-  _dinnerVotingIds.add(placeId);
-  try{
-    const f = findDinnerPlace(placeId); if(!f) return;
-    const was = f.place.voters.has(MY_VOTER_ID);
-    if(was) f.place.voters.delete(MY_VOTER_ID); else f.place.voters.add(MY_VOTER_ID);
-    rerender();
-    _animateVote('d'+placeId, !was);
-    setSyncState('sv');
-    const { error } = was
-      ? await sb.from('dinner_votes').delete().eq('place_id', placeId).eq('voter_id', MY_VOTER_ID)
-      : await sb.from('dinner_votes').insert({ place_id: placeId, voter_id: MY_VOTER_ID });
-    if(error){
-      if(was) f.place.voters.add(MY_VOTER_ID); else f.place.voters.delete(MY_VOTER_ID);
-      rerender(); setSyncState('err'); showToast('투표 처리 실패', 'err');
-      return;
-    }
-    setSyncState('ok');
-  } finally {
-    _dinnerVotingIds.delete(placeId);
-  }
+function toggleDinnerVoteAsync(placeId){
+  const f = findDinnerPlace(placeId);
+  return _toggleVote(f && f.place, 'dinner_votes', { place_id: placeId, voter_id: MY_VOTER_ID }, 'd'+placeId);
 }
 
 /* ----- upcoming banner ----- */
@@ -3970,10 +3616,10 @@ function openDinnerModal(id){
   if(window.closeTweaks) closeTweaks();
   ds = { name:'', memo:'' };
   openDinnerId = id;
-  openDay = null; helpOpen = false;
+  openDay = null;
   document.getElementById('mw').innerHTML = buildDinnerModalShellHTML(d);
   refreshDinnerModalContent(d);
-  document.body.classList.add('modal-open');
+  _modalOpened();
   // preventScroll — 열리는 애니메이션 중(모달이 칸 쪽으로 옮겨져 있을 때) 포커스가 배경을 스크롤시키지 않게.
   // 대신 애니메이션이 끝나면 가려진 경우에만 보이게 스크롤 (_revealFocusedField)
   setTimeout(() => { const el = document.getElementById('dpName'); if(el) el.focus({ preventScroll: true }); }, 30);
@@ -3984,10 +3630,7 @@ function buildDinnerModalShellHTML(d){
   const dow = DOW_KR[new Date(d.year, d.month-1, d.day).getDay()];
   const dd = dinnerDday(d);
   const sub = d.year + '년 ' + MN[d.month] + ' ' + d.day + '일 (' + dow + ')' + (dd ? ' · ' + dd : ' · 지난 회식');
-  const names = getAllDinnerPlaceNames();
-  const dataListHTML = names.length
-    ? '<datalist id="dinnerPlaceNames">' + names.map(n => '<option value="'+esc(n)+'"></option>').join('') + '</datalist>'
-    : '';
+  const dataListHTML = datalistHTML('dinnerPlaceNames', getAllDinnerPlaceNames());
   return `
     <div class="backdrop" onclick="closeMod(event,this)">
       <div class="modal" data-dinner-id="${d.id}" onclick="event.stopPropagation()" role="dialog" aria-modal="true">
@@ -4123,7 +3766,6 @@ function jumpToToday(){
 /* ---------- render ---------- */
 function rerender(animate){
   renderTabs();
-  renderHero();
   renderSidebarHero();
   renderDinnerBanner();
   render(animate);
@@ -4188,7 +3830,6 @@ function sw(y, m){
   const prevInk = prevTab ? { l: prevTab.offsetLeft, t: prevTab.offsetTop, w: prevTab.offsetWidth } : null;
   curYear = y; cur = m;
   renderTabs();
-  renderHero();
   renderSidebarHero();
   render(false); // skip mount stagger; page flip handles entrance
   // 위쪽 카드(오늘의 점심 등)가 달에 따라 높이가 바뀌어 그리드가 움직이므로,
@@ -4442,6 +4083,7 @@ function render(animate){
   document.getElementById('notice').textContent =
     cnt>0 ? curYear+'년 '+MN[cur]+' · 총 '+cnt+'개 기록 · 팀원 모두와 실시간 공유 중'
           : '날짜 칸을 클릭해서 이번 달을 기록해보세요!';
+  if(cnt === 0 && window._startTips) window._startTips();
 
   if(animate){
     // 리플이 퍼지기 시작할 때 진원지(오늘 칸)에서 소나 링을 쏜다
@@ -4453,13 +4095,19 @@ function render(animate){
 }
 
 /* ---------- modal ---------- */
-function openModal(dn){
+// opts.focus === false 면 식당 이름 칸에 자동 포커스를 주지 않는다
+function openModal(dn, opts){
   ensureDay(curYear, cur, dn);
   es = { name: '', memo: '' };
   openDay = dn;
   openDinnerId = null;  // mw 를 점유하므로 회식 모달 상태는 해제
-  renderModal(dn);
+  renderModal(dn, !(opts && opts.focus === false));
+  _modalOpened();
+}
+// 모달(#mw)을 새로 띄운 직후 공통 처리 — 배경 스크롤 잠금 + 여는 애니메이션 (v2 polish 의 _animateModalOpen)
+function _modalOpened(){
   document.body.classList.add('modal-open');
+  if(window._animateModalOpen) window._animateModalOpen();
 }
 // 모달 안 입력칸에 포커스가 있는데 보이는 영역(키보드가 올라오면 줄어드는 visualViewport)
 // 밖에 있으면 모달 배경 안에서 보이게 스크롤한다. 이미 보이면 아무것도 안 한다.
@@ -4476,21 +4124,28 @@ function _revealFocusedField(){
 if(window.visualViewport){
   window.visualViewport.addEventListener('resize', () => setTimeout(_revealFocusedField, 60));
 }
+// 모달 닫기 — 배경을 눌렀을 때(ev.target === 배경)나 닫기 버튼·ESC 에서 호출.
+// 닫는 애니메이션은 v2 polish 의 _animateModalClose 가 맡고, 끝나면 finish() 로 정리한다.
 function closeMod(ev, ov){
   if(ev && ov && ev.target !== ov) return;
   const mw = document.getElementById('mw');
   const bd = mw.querySelector('.backdrop');
-  if(!bd){ mw.innerHTML=''; openDay=null; helpOpen=false; openDinnerId=null; document.body.classList.remove('modal-open'); return; }
-  bd.classList.add('closing');
-  setTimeout(() => {
+  const m  = mw.querySelector('.modal');
+  const finish = () => {
     // 닫는 사이 다른 모달이 mw 를 차지했다면 (빠른 연속 클릭) 건드리지 않는다
-    if(!mw.contains(bd)) return;
-    mw.innerHTML='';
-    openDay=null; helpOpen=false; openDinnerId=null;
+    if(bd && !mw.contains(bd)) return false;
+    mw.innerHTML = '';
+    openDay = null; openDinnerId = null;
     document.body.classList.remove('modal-open');
-  }, 220);
+    return true;
+  };
+  if(!bd || !m){ finish(); return; }
+  if(bd.classList.contains('closing')) return;   // 닫히는 중 연타 무시
+  bd.classList.add('closing');
+  if(window._animateModalClose) window._animateModalClose(m, finish);
+  else setTimeout(finish, 220);
 }
-function renderModal(dn){
+function renderModal(dn, focus = true){
   // If modal for the same day is already on screen, only refresh the list — no re-animation.
   const mw = document.getElementById('mw');
   const existing = mw.querySelector('.modal[data-day="' + dn + '"]');
@@ -4503,6 +4158,7 @@ function renderModal(dn){
   refreshModalContent(dn, mw.querySelector('.modal'));
   // preventScroll — 열리는 애니메이션 중(모달이 칸 쪽으로 옮겨져 있을 때) 포커스가 배경을 스크롤시키지 않게.
   // 대신 애니메이션이 끝나면 가려진 경우에만 보이게 스크롤 (_revealFocusedField)
+  if(!focus) return;
   setTimeout(()=>{ const el=document.getElementById('nName'); if(el) el.focus({ preventScroll: true }); }, 30);
   setTimeout(_revealFocusedField, 600);
 }
@@ -4512,10 +4168,7 @@ function buildModalShellHTML(dn){
   const dow=DOW_KR[new Date(curYear,cur-1,dn).getDay()];
   const dnr=getDinnerOn(curYear,cur,dn);
 
-  const names = getAllRestaurantNames();
-  const dataListHTML = names.length
-    ? '<datalist id="restNames">'+names.map(n=>'<option value="'+esc(n)+'"></option>').join('')+'</datalist>'
-    : '';
+  const dataListHTML = datalistHTML('restNames', getAllRestaurantNames());
 
   return `
     <div class="backdrop" onclick="closeMod(event,this)">
@@ -4696,26 +4349,24 @@ async function onSaveEditClick(entryId){
 }
 
 function openHelp(){
-  helpOpen=true;
   openDay=null; openDinnerId=null;  // mw 를 점유
-  document.body.classList.add('modal-open');
   document.getElementById('mw').innerHTML = `
     <div class="backdrop" onclick="closeMod(event,this)">
       <div class="modal" onclick="event.stopPropagation()" role="dialog" aria-modal="true">
         <div class="mhdr">
           <div>
             <div class="mtitle">사용 방법</div>
-            <div class="msub">팀 GTL 캘린더 · 2026</div>
+            <div class="msub">팀 GTL 캘린더 · ${YEAR_START}–${YEAR_END}</div>
           </div>
           <button class="mclose" type="button" onclick="closeMod()" aria-label="닫기"><i class="ti ti-x"></i></button>
         </div>
         <div style="display:flex;flex-direction:column;gap:14px;font-size:13px;color:var(--text-2);line-height:1.65;margin-bottom:1.2rem">
           ${[
-            ['ti-bowl','오늘 뭐 먹지?','오전엔 상단 카드에 오늘 후보가 표시됩니다. 🎲 골라줘 버튼으로 랜덤 추첨도 가능 (13시 이후 자동 숨김).'],
-            ['ti-beer','회식','설정(⚙️)에서 날짜를 잡으면 달력에 🍻 태그와 상단 배너가 생겨요. 배너를 눌러 장소 후보를 올리고 투표로 정합니다.'],
+            ['ti-bowl','오늘의 점심','왼쪽 카드에 오늘 후보와 1위가 정리돼요. 후보가 2개 이상이면 <b>메뉴 정해줘!</b> 로 오늘 후보 전부 중에서 무작위 추첨.'],
+            ['ti-beer','회식','설정(왼쪽 위 ●●●, 모바일은 오른쪽 위 ⚙️)에서 날짜를 잡으면 달력에 🍻 태그와 상단 배너가 생겨요. 배너를 눌러 장소 후보를 올리고 투표로 정합니다.'],
             ['ti-bolt','실시간 공유','다른 팀원의 추가·투표·삭제가 새로고침 없이 즉시 반영됩니다.'],
-            ['ti-calendar-event','오늘로 이동','상단의 오늘 버튼이나 \`홈\` 키로 이번 달 + 오늘 칸으로 점프합니다.'],
-            ['ti-moon','다크 모드','달/해 버튼으로 토글. 시스템 설정도 자동 감지합니다.'],
+            ['ti-calendar-event','달 이동 · 오늘로','← → 키, 달력 위 마우스 휠, 모바일은 좌우로 밀기. T 또는 Home 키(다른 달을 볼 땐 왼쪽 카드의 <b>오늘로 가기</b>)로 오늘로 돌아와요.'],
+            ['ti-moon','다크 모드','오른쪽 위 달/해 버튼이나 D 키로 토글. 처음엔 시스템 설정을 따라요.'],
             ['ti-thumb-up','투표','항목 옆 👍 버튼으로 투표. 한 사람당 항목별 1표.']
           ].map(r => {
             return '<div><div style="font-weight:800;color:var(--text);margin-bottom:2px;display:flex;align-items:center;gap:7px">'+
@@ -4728,12 +4379,13 @@ function openHelp(){
         </div>
       </div>
     </div>`;
+  _modalOpened();
 }
 
 function isTypingTarget(el){
   if(!el) return false;
-  const 태그=(el.tagName||'').toUpperCase();
-  return 태그==='INPUT'||태그==='TEXTAREA'||el.isContentEditable;
+  const tag=(el.tagName||'').toUpperCase();
+  return tag==='INPUT'||tag==='TEXTAREA'||el.isContentEditable;
 }
 function isModalOpen(){
   return !!(document.getElementById('mw').innerHTML.trim() || document.getElementById('cw').innerHTML.trim());
@@ -4748,6 +4400,8 @@ document.addEventListener('keydown',(e)=>{
   }
   if(isTypingTarget(document.activeElement)) return;
   if(isModalOpen()) return;
+  // 달력 칸이 방향키로 포커스를 옮겼으면(preventDefault) 달은 넘기지 않는다 — 칸 끝을 넘어갈 때만 넘어감
+  if(e.defaultPrevented) return;
   if(e.key==='ArrowLeft'){ e.preventDefault(); changeMonth(-1); }
   else if(e.key==='ArrowRight'){ e.preventDefault(); changeMonth(1); }
   else if(e.key==='Home' || e.key==='t' || e.key==='T'){ e.preventDefault(); jumpToToday(); }
@@ -4793,13 +4447,19 @@ document.addEventListener('touchend', ev => {
   changeMonth(dx < 0 ? 1 : -1);
 }, { passive: true });
 
-// Re-check hero visibility every minute (covers 13:00 boundary without reload)
-setInterval(() => { if(isTodaysMonth()){ renderHero(); renderSidebarHero(); } }, 60*1000);
+// 켜둔 채로 자정이 지나면 '오늘'이 바뀐다 — 달력의 오늘 칸·오늘 카드·회식 D-day 를 새 날짜로 다시 그린다
+let _todayKey = new Date().toDateString();
+setInterval(() => {
+  const k = new Date().toDateString();
+  if(k === _todayKey) return;
+  _todayKey = k;
+  rerender();
+}, 60*1000);
 
 /* =================================================================
-   v2 polish — runs inside the main script so it can reach D, curYear,
-   MY_VOTER_ID, rollDice, openModal, renderHero. All side-effects are
-   additive — nothing in the original render path was changed.
+   v2 polish — 연출 모음 (셀 미리보기 · 컨페티 · 소나 · 도장 · 모달 모핑 · 팁).
+   메인 코드는 window._animateModalOpen / _animateModalClose / _onDiceWinner /
+   _voteBurst / _sonar / _startTips 로만 부른다 — 이 블록이 없어도 앱은 동작한다.
    ================================================================= */
 (function v2Polish(){
   const REDUCE = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -5044,7 +4704,7 @@ setInterval(() => { if(isTodaysMonth()){ renderHero(); renderSidebarHero(); } },
      다시 쏙 들어간다. 콘텐츠를 찌그러뜨리는 scale 대신 clip-path 창을 칸 크기에서
      모달 크기로 넓히면서 위치만 옮긴다. 출발점이 없으면(키보드·설정 패널 등)
      살짝 기울어진 채 떠오르는 기본 진입. */
-  const ORIGIN_SEL = '.cell, .hero-row, .more-lnk, .add-btn-ghost, .today-leader, .today-row, .ti-add, .today-empty, .bd-wd, .dinner-banner, .dinner-tag, .help-btn, [data-twk-dinner-open]';
+  const ORIGIN_SEL = '.cell, .more-lnk, .today-leader, .today-row, .ti-add, .today-empty, .bd-wd, .dinner-banner, .dinner-tag, .help-btn, [data-twk-dinner-open]';
   let _lastOrigin = null;   // 마지막 클릭 { el, t } — 모달을 연 클릭인지 시간으로 판별
   let _openOrigin = null;   // 지금 열린 모달의 출발점 — 닫을 때 다시 찾아 들어갈 단서들
   document.addEventListener('click', e => {
@@ -5067,7 +4727,6 @@ setInterval(() => { if(isTodaysMonth()){ renderHero(); renderSidebarHero(); } },
       entryId: row ? row.getAttribute('data-entry-id') : null,
       cls: el.classList.contains('dinner-banner') ? '.dinner-banner'
          : el.classList.contains('ti-add') ? '.today-card .ti-add'
-         : el.classList.contains('add-btn-ghost') ? '.today-hero .add-btn-ghost'
          : el.classList.contains('help-btn') ? '.help-btn' : null,
     };
   }
@@ -5145,34 +4804,9 @@ setInterval(() => { if(isTodaysMonth()){ renderHero(); renderSidebarHero(); } },
     });
   }
 
-  const _openModalOrig = openModal;
-  openModal = function(dn){
-    _openModalOrig.apply(this, arguments);
-    animateModalOpen();
-  };
-  const _openDinnerModalOrig = openDinnerModal;
-  openDinnerModal = function(){
-    _openDinnerModalOrig.apply(this, arguments);
-    animateModalOpen();
-  };
-  const _openHelpOrig = openHelp;
-  openHelp = function(){
-    _openHelpOrig.apply(this, arguments);
-    animateModalOpen();
-  };
-
-  const _closeModOrig = closeMod;
-  closeMod = function(ev, ov){
-    // backdrop click guard
-    if(ev && ov && ev.target !== ov) return;
-    const mw = document.getElementById('mw');
-    if(!mw) return;
-    const bd = mw.querySelector('.backdrop');
-    const m  = mw.querySelector('.modal');
-    if(!bd || !m){ return _closeModOrig.apply(this, arguments); }
-    if(bd.classList.contains('closing')) return;   // 닫히는 중 연타 무시
-
-    bd.classList.add('closing');
+  // 닫는 애니메이션 — closeMod 가 부른다. 다 끝나면 finish() 로 #mw 를 비우게 하고,
+  // 실제로 닫혔으면(finish 가 true) 출발했던 칸이 살짝 받아주는 착지 반응을 보여준다.
+  function animateModalClose(m, finish){
     // Cancel any running animations on the modal (a still-running open
     // animation, or a leftover one from before) so this close starts from a
     // clean transform stack and isn't visually absorbed by them.
@@ -5182,6 +4816,7 @@ setInterval(() => { if(isTodaysMonth()){ renderHero(); renderSidebarHero(); } },
     // 출발한 칸이 아직 화면에 있으면 그 칸으로 빨려 들어가고, 없으면 기울며 가라앉는다
     const target = REDUCE ? null : resolveOrigin(_openOrigin);
     _openOrigin = null;
+    if(typeof m.animate !== 'function'){ setTimeout(finish, 220); return; }
     let anim, dur;
     if(target){
       dur = 400;
@@ -5198,18 +4833,11 @@ setInterval(() => { if(isTodaysMonth()){ renderHero(); renderSidebarHero(); } },
         { opacity: 0, transform: 'perspective(1000px) rotateX(12deg) translateY(26px) scale(.93)' }
       ], { duration: dur, easing: 'cubic-bezier(.55, 0, .75, .3)', fill: 'forwards' });
     }
-    // Only clear mw if this closing backdrop still owns it — if the user
-    // opened another modal (help/dinner/cell) within the close animation
-    // window, wiping innerHTML here would silently kill the new modal.
     let done = false;
-    const finalizeClose = () => {
+    const end = () => {
       if(done) return;
       done = true;
-      if(!mw.contains(bd)) return;
-      mw.innerHTML = '';
-      openDay = null; helpOpen = false; openDinnerId = null;
-      document.body.classList.remove('modal-open');
-      // 들어간 자리가 살짝 받아주는 착지 반응
+      if(!finish()) return;
       if(target && target.el.isConnected && typeof target.el.animate === 'function'){
         target.el.animate(
           [{ transform: 'scale(.96)' }, { transform: 'scale(1.025)', offset: .5 }, { transform: 'scale(1)' }],
@@ -5218,40 +4846,34 @@ setInterval(() => { if(isTodaysMonth()){ renderHero(); renderSidebarHero(); } },
         sonar(target.el, 'var(--accent)', 1);
       }
     };
-    anim.onfinish = finalizeClose;
+    anim.onfinish = end;
     // Safety net — if onfinish doesn't fire (e.g. WAA bug), clean up anyway.
-    setTimeout(finalizeClose, dur + 150);
-  };
+    setTimeout(end, dur + 150);
+  }
 
-  // Expose confetti (dinner dice) + modal-open animation (dinner scheduler).
-  window._fireConfetti = fireConfetti;
+  // 모달을 여는 쪽(_modalOpened)·닫는 쪽(closeMod)에서 부른다
   window._animateModalOpen = animateModalOpen;
+  window._animateModalClose = animateModalClose;
 
-  /* (6) Tip rotator — only when there are no records this month */
+  /* (6) 팁 로테이터 — 이번 달에 기록이 하나도 없으면 아래 안내 자리에서 팁을 돌린다.
+     render() 가 빈 달을 그릴 때마다 _startTips() 를 부르고, 기록이 생기면 다음 차례에 스스로 멈춘다. */
   const TIPS = [
-    '🎲 골라줘 버튼은 후보 중에서 무작위로 뽑아요',
+    '🎲 메뉴 정해줘! 는 오늘 후보 전부 중에서 무작위로 뽑아요',
     '⌨️ ← → 키로 달 이동 · T 또는 Home 으로 오늘로',
     '🌙 D 키로 다크 모드 바로 토글',
     '👥 한 사람당 항목별 1표 · 한 디바이스 = 1명',
     '📌 매달 마지막 금요일은 자동으로 공동휴무 표시',
   ];
   let _tipIdx = 0, _tipTimer = null;
-  function refreshTip(){
+  function showTip(){
     const n = document.getElementById('notice');
-    if(!n) return;
-    const dat = ((D[curYear]||{})[cur])||{};
-    const cnt = Object.values(dat).reduce((s,d)=>s+(d.entries||[]).length, 0);
-    if(cnt > 0){
-      // entries exist — stop rotating; render() already showed the count.
-      if(_tipTimer){ clearInterval(_tipTimer); _tipTimer = null; }
-      return;
-    }
-    n.innerHTML = '<span class="tip-rotator"><span class="tip" key="'+_tipIdx+'">'+TIPS[_tipIdx]+'</span></span>';
-    _tipIdx = (_tipIdx + 1) % TIPS.length;
-    if(!_tipTimer) _tipTimer = setInterval(refreshTip, 5500);
+    if(!n || hasDat(curYear, cur)){ clearInterval(_tipTimer); _tipTimer = null; return; }
+    n.innerHTML = '<span class="tip-rotator"><span class="tip">'+TIPS[_tipIdx]+'</span></span>';
   }
-  // First tick after boot; refreshTip itself (re)installs the interval as needed.
-  setTimeout(refreshTip, 600);
+  window._startTips = function(){
+    showTip();
+    if(!_tipTimer) _tipTimer = setInterval(() => { _tipIdx = (_tipIdx + 1) % TIPS.length; showTip(); }, 5500);
+  };
 
 })();
 
@@ -5262,14 +4884,15 @@ setInterval(() => { if(isTodaysMonth()){ renderHero(); renderSidebarHero(); } },
    just renders the live picker UI.
    ============================================================ */
 (function tweaksInit(){
-  // 미리보기 색: bg 배경 · sf 카드 · ac 액센트 · se 세컨더리 · hl 하이라이트 (CSS 팔레트와 같은 값)
+  // 색은 CSS 의 [data-palette="…"] 블록에만 있다 — 미리보기도 거기서 읽는다 (.pc-preview[data-palette])
+  // id 를 바꾸면 <head> 의 PAL_IDS · 예전 id 변환표도 같이 고칠 것
   const PALETTES = [
-    { id: 'buttercream', label: '살구', emoji: '🍑', desc: '따뜻한 기본',  bg: '#f6f1e9', sf: '#fffdf9', ac: '#d0603c', se: '#6d9a6b', hl: '#e0a23e' },
-    { id: 'mango',       label: '라떼', emoji: '☕', desc: '포근한 카페',  bg: '#ece1d3', sf: '#fbf6ef', ac: '#74442a', se: '#b2763e', hl: '#d39a4c' },
-    { id: 'forest',      label: '말차', emoji: '🍵', desc: '싱그러운 초록', bg: '#e8f0dc', sf: '#f9fcf3', ac: '#3a7a35', se: '#d2862f', hl: '#c8ad2e' },
-    { id: 'linen',       label: '베리', emoji: '🫐', desc: '새콤달콤 보라', bg: '#efe8f8', sf: '#fcfaff', ac: '#7f3dba', se: '#de4f8c', hl: '#ef9c43' },
-    { id: 'midnight',    label: '잉크', emoji: '🖋️', desc: '선명하고 차분', bg: '#e6ecf6', sf: '#f8fbff', ac: '#2552c8', se: '#ee7448', hl: '#f0b032' },
-    { id: 'sakura',      label: '로즈', emoji: '🌹', desc: '로맨틱 핑크',  bg: '#fbebef', sf: '#fffafb', ac: '#db3f6b', se: '#5f9450', hl: '#ef9a45' },
+    { id: 'apricot', label: '살구', emoji: '🍑', desc: '따뜻한 기본' },
+    { id: 'latte',   label: '라떼', emoji: '☕', desc: '포근한 카페' },
+    { id: 'matcha',  label: '말차', emoji: '🍵', desc: '싱그러운 초록' },
+    { id: 'berry',   label: '베리', emoji: '🫐', desc: '새콤달콤 보라' },
+    { id: 'ink',     label: '잉크', emoji: '🖋️', desc: '선명하고 차분' },
+    { id: 'rose',    label: '로즈', emoji: '🌹', desc: '로맨틱 핑크' },
   ];
   const FONTS = [
     { id: 'default', label: '기본 · 깔끔',   family: "'Pretendard Variable', Pretendard, sans-serif" },
@@ -5278,18 +4901,12 @@ setInterval(() => { if(isTodaysMonth()){ renderHero(); renderSidebarHero(); } },
     { id: 'round',   label: '동글 · 귀여움', family: "'Jua', sans-serif" },
     { id: 'poster',  label: '포스터 · 힘참', family: "'Black Han Sans', sans-serif" },
   ];
-  const LAYOUTS = [
-    { id: 'stacked', label: '상단 카드' },
-    { id: 'sidebar', label: '사이드바' },
-  ];
 
   function getState(){
     const root = document.documentElement;
-    const body = document.getElementById('windowBody');
     return {
-      palette: root.getAttribute('data-palette') || 'buttercream',
+      palette: root.getAttribute('data-palette') || 'apricot',
       font:    root.getAttribute('data-font')    || 'default',
-      layout:  (body && body.getAttribute('data-layout')) || 'sidebar',
       dark:    (root.getAttribute('data-theme') === 'dark'),
     };
   }
@@ -5303,11 +4920,6 @@ setInterval(() => { if(isTodaysMonth()){ renderHero(); renderSidebarHero(); } },
     if(part.font){
       root.setAttribute('data-font', part.font);
       try { localStorage.setItem('gtl-font', part.font); } catch(e){}
-    }
-    if(part.layout){
-      try { localStorage.setItem('gtl-layout', part.layout); } catch(e){}
-      root.setAttribute('data-layout', part.layout);
-      if(typeof applyLayout === 'function') applyLayout(part.layout);
     }
     if(typeof part.dark === 'boolean'){
       const t = part.dark ? 'dark' : 'light';
@@ -5365,23 +4977,14 @@ setInterval(() => { if(isTodaysMonth()){ renderHero(); renderSidebarHero(); } },
       '<div class="twk-body">'+
         dinnerSectionHTML()+
         '<div class="twk-section">'+
-          '<div class="twk-section-title">레이아웃</div>'+
-          '<div class="twk-radio">'+
-            LAYOUTS.map(function(l){
-              return '<button type="button" class="'+(s.layout===l.id?'on':'')+'" data-twk-layout="'+l.id+'">'+l.label+'</button>';
-            }).join('')+
-          '</div>'+
-        '</div>'+
-        '<div class="twk-section">'+
           '<div class="twk-section-title">컬러 팔레트</div>'+
           '<div class="palette-chips">'+
             PALETTES.map(function(p){
-              return '<button class="palette-chip'+(s.palette===p.id?' on':'')+'" type="button" data-twk-pal="'+p.id+'" title="'+p.label+' — '+p.desc+'"'+
-                ' style="--pc-bg:'+p.bg+';--pc-sf:'+p.sf+';--pc-ac:'+p.ac+'">'+
-                '<div class="pc-preview">'+
+              return '<button class="palette-chip'+(s.palette===p.id?' on':'')+'" type="button" data-twk-pal="'+p.id+'" title="'+p.label+' — '+p.desc+'">'+
+                '<div class="pc-preview" data-palette="'+p.id+'">'+
                   '<span class="pc-emoji">'+p.emoji+'</span>'+
-                  '<span class="pc-dot" style="background:'+p.se+'"></span>'+
-                  '<span class="pc-dot" style="background:'+p.hl+'"></span>'+
+                  '<span class="pc-dot"></span>'+
+                  '<span class="pc-dot hl"></span>'+
                   '<span class="pc-pill"></span>'+
                 '</div>'+
                 '<div class="pc-label">'+p.label+'</div>'+
@@ -5423,9 +5026,6 @@ setInterval(() => { if(isTodaysMonth()){ renderHero(); renderSidebarHero(); } },
     panel.querySelectorAll('[data-twk-font]').forEach(function(btn){
       btn.addEventListener('click', function(){ setState({ font: btn.getAttribute('data-twk-font') }); });
     });
-    panel.querySelectorAll('[data-twk-layout]').forEach(function(btn){
-      btn.addEventListener('click', function(){ setState({ layout: btn.getAttribute('data-twk-layout') }); });
-    });
     panel.querySelectorAll('[data-twk-act="dark"]').forEach(function(el){
       el.addEventListener('click', function(){ setState({ dark: !getState().dark }); });
       el.addEventListener('keydown', function(e){
@@ -5463,15 +5063,34 @@ setInterval(() => { if(isTodaysMonth()){ renderHero(); renderSidebarHero(); } },
     // from the DOM, breaking the `.closest('.twk-panel')` guard in outsideClick
     // and causing the panel to close on every selection.
     panel.addEventListener('click', function(e){ e.stopPropagation(); });
+    placePanel(panel);
     root.appendChild(panel);
     bindPanel();
-    const fab = document.getElementById('settingsFab');
-    if(fab) fab.style.display = 'none';
     // Outside click + ESC close (deferred so the opening click itself doesn't close)
     setTimeout(function(){
       document.addEventListener('click', outsideClick);
       document.addEventListener('keydown', escClose);
     }, 0);
+  }
+  // 패널은 누른 설정 버튼 바로 아래에서 펼친다 — 데스크톱은 왼쪽 위 ●●●, 모바일은 오른쪽 위 ⚙️
+  function placePanel(panel){
+    const btn = [document.querySelector('.title-grip'), document.querySelector('.settings-icon-btn')]
+      .find(function(b){ return b && b.getBoundingClientRect().width; });
+    if(!btn) return;   // 버튼이 안 보이면 CSS 기본 위치(왼쪽 위)
+    const r = btn.getBoundingClientRect();
+    const top = Math.round(r.bottom + 8);
+    panel.style.top = top + 'px';
+    panel.style.bottom = 'auto';
+    panel.style.maxHeight = 'min(640px, calc(100vh - ' + (top + 14) + 'px))';
+    if(r.left + r.width / 2 < innerWidth / 2){
+      panel.style.left = Math.max(14, Math.round(r.left)) + 'px';
+      panel.style.right = 'auto';
+      panel.style.transformOrigin = 'top left';
+    } else {
+      panel.style.left = 'auto';
+      panel.style.right = Math.max(14, Math.round(innerWidth - r.right)) + 'px';
+      panel.style.transformOrigin = 'top right';
+    }
   }
   function closeTweaks(){
     const root = document.getElementById('tweaksRoot');
@@ -5480,15 +5099,11 @@ setInterval(() => { if(isTodaysMonth()){ renderHero(); renderSidebarHero(); } },
     panel.classList.add('closing');
     document.removeEventListener('click', outsideClick);
     document.removeEventListener('keydown', escClose);
-    setTimeout(function(){
-      panel.remove();
-      const fab = document.getElementById('settingsFab');
-      if(fab) fab.style.display = '';
-    }, 180);
+    setTimeout(function(){ panel.remove(); }, 180);
   }
   function outsideClick(e){
     if(e.target.closest('.twk-panel')) return;
-    if(e.target.closest('#settingsFab') || e.target.closest('.title-grip')) return;
+    if(e.target.closest('.title-grip') || e.target.closest('.settings-icon-btn')) return;
     closeTweaks();
   }
   function escClose(e){
@@ -5505,13 +5120,13 @@ setInterval(() => { if(isTodaysMonth()){ renderHero(); renderSidebarHero(); } },
 (async () => {
   // theme: render theme icon based on the already-applied attribute
   applyTheme(document.documentElement.getAttribute('data-theme') || 'light');
-  // Apply the saved layout to .window-body (pre-paint stashed it on <html>)
-  const savedLayout = document.documentElement.getAttribute('data-layout') || 'sidebar';
-  applyLayout(savedLayout);
+
+  // 연도 범위 표시는 상수에서 — 지원 연도를 늘릴 땐 YEAR_START / YEAR_END 만 고치면 된다
+  document.getElementById('yearRange').textContent = YEAR_START + ' – ' + YEAR_END;
+  document.getElementById('pageTitle').textContent = '팀 GTL 월간 캘린더 ' + YEAR_START + '–' + YEAR_END;
 
   MY_VOTER_ID = getOrMakeVoterId();
   renderTabs();
-  renderHero();
   renderSidebarHero();
   render(true);
   updateNavButtons();
