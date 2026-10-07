@@ -1,12 +1,13 @@
 /**
- * 팀 GTL 캘린더 — Supabase 버전 서버
+ * 팀 GTL 캘린더 — 의존성 0개 Node 서버
  *
- * 역할이 대폭 줄었음:
- *   - index.html 정적 서빙
- *   - /config.js 로 Supabase URL/anon key 를 브라우저에 주입
+ *   GET /                  index.html (gzip + ETag)
+ *   GET /config.js         Supabase URL / anon key 를 브라우저에 주입
+ *   GET /api/holidays/YYYY 공휴일 (KASI 특일 정보 프록시, 하루 캐시)
+ *   GET /healthz           정적 ok — Render 헬스체크 · 웨이크업 핑 대상 (supabase/keepalive.sql)
+ *   GET /healthz/db        Supabase 1건 읽기 — 7일 무활동 일시중지 방지 (.github/workflows/supabase-keepalive.yml)
  *
  * 데이터 저장/실시간 동기화는 전부 브라우저 ↔ Supabase 가 직접 처리.
- * (따라서 data.json 도, /api/data 도 없음.)
  */
 
 const http   = require('http');
@@ -44,7 +45,8 @@ async function fetchHolidaysForYear(year) {
     + '&ServiceKey=' + encodeURIComponent(HOLIDAY_API_KEY)
     + '&_type=json&numOfRows=100';
 
-  const res = await fetch(url);
+  // KASI 가 응답을 안 주면 브라우저 첫 화면이 같이 기다리게 되므로 끊는다
+  const res = await fetch(url, { signal: AbortSignal.timeout(5000) });
   if (!res.ok) throw new Error('upstream HTTP ' + res.status);
   const json = await res.json();
 
@@ -67,8 +69,8 @@ async function fetchHolidaysForYear(year) {
 
 // Supabase 활동 핑 (프로젝트 자동 일시중지 방지)
 // Supabase Free 는 프로젝트가 7일간 아무 요청도 받지 못하면 자동으로 일시중지된다.
-// keepalive 워크플로가 치던 /healthz 는 정적 'ok' 라 Supabase 를 전혀 건드리지 않아서,
-// 팀이 한 주 쉬면(연휴·휴가) 그대로 pause 대상이 된다.
+// Render 웨이크업 핑(supabase/keepalive.sql)이 치는 /healthz 는 정적 'ok' 라 Supabase 를 전혀
+// 건드리지 않고, 주말·공휴일엔 그마저 쉬어서 팀이 한 주 쉬면(연휴·휴가) 그대로 pause 대상이 된다.
 // 여기서 entries 를 1건만 읽어 "활동"을 남긴다 — 쓰기가 아니라 데이터는 건드리지 않음.
 async function pingSupabase() {
   if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
