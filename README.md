@@ -70,8 +70,8 @@ node --env-file=.env server.js
 2. Region 은 `Northeast Asia (Seoul)`, Plan 은 Free
 3. 프로비저닝이 끝나면 **SQL Editor** → `supabase/schema.sql` 내용 전체 붙여넣고 Run
 4. Table Editor 에 `entries` `votes` `dinners` `dinner_places` `dinner_votes` 가 보이면 성공
-5. 같은 SQL Editor 에서 `supabase/keepalive.sql` 도 붙여넣고 Run — 평일 08~14시에
-   Render 가 잠들지 않게 10분마다 깨워주는 pg_cron 잡이 등록됩니다 (Render 배포 후 아무 때나 해도 됨)
+5. 같은 SQL Editor 에서 `supabase/keepalive.sql` 도 붙여넣고 Run — 공휴일 뺀 평일 08~14시에
+   Render 가 잠들지 않게 12분마다 깨워주는 pg_cron 잡이 등록됩니다 (Render 배포 후 아무 때나 해도 됨)
 
 이미 운영 중인 DB 에 새 테이블만 추가할 때도 `schema.sql` 을 통째로 다시 실행하면
 됩니다 — 전부 idempotent 라 기존 데이터는 건드리지 않습니다.
@@ -111,6 +111,7 @@ Project Settings → API 에서 두 값을 복사합니다.
 | `index.html` | 앱 전체. UI·로직·CSS 가 한 파일에 들어있는 SPA |
 | `server.js` | 정적 서빙 + `/config.js`(env 주입) + `/api/holidays/:year`(공휴일 프록시) + `/healthz`·`/healthz/db` |
 | `supabase/schema.sql` | 테이블 + RLS. SQL Editor 에 붙여넣기용, 재실행 안전 |
+| `supabase/keepalive.sql` | 평일 오전 Render 웨이크업 핑 (pg_cron). SQL Editor 에 붙여넣기용, 재실행 안전 |
 | `.env.example` | 로컬 개발용 환경 변수 템플릿 |
 
 <br/>
@@ -123,7 +124,7 @@ Project Settings → API 에서 두 값을 복사합니다.
 | "연결 오류 · 재시도" | 스키마를 적용했는지, anon key 를 썼는지 (`service_role` 아님). 표시줄 클릭 시 재연결 시도 |
 | 설정에 "회식 기능을 켜려면…" 안내 | `schema.sql` 재실행 필요 (dinners 테이블이 아직 없음) |
 | 추가는 되는데 남에게 안 보임 | Supabase → Database → Replication 에서 `supabase_realtime` publication 에 테이블들이 들어있는지 |
-| 첫 접속이 5~10초 느림 | Render Free 의 sleep. 평일 08~14시(KST)엔 Supabase pg_cron 이 10분마다 `/healthz` 를 핑해 깨워둠 — **SQL Editor 에서 `supabase/keepalive.sql` 을 한 번 실행해야 켜짐.** GitHub Actions(`.github/workflows/keepalive.yml`)도 백업으로 돌지만 GitHub 의 schedule 은 대부분 버려져서(실측 하루 2~3번) 단독으론 부족함. 다른 시간대까지 원하면 UptimeRobot 으로 `/healthz` 를 5분마다 핑 |
+| 첫 접속이 수십 초 느림 | Render Free 의 sleep. 공휴일 뺀 평일 08:07~14시(KST)엔 Supabase pg_cron 이 12분마다 `/healthz` 를 핑해 깨워둠 — **SQL Editor 에서 `supabase/keepalive.sql` 을 한 번 실행해야 켜짐.** 밤·주말·공휴일엔 일부러 잠들게 둬서 첫 접속만 느림. 그 시간대까지 원하면 UptimeRobot 으로 `/healthz` 를 5분마다 핑 |
 | Supabase 에서 "프로젝트 일시중지 예정" 메일 | Supabase Free 는 7일간 요청이 없으면 자동 일시중지. `.github/workflows/supabase-keepalive.yml` 이 **매일**(주말·공휴일 포함) `/healthz/db` 를 쳐서 활동을 남김. 메일이 계속 오면 Actions 탭에서 이 워크플로가 켜져 있는지 확인 |
 
 투표는 계정 없이 localStorage 의 익명 id 로 구분합니다. 시크릿 모드나 캐시 삭제 후엔
