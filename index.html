@@ -2797,23 +2797,33 @@ function initSupabase(){
 }
 
 // Supabase(PostgREST)는 요청 한 번에 최대 1000줄만 돌려주고, 넘는 건 에러 없이 잘라 버린다.
-// 기록·투표가 쌓여도 빠지지 않게 끝까지 나눠 받는다. build(opts) 는 매번 새 쿼리를 만들어야 한다
-// (supabase 쿼리 빌더는 한 번 await 하면 재사용할 수 없음). 순서가 고정돼야 페이지가 겹치지 않으므로
-// 호출부에서 기본키로 order 를 건다.
-async function fetchAllRows(build){
+// 기록·투표가 쌓여도 빠지지 않게 끝까지 나눠 받는다.
+//  - build(opts): 매번 새 쿼리를 만든다 (기본키 순 order 까지). supabase 쿼리는 한 번 await 하면 재사용 불가.
+//  - after(q, last): '마지막으로 받은 줄 다음부터' 조건을 붙인다 (키셋 방식). offset(몇 번째부터)으로
+//    넘기면 받는 사이 앞쪽 줄이 지워질 때 순서가 한 칸 당겨져서 엉뚱한 줄 하나가 빠진다.
+async function fetchAllRows(build, after){
   const PAGE = 1000;
   const first = await build({ count: 'exact' }).range(0, PAGE - 1);
   if(first.error) return first;
   const rows = (first.data || []).slice();
   const total = typeof first.count === 'number' ? first.count : rows.length;
   while(rows.length < total){
-    const { data, error } = await build().range(rows.length, rows.length + PAGE - 1);
+    const { data, error } = await after(build(), rows[rows.length - 1]).range(0, PAGE - 1);
     if(error) return { data: null, error };
     if(!data || !data.length) break;   // 그 사이 지워져서 total 보다 적을 수 있다
     rows.push(...data);
   }
   return { data: rows, error: null };
 }
+// 키셋 조건 — 기본키가 id 하나인 테이블
+function afterId(q, last){ return q.gt('id', last.id); }
+// 기본키가 (부모 id, voter_id) 인 투표 테이블 — (부모 id, voter_id) 순서에서 last 다음 줄부터
+function afterVote(parent){
+  return (q, last) => q.or(parent + '.gt.' + last[parent] +
+    ',and(' + parent + '.eq.' + last[parent] + ',voter_id.gt.' + pgQuote(last.voter_id) + ')');
+}
+// PostgREST 필터 값 따옴표 — voter_id 는 브라우저가 만든 문자열이라 , . ( ) " 가 섞여도 안전하게
+function pgQuote(v){ return '"' + String(v).replace(/\\/g, '\\\\').replace(/"/g, '\\"') + '"'; }
 
 async function loadAll(){
   setSyncState('load');
@@ -2822,8 +2832,8 @@ async function loadAll(){
   // entries + votes + dinners from supabase, holidays from server proxy — in parallel.
   // 투표는 entry id 목록으로 거르지 않고 전부 받는다 — id 가 수천 개면 URL 이 너무 길어져 요청이 깨진다.
   const [entriesRes, votesRes] = await Promise.all([
-    fetchAllRows(o => sb.from('entries').select('id,year,month,day,name,memo', o).in('year', YEARS).order('id')),
-    fetchAllRows(o => sb.from('votes').select('entry_id,voter_id', o).order('entry_id').order('voter_id')),
+    fetchAllRows(o => sb.from('entries').select('id,year,month,day,name,memo', o).in('year', YEARS).order('id'), afterId),
+    fetchAllRows(o => sb.from('votes').select('entry_id,voter_id', o).order('entry_id').order('voter_id'), afterVote('entry_id')),
     loadAllHolidays(),
     loadDinners()
   ]);
@@ -2862,9 +2872,9 @@ function subscribe(){
 async function loadDinners(){
   try{
     const [dRes, pRes, vRes] = await Promise.all([
-      fetchAllRows(o => sb.from('dinners').select('id,year,month,day,title', o).in('year', YEARS).order('id')),
-      fetchAllRows(o => sb.from('dinner_places').select('id,dinner_id,name,memo', o).order('id')),
-      fetchAllRows(o => sb.from('dinner_votes').select('place_id,voter_id', o).order('place_id').order('voter_id')),
+      fetchAllRows(o => sb.from('dinners').select('id,year,month,day,title', o).in('year', YEARS).order('id'), afterId),
+      fetchAllRows(o => sb.from('dinner_places').select('id,dinner_id,name,memo', o).order('id'), afterId),
+      fetchAllRows(o => sb.from('dinner_votes').select('place_id,voter_id', o).order('place_id').order('voter_id'), afterVote('place_id')),
     ]);
     for(const r of [dRes, pRes, vRes]) if(r.error) throw r.error;
     const list = dRes.data.map(r => ({
