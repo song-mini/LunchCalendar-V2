@@ -9,10 +9,14 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&family=Hahmlet:wght@400;500;600;700&family=Gaegu:wght@400;700&family=Jua&family=Black+Han+Sans&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&family=Nanum+Myeongjo:wght@400;700;800&family=Gaegu:wght@400;700&family=Jua&family=Black+Han+Sans&family=Do+Hyeon&display=swap" rel="stylesheet">
+<!-- 픽셀 폰트(갈무리) — 고른 사람만 쓰니 첫 화면을 막지 않게 늦게 붙인다 (글꼴 파일은 실제로 쓸 때만 받음) -->
+<link href="https://cdn.jsdelivr.net/npm/galmuri@2.40.3/dist/galmuri.css" rel="stylesheet" media="print" onload="this.media='all'">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.7.0/dist/tabler-icons.min.css">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  /* 버튼·입력칸은 브라우저 기본 글꼴을 쓰므로 고른 폰트를 따라가게 (아이콘 폰트 .ti 는 자기 글꼴을 지정함) */
+  button, input, textarea, select { font-family: inherit; }
 
   /* ============================================================
      Design tokens — Geist 기반 재설계.
@@ -95,6 +99,7 @@
      (예전엔 전부 크림 배경에 액센트만 달라 고르는 맛이 없었다)
      라떼 ☕ 갈색 단색조 카페 / 말차 🍵 싱그러운 초록 + 꿀 / 베리 🫐 보라 + 핑크
      잉크 🖋️ 차갑고 선명한 파랑 + 코랄 / 로즈 🌹 분홍 + 잎사귀 초록
+     다크 버전은 아래 'Dark theme' 에 팔레트마다 따로 있다.
      설정 패널 미리보기도 이 값을 그대로 읽는다 — 색은 여기만 고치면 된다.
      ============================================================ */
   [data-palette] {
@@ -109,160 +114,151 @@
       var(--bg);
   }
 
-  /* === 라떼 ☕ — 에스프레소 · 캐러멜 · 우유 거품 === */
+  /* === 라떼 ☕ — 캐러멜 크림 배경 · 에스프레소 · 캐러멜 === */
   [data-palette="latte"] {
-    --bg:#ece1d3;
-    --surface:#fbf6ef; --surface-solid:#fbf6ef;
-    --surface-2:#f2e8da; --surface-3:#e7d9c5;
-    --bd:rgba(58,34,16,.12); --bd-strong:rgba(58,34,16,.24);
-    --text:#2b1c11; --text-2:#5e4733; --text-3:#927a63;
-    --teal:#b2763e; --teal-2:#c38a52; --teal-3:#f4e4cf; --teal-glow: rgba(178,118,62,.22);
-    --coral:#74442a; --coral-2:#eedccb;
-    --accent: var(--coral); --accent-soft: var(--coral-2); --accent-bd:#d2b08f;
+    --bg:#e6d2ba; --surface:#f8eee1; --surface-solid:#f8eee1;
+    --surface-2:#efe0cd; --surface-3:#e5d0b7;
+    --bd:rgba(70,40,18,.14); --bd-strong:rgba(70,40,18,.28);
+    --text:#2e1c10; --text-2:#634831; --text-3:#8d725a;
+    --teal:#b8763a; --teal-2:#c98b4f; --teal-3:#f2dcc2; --teal-glow: color-mix(in oklch, var(--teal) 22%, transparent);
+    --coral:#6f3f22; --coral-2:#ead3bd;
+    --accent: var(--coral); --accent-soft: var(--coral-2); --accent-bd:#cda580;
     --secondary: var(--teal);
-    --highlight:#d39a4c; --highlight-soft:#f5e3c7;
-    --hol-bg:#f1dfcd; --hol-bd:#d7b392; --hol-t:#6e3d1f;
-    --off-bg:#f3e6cb; --off-bd:#d9bf87; --off-t:#6d4d15;
-    --wk-bg:#ebe0cf; --wk-bd:#d6c5ac;
-    --today-bg:#f4e6d1;
-    --sun:#93502a; --sat:#a06f3c;
+    --highlight:#d99a45; --highlight-soft:#f3ddbb;
+    --hol-bg:#eed5bf; --hol-bd:#d1a682; --hol-t:#6a3a1c;
+    --off-bg:#f0e0bf; --off-bd:#d4b577; --off-t:#6b4b14;
+    --wk-bg:#eadac4; --wk-bd:#d6bfa2;
+    --today-bg:#f6e0c4;
+    --sun:#9a4f25; --sat:#a87339;
   }
 
-  /* === 말차 🍵 — 진한 녹차 · 꿀 · 연두 === */
+  /* === 말차 🍵 — 연두 배경 · 진한 녹차 · 꿀 === */
   [data-palette="matcha"] {
-    --bg:#e8f0dc;
-    --surface:#f9fcf3; --surface-solid:#f9fcf3;
-    --surface-2:#edf4e1; --surface-3:#e0ead0;
-    --bd:rgba(24,48,14,.11); --bd-strong:rgba(24,48,14,.22);
-    --text:#17260f; --text-2:#45583a; --text-3:#78896b;
-    --teal:#d2862f; --teal-2:#de994a; --teal-3:#f8e5cb; --teal-glow: rgba(210,134,47,.2);
-    --coral:#3a7a35; --coral-2:#d9eccf;
-    --accent: var(--coral); --accent-soft: var(--coral-2); --accent-bd:#acd29c;
+    --bg:#d4e7c4; --surface:#f1f8e8; --surface-solid:#f1f8e8;
+    --surface-2:#e2efd3; --surface-3:#d2e4bf;
+    --bd:rgba(20,50,15,.13); --bd-strong:rgba(20,50,15,.26);
+    --text:#142a10; --text-2:#3d5732; --text-3:#66815a;
+    --teal:#b6720e; --teal-2:#c98822; --teal-3:#f6e2bf; --teal-glow: color-mix(in oklch, var(--teal) 22%, transparent);
+    --coral:#2c7a30; --coral-2:#cfe8c3;
+    --accent: var(--coral); --accent-soft: var(--coral-2); --accent-bd:#98cb85;
     --secondary: var(--teal);
-    --highlight:#c8ad2e; --highlight-soft:#f0eabf;
-    --hol-bg:#e1eed4; --hol-bd:#a9cb92; --hol-t:#2c5e22;
-    --off-bg:#f3ecc9; --off-bd:#d5c37c; --off-t:#665413;
-    --wk-bg:#e3ebd3; --wk-bd:#c8d6b2;
-    --today-bg:#f7e7cf;
-    --sun:#c0682a; --sat:#3a7a35;
+    --highlight:#bf9f1e; --highlight-soft:#ece3ae;
+    --hol-bg:#d7ebca; --hol-bd:#9cc885; --hol-t:#255c1c;
+    --off-bg:#efe7c0; --off-bd:#d1be6e; --off-t:#5f4f0e;
+    --wk-bg:#dae8c9; --wk-bd:#bed3a4;
+    --today-bg:#f5e2c2;
+    --sun:#b8600f; --sat:#2c7a30;
   }
 
-  /* === 베리 🫐 — 블루베리 보라 · 라즈베리 핑크 === */
+  /* === 베리 🫐 — 라벤더 배경 · 블루베리 보라 · 라즈베리 === */
   [data-palette="berry"] {
-    --bg:#efe8f8;
-    --surface:#fcfaff; --surface-solid:#fcfaff;
-    --surface-2:#f2ebfa; --surface-3:#e7dcf3;
-    --bd:rgba(46,22,74,.11); --bd-strong:rgba(46,22,74,.22);
-    --text:#25163a; --text-2:#574870; --text-3:#8a7ca0;
-    --teal:#de4f8c; --teal-2:#e76b9f; --teal-3:#fbe0ec; --teal-glow: rgba(222,79,140,.18);
-    --coral:#7f3dba; --coral-2:#ecdffa;
-    --accent: var(--coral); --accent-soft: var(--coral-2); --accent-bd:#cfb2ec;
+    --bg:#e5d8f5; --surface:#faf5ff; --surface-solid:#faf5ff;
+    --surface-2:#efe5fb; --surface-3:#e2d2f4;
+    --bd:rgba(50,20,80,.12); --bd-strong:rgba(50,20,80,.24);
+    --text:#26143d; --text-2:#574475; --text-3:#7f6d99;
+    --teal:#d63a80; --teal-2:#e25a97; --teal-3:#fad8e8; --teal-glow: color-mix(in oklch, var(--teal) 22%, transparent);
+    --coral:#7230bc; --coral-2:#e7d7fa;
+    --accent: var(--coral); --accent-soft: var(--coral-2); --accent-bd:#c5a2ec;
     --secondary: var(--teal);
-    --highlight:#ef9c43; --highlight-soft:#fbe8cf;
-    --hol-bg:#f3e3fb; --hol-bd:#d4b0ec; --hol-t:#6a2c9e;
-    --off-bg:#f9ead7; --off-bd:#e2c08d; --off-t:#7a4f17;
-    --wk-bg:#ebe3f5; --wk-bd:#d3c6e6;
-    --today-bg:#fbe2ed;
-    --sun:#de4f8c; --sat:#7f3dba;
+    --highlight:#ec9234; --highlight-soft:#fbe2c6;
+    --hol-bg:#efdaf8; --hol-bd:#cfa4ea; --hol-t:#64249a;
+    --off-bg:#f9e7d2; --off-bd:#e2bd86; --off-t:#784d16;
+    --wk-bg:#e9ddf6; --wk-bd:#cfbde7;
+    --today-bg:#fadbe9;
+    --sun:#d63a80; --sat:#7230bc;
   }
 
-  /* === 잉크 🖋️ — 선명한 잉크 블루 · 코랄 · 차가운 종이 === */
+  /* === 잉크 🖋️ — 하늘색 종이 · 잉크 블루 · 코랄 === */
   [data-palette="ink"] {
-    --bg:#e6ecf6;
-    --surface:#f8fbff; --surface-solid:#f8fbff;
-    --surface-2:#ecf1f9; --surface-3:#dfe7f3;
-    --bd:rgba(14,30,66,.11); --bd-strong:rgba(14,30,66,.22);
-    --text:#0f1a33; --text-2:#41506e; --text-3:#7584a2;
-    --teal:#ee7448; --teal-2:#f28a64; --teal-3:#fde4d9; --teal-glow: rgba(238,116,72,.18);
-    --coral:#2552c8; --coral-2:#dce5fb;
-    --accent: var(--coral); --accent-soft: var(--coral-2); --accent-bd:#aec3f0;
+    --bg:#d8e3f5; --surface:#f4f8ff; --surface-solid:#f4f8ff;
+    --surface-2:#e5ecfa; --surface-3:#d4dff2;
+    --bd:rgba(10,30,70,.12); --bd-strong:rgba(10,30,70,.24);
+    --text:#0d1a35; --text-2:#3a4c6f; --text-3:#677a9d;
+    --teal:#dc5524; --teal-2:#e8713f; --teal-3:#fcdccf; --teal-glow: color-mix(in oklch, var(--teal) 22%, transparent);
+    --coral:#1c4cd4; --coral-2:#d6e2fc;
+    --accent: var(--coral); --accent-soft: var(--coral-2); --accent-bd:#a5bdf1;
     --secondary: var(--teal);
-    --highlight:#f0b032; --highlight-soft:#fcefcd;
-    --hol-bg:#e1e9fb; --hol-bd:#aabfec; --hol-t:#1f48b0;
-    --off-bg:#fbefcf; --off-bd:#e2c57c; --off-t:#6e5310;
-    --wk-bg:#e3e9f3; --wk-bd:#c7d2e4;
-    --today-bg:#fde6dc;
-    --sun:#2552c8; --sat:#ee7448;
+    --highlight:#efa923; --highlight-soft:#fbe9c2;
+    --hol-bg:#dae5fb; --hol-bd:#a4baed; --hol-t:#1942ae;
+    --off-bg:#faedcb; --off-bd:#e0c277; --off-t:#6b500e;
+    --wk-bg:#dde6f5; --wk-bd:#c0cde5;
+    --today-bg:#fcdfd2;
+    --sun:#1c4cd4; --sat:#dc5524;
   }
 
-  /* === 로즈 🌹 — 장미 분홍 · 잎사귀 초록 · 복숭아 === */
+  /* === 로즈 🌹 — 분홍 배경 · 장미 · 잎사귀 초록 === */
   [data-palette="rose"] {
-    --bg:#fbebef;
-    --surface:#fffafb; --surface-solid:#fffafb;
-    --surface-2:#fcf0f3; --surface-3:#f6e0e6;
-    --bd:rgba(70,18,34,.10); --bd-strong:rgba(70,18,34,.21);
-    --text:#33141d; --text-2:#6a424f; --text-3:#a07683;
-    --teal:#5f9450; --teal-2:#73a763; --teal-3:#e3f0dc; --teal-glow: rgba(95,148,80,.18);
-    --coral:#db3f6b; --coral-2:#fddde6;
-    --accent: var(--coral); --accent-soft: var(--coral-2); --accent-bd:#f2b0c2;
+    --bg:#f8dbe5; --surface:#fff5f8; --surface-solid:#fff5f8;
+    --surface-2:#fbe7ee; --surface-3:#f4d5df;
+    --bd:rgba(80,15,35,.11); --bd-strong:rgba(80,15,35,.23);
+    --text:#3a111f; --text-2:#6e3d4d; --text-3:#9a6a7a;
+    --teal:#468f41; --teal-2:#5aa555; --teal-3:#dbeed6; --teal-glow: color-mix(in oklch, var(--teal) 22%, transparent);
+    --coral:#d22f66; --coral-2:#fcd6e3;
+    --accent: var(--coral); --accent-soft: var(--coral-2); --accent-bd:#efa5bd;
     --secondary: var(--teal);
-    --highlight:#ef9a45; --highlight-soft:#fce9d3;
-    --hol-bg:#fde0e8; --hol-bd:#efadbf; --hol-t:#b02a51;
-    --off-bg:#fbebd5; --off-bd:#e6c38c; --off-t:#7c5219;
-    --wk-bg:#f6e5ea; --wk-bd:#e5ccd4;
-    --today-bg:#e6f1df;
-    --sun:#db3f6b; --sat:#5f9450;
+    --highlight:#ee8e3c; --highlight-soft:#fce1cc;
+    --hol-bg:#fcd8e4; --hol-bd:#eca2b9; --hol-t:#a8224d;
+    --off-bg:#fae6d0; --off-bd:#e5bf86; --off-t:#7a5018;
+    --wk-bg:#f6dfe6; --wk-bd:#e7c5cf;
+    --today-bg:#dff0da;
+    --sun:#d22f66; --sat:#468f41;
   }
 
-  /* === 폰트 (설정에서 선택) — 서로 확실히 다른 5가지 성격.
-         전부 한글 글리프가 있는 폰트라 제목·날짜·요일 한글까지 실제로 바뀐다.
-         기본(Pretendard·Geist, 깔끔) / 명조(Hahmlet, 단정) / 손글씨(Gaegu, 다정)
-         / 동글(Jua, 둥글고 귀엽게) / 포스터(Black Han Sans, 굵고 힘있게).
-         본문(후보 이름·메모 등 작은 글자)은 가독성을 위해 기본 폰트 유지 === */
-  [data-font="hahmlet"] {
-    --ff-display: 'Hahmlet', 'Pretendard Variable', serif;
-    --ff-numeric: 'Hahmlet', 'Geist', 'Pretendard Variable', serif;
+  /* === 폰트 (설정에서 선택) — 6가지, 고르면 화면 전체 글자가 바뀐다 (제목·날짜·후보 이름·버튼까지).
+         기본(Pretendard·Geist, 깔끔) / 명조(나눔명조, 책처럼) / 손글씨(개구, 다정)
+         / 동글(주아, 귀엽게) / 포스터(검은고딕 + 도현, 굵고 힘있게) / 픽셀(갈무리, 8비트 게임).
+         --ff 본문 · --ff-display 제목·요일 · --ff-numeric 날짜 숫자 · --ff-mono 작은 라벨.
+         id 를 바꾸면 <head> 의 FONT_IDS · 예전 id 변환표, 설정 패널 FONTS 도 같이 고칠 것 === */
+  [data-font="serif"] {
+    --ff: 'Nanum Myeongjo', 'Pretendard Variable', serif;
+    --ff-display: 'Nanum Myeongjo', 'Pretendard Variable', serif;
+    --ff-numeric: 'Nanum Myeongjo', 'Pretendard Variable', serif;
+    --ff-mono: 'Nanum Myeongjo', serif;
   }
   [data-font="hand"] {
+    --ff: 'Gaegu', 'Pretendard Variable', cursive;
     --ff-display: 'Gaegu', 'Pretendard Variable', cursive;
-    --ff-numeric: 'Gaegu', 'Pretendard Variable', sans-serif;
+    --ff-numeric: 'Gaegu', 'Pretendard Variable', cursive;
+    --ff-mono: 'Gaegu', cursive;
   }
   [data-font="round"] {
+    --ff: 'Jua', 'Pretendard Variable', sans-serif;
     --ff-display: 'Jua', 'Pretendard Variable', sans-serif;
     --ff-numeric: 'Jua', 'Pretendard Variable', sans-serif;
+    --ff-mono: 'Jua', sans-serif;
   }
   [data-font="poster"] {
-    --ff-display: 'Black Han Sans', 'Pretendard Variable', sans-serif;
+    --ff: 'Do Hyeon', 'Pretendard Variable', sans-serif;
+    --ff-display: 'Black Han Sans', 'Do Hyeon', 'Pretendard Variable', sans-serif;
     --ff-numeric: 'Black Han Sans', 'Pretendard Variable', sans-serif;
+    --ff-mono: 'Do Hyeon', sans-serif;
+  }
+  [data-font="pixel"] {
+    --ff: 'Galmuri11', 'Pretendard Variable', monospace;
+    --ff-display: 'Galmuri11', 'Pretendard Variable', monospace;
+    --ff-numeric: 'Galmuri11', 'Pretendard Variable', monospace;
+    --ff-mono: 'GalmuriMono11', 'Galmuri11', monospace;
   }
   /* 굵기가 하나뿐인 폰트에 600 을 요청해도 가짜 볼드로 뭉개지지 않게 */
   [data-font="round"], [data-font="poster"] { font-synthesis: none; }
+  /* 검은고딕은 작은 요일 글자에선 뭉개진다 — 요일은 도현으로 */
+  [data-font="poster"] :is(.dow, .bd-wl, .ds-dow) { font-family: 'Do Hyeon', sans-serif; }
+  /* 개구는 같은 크기에서 글자가 작게 그려져서 살짝 키운다 (아이콘 폰트는 그대로) */
+  [data-font="hand"] body { font-size-adjust: 0.43; }
+  .ti { font-size-adjust: none; }
 
   /* ============================================================
-     Dark theme — Geist dark: 깊은 뉴트럴 배경 + 밝힌 액센트.
-     표면 위계는 배경 → 카드 → inset 순으로 아주 미세하게 상승.
+     Dark theme — 팔레트마다 배경·카드까지 물든 6가지 밤 (살구=숯, 라떼=에스프레소,
+     말차=숲, 베리=자두, 잉크=남색, 로즈=와인). 아래 공통 블록은 그림자·하이라이트 등
+     색 외의 값, 그 다음이 팔레트별 색. .pc-preview 셀렉터는 설정 패널 미리보기용
+     (다크 모드에선 미리보기도 다크 색으로 보인다).
      ============================================================ */
   [data-theme="dark"] {
-    --bg:#0c0b09;
-    --surface:#161411;
-    --surface-solid:#161411;
-    --surface-2:#1f1d19;
-    --surface-3:#282521;
-    --bd:rgba(255,245,230,.09);
-    --bd-strong:rgba(255,245,230,.17);
-    --text:#eeeae3;
-    --text-2:#a8a196;
-    --text-3:#736d63;
-
-    --teal:#86b57f;
     --teal-2: color-mix(in oklch, var(--teal) 84%, white);
-    --teal-3:rgba(134,181,127,.15);
     --teal-glow: color-mix(in oklch, var(--teal) 24%, transparent);
-    --coral:#e8815b;
-    --coral-2:rgba(232,129,91,.15);
     --accent: var(--coral);
     --accent-soft: var(--coral-2);
-    --accent-bd:rgba(232,129,91,.38);
     --secondary: var(--teal);
-    --highlight:#dba84c; --highlight-soft:rgba(219,168,76,.15);
-
-    --sat:#7fa3e8;
-    --sun:#e8815b;
-
-    --hol-bg:rgba(232,129,91,.10); --hol-bd:rgba(232,129,91,.30); --hol-t:#f09a78;
-    --off-bg:rgba(219,168,76,.09); --off-bd:rgba(219,168,76,.28); --off-t:#dfb264;
-    --wk-bg:rgba(127,163,232,.07); --wk-bd:rgba(127,163,232,.20);
-    --today-bg:rgba(134,181,127,.13);
 
     --shadow-card:  0 1px 2px rgba(0,0,0,.16);
     --shadow-pop:   0 1px 1px rgba(0,0,0,.02), 0 4px 8px -4px rgba(0,0,0,.04), 0 16px 24px -8px rgba(0,0,0,.06);
@@ -272,55 +268,111 @@
     --hi: rgba(255,245,230,.05);
 
     --page-bg:
-      radial-gradient(1800px 1100px at 50% -30%, color-mix(in oklch, var(--accent) 7%, transparent), transparent 72%),
+      radial-gradient(1300px 900px at -5% -15%, color-mix(in oklch, var(--accent) 14%, transparent), transparent 62%),
+      radial-gradient(1100px 800px at 105% 115%, color-mix(in oklch, var(--teal) 10%, transparent), transparent 60%),
       var(--bg);
   }
 
-  /* 다크에서도 팔레트 정체성 유지 — 액센트만 밝은 톤으로 재지정 */
-  [data-theme="dark"][data-palette="latte"] {
-    --bg:#0f0b08; --surface:#1a1410; --surface-solid:#1a1410; --surface-2:#241c16; --surface-3:#2e241c;
-    --coral:#d39b67; --teal:#e0a868; --highlight:#e3b26a;
-    --coral-2:rgba(211,155,103,.15); --teal-3:rgba(224,168,104,.14); --accent-bd:rgba(211,155,103,.4);
-    --highlight-soft:rgba(227,178,106,.14);
-    --sun:#d39b67; --sat:#e0a868;
-    --hol-bg:rgba(211,155,103,.11); --hol-bd:rgba(211,155,103,.32); --hol-t:#e0ae7f;
-    --today-bg:rgba(224,168,104,.13);
+  /* === 살구 (다크) — 따뜻한 숯색 · 코랄 · 세이지 === */
+  [data-theme="dark"],
+  [data-theme="dark"] .pc-preview[data-palette="apricot"] {
+    --bg:#131110; --surface:#1d1a17; --surface-solid:#1d1a17;
+    --surface-2:#27231f; --surface-3:#322d28;
+    --bd:rgba(255,240,225,.09); --bd-strong:rgba(255,240,225,.17);
+    --text:#efe9e1; --text-2:#aaa196; --text-3:#7a7268;
+    --teal:#8cbd84; --teal-3:rgba(140,189,132,.15);
+    --coral:#ef875e; --coral-2:rgba(239,135,94,.15); --accent-bd:rgba(239,135,94,.40);
+    --highlight:#e0ad4f; --highlight-soft:rgba(224,173,79,.15);
+    --hol-bg:rgba(239,135,94,.11); --hol-bd:rgba(239,135,94,.32); --hol-t:#f5a07e;
+    --off-bg:rgba(224,173,79,.10); --off-bd:rgba(224,173,79,.30); --off-t:#e6b868;
+    --wk-bg:rgba(130,165,235,.07); --wk-bd:rgba(130,165,235,.20);
+    --today-bg:rgba(140,189,132,.14);
+    --sun:#ef875e; --sat:#86a8ec;
   }
-  [data-theme="dark"][data-palette="matcha"] {
-    --bg:#090d08; --surface:#121810; --surface-solid:#121810; --surface-2:#1a2217; --surface-3:#222c1e;
-    --coral:#79c06c; --teal:#e8a656; --highlight:#d9c055;
-    --coral-2:rgba(121,192,108,.14); --teal-3:rgba(232,166,86,.14); --accent-bd:rgba(121,192,108,.4);
-    --highlight-soft:rgba(217,192,85,.14);
-    --sun:#e8a656; --sat:#79c06c;
-    --hol-bg:rgba(121,192,108,.11); --hol-bd:rgba(121,192,108,.32); --hol-t:#8fcf83;
-    --today-bg:rgba(232,166,86,.13);
+
+  /* === 라떼 (다크) — 에스프레소 갈색 · 우유 거품 · 캐러멜 === */
+  [data-theme="dark"][data-palette="latte"],
+  [data-theme="dark"] .pc-preview[data-palette="latte"] {
+    --bg:#1e1209; --surface:#2a1a0e; --surface-solid:#2a1a0e;
+    --surface-2:#372416; --surface-3:#452f1e;
+    --bd:rgba(255,220,180,.11); --bd-strong:rgba(255,220,180,.21);
+    --text:#f6e8d6; --text-2:#c8ad90; --text-3:#93795f;
+    --teal:#e6a25c; --teal-3:rgba(230,162,92,.17);
+    --coral:#ecc59a; --coral-2:rgba(236,197,154,.16); --accent-bd:rgba(236,197,154,.44);
+    --highlight:#f2b860; --highlight-soft:rgba(242,184,96,.15);
+    --hol-bg:rgba(236,160,110,.13); --hol-bd:rgba(236,160,110,.36); --hol-t:#f2b48a;
+    --off-bg:rgba(242,184,96,.11); --off-bd:rgba(242,184,96,.32); --off-t:#f1c57c;
+    --wk-bg:rgba(255,220,180,.05); --wk-bd:rgba(255,220,180,.15);
+    --today-bg:rgba(230,162,92,.17);
+    --sun:#eba57c; --sat:#d8b38a;
   }
-  [data-theme="dark"][data-palette="berry"] {
-    --bg:#0d0a12; --surface:#17121f; --surface-solid:#17121f; --surface-2:#201929; --surface-3:#292133;
-    --coral:#b789ec; --teal:#f07aac; --highlight:#f0ae62;
-    --coral-2:rgba(183,137,236,.15); --teal-3:rgba(240,122,172,.14); --accent-bd:rgba(183,137,236,.4);
-    --highlight-soft:rgba(240,174,98,.14);
-    --sun:#f07aac; --sat:#b789ec;
-    --hol-bg:rgba(183,137,236,.11); --hol-bd:rgba(183,137,236,.32); --hol-t:#c79ff1;
-    --today-bg:rgba(240,122,172,.13);
+
+  /* === 말차 (다크) — 깊은 숲 초록 · 말차 · 꿀 === */
+  [data-theme="dark"][data-palette="matcha"],
+  [data-theme="dark"] .pc-preview[data-palette="matcha"] {
+    --bg:#0b190f; --surface:#122517; --surface-solid:#122517;
+    --surface-2:#19321f; --surface-3:#223f28;
+    --bd:rgba(200,255,190,.10); --bd-strong:rgba(200,255,190,.19);
+    --text:#e4f4de; --text-2:#a7c49f; --text-3:#6f8c68;
+    --teal:#f2b347; --teal-3:rgba(242,179,71,.15);
+    --coral:#86d46e; --coral-2:rgba(134,212,110,.16); --accent-bd:rgba(134,212,110,.42);
+    --highlight:#d9c856; --highlight-soft:rgba(217,200,86,.14);
+    --hol-bg:rgba(134,212,110,.12); --hol-bd:rgba(134,212,110,.34); --hol-t:#9fe187;
+    --off-bg:rgba(217,200,86,.10); --off-bd:rgba(217,200,86,.30); --off-t:#e0d279;
+    --wk-bg:rgba(200,255,190,.045); --wk-bd:rgba(200,255,190,.13);
+    --today-bg:rgba(242,179,71,.14);
+    --sun:#f2b347; --sat:#86d46e;
   }
-  [data-theme="dark"][data-palette="ink"] {
-    --bg:#080b12; --surface:#10151f; --surface-solid:#10151f; --surface-2:#171e2b; --surface-3:#1f2736;
-    --coral:#6e9bff; --teal:#f5936c; --highlight:#f0bf55;
-    --coral-2:rgba(110,155,255,.15); --teal-3:rgba(245,147,108,.14); --accent-bd:rgba(110,155,255,.4);
-    --highlight-soft:rgba(240,191,85,.14);
-    --sun:#6e9bff; --sat:#f5936c;
-    --hol-bg:rgba(110,155,255,.11); --hol-bd:rgba(110,155,255,.32); --hol-t:#8bb0ff;
-    --today-bg:rgba(245,147,108,.13);
+
+  /* === 베리 (다크) — 자두빛 밤 · 블루베리 · 라즈베리 === */
+  [data-theme="dark"][data-palette="berry"],
+  [data-theme="dark"] .pc-preview[data-palette="berry"] {
+    --bg:#140b22; --surface:#1f132f; --surface-solid:#1f132f;
+    --surface-2:#2a1b3e; --surface-3:#35244c;
+    --bd:rgba(230,210,255,.10); --bd-strong:rgba(230,210,255,.20);
+    --text:#f2e9fe; --text-2:#bba8d6; --text-3:#86739f;
+    --teal:#ff78b4; --teal-3:rgba(255,120,180,.15);
+    --coral:#c29aff; --coral-2:rgba(194,154,255,.17); --accent-bd:rgba(194,154,255,.44);
+    --highlight:#ffb25a; --highlight-soft:rgba(255,178,90,.14);
+    --hol-bg:rgba(194,154,255,.13); --hol-bd:rgba(194,154,255,.36); --hol-t:#d4b5ff;
+    --off-bg:rgba(255,178,90,.10); --off-bd:rgba(255,178,90,.30); --off-t:#ffc683;
+    --wk-bg:rgba(230,210,255,.05); --wk-bd:rgba(230,210,255,.14);
+    --today-bg:rgba(255,120,180,.14);
+    --sun:#ff78b4; --sat:#c29aff;
   }
-  [data-theme="dark"][data-palette="rose"] {
-    --bg:#110a0c; --surface:#1c1215; --surface-solid:#1c1215; --surface-2:#26191d; --surface-3:#302026;
-    --coral:#f2708f; --teal:#8fc07a; --highlight:#f0aa62;
-    --coral-2:rgba(242,112,143,.15); --teal-3:rgba(143,192,122,.14); --accent-bd:rgba(242,112,143,.4);
-    --highlight-soft:rgba(240,170,98,.14);
-    --sun:#f2708f; --sat:#8fc07a;
-    --hol-bg:rgba(242,112,143,.11); --hol-bd:rgba(242,112,143,.32); --hol-t:#f68ba5;
-    --today-bg:rgba(143,192,122,.13);
+
+  /* === 잉크 (다크) — 한밤의 남색 · 밝은 파랑 · 코랄 === */
+  [data-theme="dark"][data-palette="ink"],
+  [data-theme="dark"] .pc-preview[data-palette="ink"] {
+    --bg:#07101f; --surface:#0e1b31; --surface-solid:#0e1b31;
+    --surface-2:#162742; --surface-3:#1f3254;
+    --bd:rgba(190,215,255,.10); --bd-strong:rgba(190,215,255,.20);
+    --text:#e6eeff; --text-2:#a5b5d4; --text-3:#6e7f9f;
+    --teal:#ff9464; --teal-3:rgba(255,148,100,.15);
+    --coral:#77a5ff; --coral-2:rgba(119,165,255,.17); --accent-bd:rgba(119,165,255,.44);
+    --highlight:#ffc84c; --highlight-soft:rgba(255,200,76,.14);
+    --hol-bg:rgba(119,165,255,.13); --hol-bd:rgba(119,165,255,.36); --hol-t:#9dbdff;
+    --off-bg:rgba(255,200,76,.10); --off-bd:rgba(255,200,76,.30); --off-t:#ffd475;
+    --wk-bg:rgba(190,215,255,.05); --wk-bd:rgba(190,215,255,.14);
+    --today-bg:rgba(255,148,100,.14);
+    --sun:#77a5ff; --sat:#ff9464;
+  }
+
+  /* === 로즈 (다크) — 와인빛 밤 · 장미 · 잎사귀 === */
+  [data-theme="dark"][data-palette="rose"],
+  [data-theme="dark"] .pc-preview[data-palette="rose"] {
+    --bg:#1c0a13; --surface:#29101d; --surface-solid:#29101d;
+    --surface-2:#37192a; --surface-3:#452336;
+    --bd:rgba(255,200,220,.10); --bd-strong:rgba(255,200,220,.20);
+    --text:#fce8ef; --text-2:#d3a6b7; --text-3:#9c7183;
+    --teal:#8fd486; --teal-3:rgba(143,212,134,.14);
+    --coral:#ff79a2; --coral-2:rgba(255,121,162,.17); --accent-bd:rgba(255,121,162,.44);
+    --highlight:#ffaa69; --highlight-soft:rgba(255,170,105,.14);
+    --hol-bg:rgba(255,121,162,.13); --hol-bd:rgba(255,121,162,.36); --hol-t:#ff9cbb;
+    --off-bg:rgba(255,170,105,.10); --off-bd:rgba(255,170,105,.30); --off-t:#ffbc89;
+    --wk-bg:rgba(255,200,220,.05); --wk-bd:rgba(255,200,220,.14);
+    --today-bg:rgba(143,212,134,.13);
+    --sun:#ff79a2; --sat:#8fd486;
   }
 
   html, body { height: 100%; }
@@ -900,10 +952,25 @@
     to   { opacity: 0; transform: translateY(-4px) scale(.98); }
   }
   .twk-head {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 14px 16px 10px;
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    padding: 10px 10px 10px 16px;
     border-bottom: 1px solid var(--bd);
   }
+  .twk-head-actions { display: flex; align-items: center; gap: 4px; }
+  /* 다크 모드 스위치 — 헤더에 작게 (따로 한 칸 차지하던 '모드' 섹션 대신) */
+  .twk-mode {
+    display: inline-flex; align-items: center; gap: 6px;
+    height: 28px; padding: 0 7px 0 9px;
+    border-radius: 9999px; border: 1px solid var(--bd);
+    background: var(--surface-2); color: var(--text-2);
+    font-family: var(--ff); font-size: 12px; font-weight: 500;
+    cursor: pointer;
+    transition: border-color var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+  }
+  .twk-mode:hover { border-color: var(--bd-strong); color: var(--text); }
+  .twk-mode .ti { font-size: 14px; }
+  .twk-mode.on .twk-switch { background: var(--accent); }
+  .twk-mode.on .twk-switch::after { transform: translateX(12px); }
   .twk-title {
     font-family: var(--ff-display);
     font-size: 14px; font-weight: 600; letter-spacing: -.28px;
@@ -919,33 +986,23 @@
   }
   .twk-close:hover { background: var(--surface-2); color: var(--text); }
   .twk-body {
-    padding: 12px 16px 16px;
+    padding: 10px 16px 14px;
     overflow-y: auto;
     overscroll-behavior: contain;
+    scrollbar-width: none;   /* 넘칠 일은 거의 없지만, 아주 낮은 화면에서도 스크롤바는 안 보이게 */
   }
-  .twk-section { margin-bottom: 16px; }
+  .twk-body::-webkit-scrollbar { display: none; }
+  .twk-section { margin-bottom: 12px; }
+  .twk-section:last-child { margin-bottom: 0; }
   .twk-section-title {
     font-family: var(--ff);
     font-size: 11.5px; letter-spacing: 0;
     color: var(--text-3); font-weight: 600;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
   }
-  .twk-toggle {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 10px 12px;
-    background: var(--surface-2); border: 1px solid var(--bd);
-    border-radius: var(--r-sm);
-    cursor: pointer;
-    transition: all var(--dur-fast) var(--ease-out);
-  }
-  .twk-toggle:hover { border-color: var(--bd-strong); }
-  .twk-toggle .label {
-    font-size: 13px; font-weight: 500; color: var(--text);
-    display: flex; align-items: center; gap: 8px;
-  }
-  .twk-toggle .label .ti { font-size: 16px; color: var(--text-2); }
   .twk-switch {
-    width: 36px; height: 20px;
+    display: inline-block; flex-shrink: 0;
+    width: 28px; height: 16px;
     background: var(--bd-strong);
     border-radius: 9999px;
     position: relative;
@@ -956,14 +1013,12 @@
     content: '';
     position: absolute;
     top: 2px; left: 2px;
-    width: 16px; height: 16px;
+    width: 12px; height: 12px;
     background: white;
     border-radius: 50%;
     box-shadow: 0 1px 3px rgba(0,0,0,.2);
     transition: transform var(--dur) var(--ease-out);
   }
-  .twk-toggle.on .twk-switch { background: var(--accent); }
-  .twk-toggle.on .twk-switch::after { transform: translateX(16px); }
 
   /* Palette chips */
   .palette-chips {
@@ -971,7 +1026,7 @@
   }
   .palette-chip {
     position: relative;
-    padding: 7px;
+    padding: 6px;
     background: var(--surface-solid);
     border: 1px solid var(--bd);
     border-radius: var(--r-sm);
@@ -986,27 +1041,27 @@
      .pc-preview 에 data-palette 가 붙어 있어서 아래 var() 는 그 팔레트의 (라이트) 색이 된다 */
   .palette-chip .pc-preview {
     position: relative;
-    height: 40px; margin-bottom: 6px;
+    height: 30px; margin-bottom: 5px;
     border-radius: 6px;
     background: linear-gradient(140deg, var(--bg) 0 55%, var(--surface) 55%);
     box-shadow: inset 0 0 0 1px rgba(0,0,0,.07);
     display: flex; align-items: flex-end; gap: 4px;
-    padding: 6px;
+    padding: 5px;
     overflow: hidden;
   }
   .palette-chip .pc-emoji {
-    position: absolute; top: 4px; left: 6px;
-    font-size: 15px; line-height: 1;
+    position: absolute; top: 3px; left: 5px;
+    font-size: 14px; line-height: 1;
     transition: transform .3s var(--ease-spring);
   }
   .palette-chip:hover .pc-emoji, .palette-chip.on .pc-emoji { transform: rotate(-12deg) scale(1.15); }
   .palette-chip .pc-pill {
     margin-left: auto;
-    width: 26px; height: 9px; border-radius: 9999px;
+    width: 24px; height: 8px; border-radius: 9999px;
     background: var(--accent);
     box-shadow: 0 2px 4px -1px color-mix(in oklch, var(--accent) 60%, transparent);
   }
-  .palette-chip .pc-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--teal); }
+  .palette-chip .pc-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--teal); }
   .palette-chip .pc-dot.hl { background: var(--highlight); }
   .palette-chip .pc-label {
     font-size: 11.5px; font-weight: 600; color: var(--text-2);
@@ -1023,7 +1078,7 @@
   }
   .font-chip {
     position: relative;
-    padding: 9px 6px 7px;
+    padding: 7px 4px 6px;
     background: var(--surface-solid);
     border: 1px solid var(--bd);
     border-radius: var(--r-sm);
@@ -1035,7 +1090,7 @@
   .font-chip.on { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); background: var(--accent-soft); }
   .font-chip .fc-sample {
     display: block;
-    font-size: 19px; line-height: 1.15; letter-spacing: -.3px;
+    font-size: 18px; line-height: 1.15; letter-spacing: -.3px;
     font-synthesis: none;
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
@@ -2265,10 +2320,12 @@
     if(PAL_IDS.indexOf(pal) < 0) pal = 'apricot';
     localStorage.setItem('gtl-palette', pal);
     document.documentElement.setAttribute('data-palette', pal);
+    // 폰트 id — 없어진 폰트는 가장 비슷한 것으로 (함렛·바탕·송명 = 명조, 돋움 = 동글)
+    var FONT_IDS = ['default', 'serif', 'hand', 'round', 'poster', 'pixel'];
     var fnt = localStorage.getItem('gtl-font') || 'default';
-    // 없어진 폰트 → 가장 비슷한 새 폰트로 (바탕·송명 = 명조, 돋움 = 동글)
-    fnt = ({ batang: 'hahmlet', song: 'hahmlet', dodum: 'round' })[fnt] || fnt;
-    if(['default', 'hahmlet', 'hand', 'round', 'poster'].indexOf(fnt) < 0) fnt = 'default';
+    fnt = ({ hahmlet: 'serif', batang: 'serif', song: 'serif', dodum: 'round' })[fnt] || fnt;
+    if(FONT_IDS.indexOf(fnt) < 0) fnt = 'default';
+    localStorage.setItem('gtl-font', fnt);
     document.documentElement.setAttribute('data-font', fnt);
     // 예전 '상단 카드' 레이아웃 설정은 없어졌다 — 남은 저장값 정리
     localStorage.removeItem('gtl-layout');
@@ -4906,10 +4963,11 @@ setInterval(() => {
   ];
   const FONTS = [
     { id: 'default', label: '기본 · 깔끔',   family: "'Pretendard Variable', Pretendard, sans-serif" },
-    { id: 'hahmlet', label: '명조 · 단정',   family: "'Hahmlet', serif" },
-    { id: 'hand',    label: '손글씨 · 다정', family: "'Gaegu', cursive", size: 23 },
+    { id: 'serif',   label: '명조 · 책처럼', family: "'Nanum Myeongjo', serif", weight: 800 },
+    { id: 'hand',    label: '손글씨 · 다정', family: "'Gaegu', cursive", size: 23, weight: 700 },
     { id: 'round',   label: '동글 · 귀여움', family: "'Jua', sans-serif" },
     { id: 'poster',  label: '포스터 · 힘참', family: "'Black Han Sans', sans-serif" },
+    { id: 'pixel',   label: '픽셀 · 레트로', family: "'Galmuri11', monospace", size: 17, weight: 700 },
   ];
 
   function getState(){
@@ -4982,7 +5040,12 @@ setInterval(() => {
     return ''+
       '<div class="twk-head">'+
         '<div class="twk-title"><i class="ti ti-settings"></i>설정</div>'+
-        '<button class="twk-close" type="button" data-twk-act="close" aria-label="닫기"><i class="ti ti-x" style="font-size:16px"></i></button>'+
+        '<div class="twk-head-actions">'+
+          '<button class="twk-mode'+(s.dark?' on':'')+'" type="button" data-twk-act="dark" aria-pressed="'+s.dark+'" aria-label="다크 모드">'+
+            '<i class="ti '+(s.dark?'ti-moon':'ti-sun')+'"></i>다크<span class="twk-switch"></span>'+
+          '</button>'+
+          '<button class="twk-close" type="button" data-twk-act="close" aria-label="닫기"><i class="ti ti-x" style="font-size:16px"></i></button>'+
+        '</div>'+
       '</div>'+
       '<div class="twk-body">'+
         dinnerSectionHTML()+
@@ -5009,17 +5072,10 @@ setInterval(() => {
           '<div class="font-chips">'+
             FONTS.map(function(f){
               return '<button type="button" class="font-chip'+(s.font===f.id?' on':'')+'" data-twk-font="'+f.id+'">'+
-                '<span class="fc-sample" style="font-family:'+f.family+(f.size ? ';font-size:'+f.size+'px' : '')+'">점심 12</span>'+
+                '<span class="fc-sample" style="font-family:'+f.family+(f.size ? ';font-size:'+f.size+'px' : '')+(f.weight ? ';font-weight:'+f.weight : '')+'">점심 12</span>'+
                 '<span class="fc-label">'+f.label+'</span>'+
               '</button>';
             }).join('')+
-          '</div>'+
-        '</div>'+
-        '<div class="twk-section">'+
-          '<div class="twk-section-title">모드</div>'+
-          '<div class="twk-toggle'+(s.dark?' on':'')+'" data-twk-act="dark" role="button" tabindex="0">'+
-            '<div class="label"><i class="ti '+(s.dark?'ti-moon':'ti-sun')+'"></i>다크 모드</div>'+
-            '<div class="twk-switch"></div>'+
           '</div>'+
         '</div>'+
       '</div>';
@@ -5038,9 +5094,6 @@ setInterval(() => {
     });
     panel.querySelectorAll('[data-twk-act="dark"]').forEach(function(el){
       el.addEventListener('click', function(){ setState({ dark: !getState().dark }); });
-      el.addEventListener('keydown', function(e){
-        if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); setState({ dark: !getState().dark }); }
-      });
     });
     panel.querySelectorAll('[data-twk-act="close"]').forEach(function(el){
       el.addEventListener('click', closeTweaks);
