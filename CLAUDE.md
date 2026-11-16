@@ -10,8 +10,9 @@
 
 ## 리포 구조
 
-- `index.html` — 단일 파일 SPA. 모든 UI/로직/CSS 인라인.
-- `server.js` — 의존성 0개 Node HTTP 서버. `index.html` 정적 서빙 + `/config.js` (Supabase env 주입) + `/api/holidays/:year` (KASI 공휴일 프록시) + `/healthz` (정적 ok, Render 헬스체크) + `/healthz/db` (entries 1건 read — Supabase 활동 핑용).
+- `index.html` — 단일 파일 SPA. UI/로직/CSS 인라인. 아이콘은 Tabler SVG 를 CSS 마스크(`.ti-이름`)로 내장 — 웹폰트 CDN 없음.
+- `polish.js` — 연출 모음(셀 미리보기 · 컨페티 · 모달 모핑 · 팁). `index.html` 이 메인 스크립트와 부팅 스크립트 사이에서 읽는다. 없어도 앱은 동작.
+- `server.js` — 의존성 0개 Node HTTP 서버. `index.html` · `/polish.js` 정적 서빙 + `/config.js` (Supabase env 주입) + `/api/holidays/:year` (KASI 공휴일 프록시) + `/healthz` (정적 ok, Render 헬스체크) + `/healthz/db` (entries 1건 read — Supabase 활동 핑용).
 - `supabase/schema.sql` — Supabase Postgres 스키마 (entries / votes + 회식용 dinners / dinner_places / dinner_votes 테이블 + RLS). 테이블이 추가되면 사용자가 Supabase SQL Editor에서 재실행해야 반영됨 (전체 idempotent).
 - `.env.example` — 로컬 개발용 환경변수 템플릿.
 - `supabase/keepalive.sql` — **Render 웨이크업 핑 (유일한 스케줄러).** Supabase pg_cron + pg_net 으로 공휴일 뺀 평일 08:07~13:55(KST) 12분 간격 `/healthz` GET → 하루 30번 (Render 15분 sleep 기준에 3분 여유). 밤·주말·공휴일은 일부러 잠들게 둠 (사용자 합의). 마지막 금요일·한국 공휴일은 함수에서 건너뜀 — 공휴일은 `http` 확장으로 Nager.Date 를 받아 `gtl_holidays` 테이블에 캐시(30일마다 갱신, 실패 시 기존 캐시 → 없으면 그냥 핑), 임시공휴일은 수동 insert. 사용자가 SQL Editor 에서 한 번 실행해야 적용 (재실행 안전). 배포 URL 이 바뀌면 파일 안 URL 수정 후 재실행. (예전 GitHub Actions keepalive 루프는 schedule 이 best-effort 라 하루 2~3번만 돌고 핑만 중복돼서 제거함)
