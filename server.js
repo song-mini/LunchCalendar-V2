@@ -2,6 +2,7 @@
  * 팀 GTL 캘린더 — 의존성 0개 Node 서버
  *
  *   GET /                  index.html (gzip + ETag)
+ *   GET /polish.js         연출 스크립트 (gzip + ETag)
  *   GET /config.js         Supabase URL / anon key 를 브라우저에 주입
  *   GET /api/holidays/YYYY 공휴일 (KASI 특일 정보 프록시, 하루 캐시)
  *   GET /healthz           정적 ok — Render 헬스체크 · 웨이크업 핑 대상 (supabase/keepalive.sql)
@@ -118,6 +119,45 @@ function getHtmlCache() {
   return htmlCache;
 }
 
+// polish.js (연출 스크립트) — index.html 과 같은 방식으로 캐시
+let polishCache = null; // { mtimeMs, raw, gz, etag }
+
+function getPolishCache() {
+  const jsPath = path.join(__dirname, 'polish.js');
+  const stat = fs.statSync(jsPath);
+  if (!polishCache || polishCache.mtimeMs !== stat.mtimeMs) {
+    const raw = fs.readFileSync(jsPath);
+    polishCache = {
+      mtimeMs: stat.mtimeMs,
+      raw,
+      gz: zlib.gzipSync(raw, { level: 9 }),
+      etag: 'W/"' + crypto.createHash('sha1').update(raw).digest('base64url').slice(0, 16) + '"'
+    };
+  }
+  return polishCache;
+}
+
+// 캐시된 본문을 no-cache + ETag 로 응답 (배포본이 그대로면 304)
+function sendCached(req, res, cache, contentType) {
+  if (req.headers['if-none-match'] === cache.etag) {
+    res.writeHead(304, { 'ETag': cache.etag, 'Vary': 'Accept-Encoding' });
+    res.end();
+    return;
+  }
+  const gzipOk = /\bgzip\b/i.test(req.headers['accept-encoding'] || '');
+  const body = gzipOk ? cache.gz : cache.raw;
+  const headers = {
+    'Content-Type': contentType,
+    'Cache-Control': 'no-cache, must-revalidate',
+    'ETag': cache.etag,
+    'Vary': 'Accept-Encoding',
+    'Content-Length': body.length
+  };
+  if (gzipOk) headers['Content-Encoding'] = 'gzip';
+  res.writeHead(200, headers);
+  res.end(body);
+}
+
 function getLocalIP() {
   const { networkInterfaces } = require('os');
   for (const iface of Object.values(networkInterfaces())) {
@@ -146,24 +186,16 @@ const server = http.createServer((req, res) => {
     try { cache = getHtmlCache(); }
     catch (e) { res.writeHead(404); res.end('index.html not found'); return; }
 
-    if (req.headers['if-none-match'] === cache.etag) {
-      res.writeHead(304, { 'ETag': cache.etag, 'Vary': 'Accept-Encoding' });
-      res.end();
-      return;
-    }
+    sendCached(req, res, cache, 'text/html; charset=utf-8');
+    return;
+  }
 
-    const gzipOk = /\bgzip\b/i.test(req.headers['accept-encoding'] || '');
-    const body = gzipOk ? cache.gz : cache.raw;
-    const headers = {
-      'Content-Type': 'text/html; charset=utf-8',
-      'Cache-Control': 'no-cache, must-revalidate',
-      'ETag': cache.etag,
-      'Vary': 'Accept-Encoding',
-      'Content-Length': body.length
-    };
-    if (gzipOk) headers['Content-Encoding'] = 'gzip';
-    res.writeHead(200, headers);
-    res.end(body);
+  // 연출 스크립트 — index.html 이 <script src="/polish.js"> 로 읽는다
+  if (req.method === 'GET' && req.url === '/polish.js') {
+    let cache;
+    try { cache = getPolishCache(); }
+    catch (e) { res.writeHead(404); res.end('polish.js not found'); return; }
+    sendCached(req, res, cache, 'application/javascript; charset=utf-8');
     return;
   }
 

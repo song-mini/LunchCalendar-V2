@@ -12,10 +12,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&family=Nanum+Myeongjo:wght@400;700;800&family=Gaegu:wght@400;700&family=Jua&family=Black+Han+Sans&family=Do+Hyeon&display=swap" rel="stylesheet">
 <!-- 픽셀 폰트(갈무리) — 고른 사람만 쓰니 첫 화면을 막지 않게 늦게 붙인다 (글꼴 파일은 실제로 쓸 때만 받음) -->
 <link href="https://cdn.jsdelivr.net/npm/galmuri@2.40.3/dist/galmuri.css" rel="stylesheet" media="print" onload="this.media='all'">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.7.0/dist/tabler-icons.min.css">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  /* 버튼·입력칸은 브라우저 기본 글꼴을 쓰므로 고른 폰트를 따라가게 (아이콘 폰트 .ti 는 자기 글꼴을 지정함) */
+  /* 버튼·입력칸은 브라우저 기본 글꼴을 쓰므로 고른 폰트를 따라가게 */
   button, input, textarea, select { font-family: inherit; }
 
   /* ============================================================
@@ -243,9 +242,48 @@
   [data-font="round"], [data-font="poster"] { font-synthesis: none; }
   /* 검은고딕은 작은 요일 글자에선 뭉개진다 — 요일은 도현으로 */
   [data-font="poster"] :is(.dow, .bd-wl, .ds-dow) { font-family: 'Do Hyeon', sans-serif; }
-  /* 개구는 같은 크기에서 글자가 작게 그려져서 살짝 키운다 (아이콘 폰트는 그대로) */
+  /* 개구는 같은 크기에서 글자가 작게 그려져서 살짝 키운다 (아이콘은 그대로) */
   [data-font="hand"] body { font-size-adjust: 0.43; }
   .ti { font-size-adjust: none; }
+
+  /* === 아이콘 — Tabler Icons(MIT) 중 쓰는 것만 SVG 마스크로 내장 (예전엔 CDN 웹폰트).
+         <i class="ti ti-이름"> 그대로 쓰고, 크기는 font-size · 색은 color 를 따른다.
+         새 아이콘이 필요하면 tabler.io/icons 의 SVG 를 아래 형식으로 한 줄 추가 === */
+  .ti{
+    display: inline-block; width: 1em; height: 1em; flex-shrink: 0;
+    vertical-align: -.125em;
+    background-color: currentColor;
+    -webkit-mask: var(--ti) center / contain no-repeat;
+            mask: var(--ti) center / contain no-repeat;
+  }
+  .ti-alert-circle{ --ti: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0'/%3E%3Cpath d='M12 8v4'/%3E%3Cpath d='M12 16h.01'/%3E%3C/svg%3E"); }
+  .ti-beer{ --ti: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 21h6a1 1 0 0 0 1 -1v-3.625c0 -1.397 .29 -2.775 .845 -4.025l.31 -.7c.556 -1.25 .845 -2.253 .845 -3.65v-4a1 1 0 0 0 -1 -1h-10a1 1 0 0 0 -1 1v4c0 1.397 .29 2.4 .845 3.65l.31 .7a9.931 9.931 0 0 1 .845 4.025v3.625a1 1 0 0 0 1 1z'/%3E%3Cpath d='M6 8h12'/%3E%3C/svg%3E"); }
+  .ti-bolt{ --ti: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M13 3l0 7l6 0l-8 11l0 -7l-6 0l8 -11'/%3E%3C/svg%3E"); }
+  .ti-bowl{ --ti: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 8h16a1 1 0 0 1 1 1v.5c0 1.5 -2.517 5.573 -4 6.5v1a1 1 0 0 1 -1 1h-8a1 1 0 0 1 -1 -1v-1c-1.687 -1.054 -4 -5 -4 -6.5v-.5a1 1 0 0 1 1 -1z'/%3E%3C/svg%3E"); }
+  .ti-calendar-event{ --ti: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 5m0 2a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2z'/%3E%3Cpath d='M16 3l0 4'/%3E%3Cpath d='M8 3l0 4'/%3E%3Cpath d='M4 11l16 0'/%3E%3Cpath d='M8 15h2v2h-2z'/%3E%3C/svg%3E"); }
+  .ti-calendar-plus{ --ti: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12.5 21h-6.5a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v5'/%3E%3Cpath d='M16 3v4'/%3E%3Cpath d='M8 3v4'/%3E%3Cpath d='M4 11h16'/%3E%3Cpath d='M16 19h6'/%3E%3Cpath d='M19 16v6'/%3E%3C/svg%3E"); }
+  .ti-calendar-x{ --ti: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M13 21h-7a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v6.5'/%3E%3Cpath d='M16 3v4'/%3E%3Cpath d='M8 3v4'/%3E%3Cpath d='M4 11h16'/%3E%3Cpath d='M22 22l-5 -5'/%3E%3Cpath d='M17 22l5 -5'/%3E%3C/svg%3E"); }
+  .ti-check{ --ti: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12l5 5l10 -10'/%3E%3C/svg%3E"); }
+  .ti-chevron-left{ --ti: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M15 6l-6 6l6 6'/%3E%3C/svg%3E"); }
+  .ti-chevron-right{ --ti: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 6l6 6l-6 6'/%3E%3C/svg%3E"); }
+  .ti-circle-dot{ --ti: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 12m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0'/%3E%3Cpath d='M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0'/%3E%3C/svg%3E"); }
+  .ti-clipboard-list{ --ti: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2'/%3E%3Cpath d='M9 3m0 2a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v0a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2z'/%3E%3Cpath d='M9 12l.01 0'/%3E%3Cpath d='M13 12l2 0'/%3E%3Cpath d='M9 16l.01 0'/%3E%3Cpath d='M13 16l2 0'/%3E%3C/svg%3E"); }
+  .ti-cloud{ --ti: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6.657 18c-2.572 0 -4.657 -2.007 -4.657 -4.483c0 -2.475 2.085 -4.482 4.657 -4.482c.393 -1.762 1.794 -3.2 3.675 -3.773c1.88 -.572 3.956 -.193 5.444 1c1.488 1.19 2.162 3.007 1.77 4.769h.99c1.913 0 3.464 1.56 3.464 3.486c0 1.927 -1.551 3.487 -3.465 3.487h-11.878'/%3E%3C/svg%3E"); }
+  .ti-dice-5{ --ti: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 3m0 2a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v14a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z'/%3E%3C/svg%3E"); }
+  .ti-heart-filled{ --ti: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='black'%3E%3Cpath d='M6.979 3.074a6 6 0 0 1 4.988 1.425l.037 .033l.034 -.03a6 6 0 0 1 4.733 -1.44l.246 .036a6 6 0 0 1 3.364 10.008l-.18 .185l-.048 .041l-7.45 7.379a1 1 0 0 1 -1.313 .082l-.094 -.082l-7.493 -7.422a6 6 0 0 1 3.176 -10.215z'/%3E%3C/svg%3E"); }
+  .ti-help{ --ti: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0'/%3E%3Cpath d='M12 17l0 .01'/%3E%3Cpath d='M12 13.5a1.5 1.5 0 0 1 1 -1.5a2.6 2.6 0 1 0 -3 -4'/%3E%3C/svg%3E"); }
+  .ti-info-circle{ --ti: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0'/%3E%3Cpath d='M12 9h.01'/%3E%3Cpath d='M11 12h1v4h1'/%3E%3C/svg%3E"); }
+  .ti-map-pin{ --ti: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 11a3 3 0 1 0 6 0a3 3 0 0 0 -6 0'/%3E%3Cpath d='M17.657 16.657l-4.243 4.243a2 2 0 0 1 -2.827 0l-4.244 -4.243a8 8 0 1 1 11.314 0z'/%3E%3C/svg%3E"); }
+  .ti-moon{ --ti: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z'/%3E%3C/svg%3E"); }
+  .ti-pencil{ --ti: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4'/%3E%3Cpath d='M13.5 6.5l4 4'/%3E%3C/svg%3E"); }
+  .ti-plus{ --ti: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 5l0 14'/%3E%3Cpath d='M5 12l14 0'/%3E%3C/svg%3E"); }
+  .ti-settings{ --ti: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10.325 4.317c.426 -1.756 2.924 -1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543 -.94 3.31 .826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756 .426 1.756 2.924 0 3.35a1.724 1.724 0 0 0 -1.066 2.573c.94 1.543 -.826 3.31 -2.37 2.37a1.724 1.724 0 0 0 -2.572 1.065c-.426 1.756 -2.924 1.756 -3.35 0a1.724 1.724 0 0 0 -2.573 -1.066c-1.543 .94 -3.31 -.826 -2.37 -2.37a1.724 1.724 0 0 0 -1.065 -2.572c-1.756 -.426 -1.756 -2.924 0 -3.35a1.724 1.724 0 0 0 1.066 -2.573c-.94 -1.543 .826 -3.31 2.37 -2.37c1 .608 2.296 .07 2.572 -1.065z'/%3E%3Cpath d='M9 12a3 3 0 1 0 6 0a3 3 0 0 0 -6 0'/%3E%3C/svg%3E"); }
+  .ti-sun{ --ti: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 12m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0'/%3E%3Cpath d='M3 12h1m8 -9v1m8 8h1m-9 8v1m-6.4 -15.4l.7 .7m12.1 -.7l-.7 .7m0 11.4l.7 .7m-12.1 -.7l-.7 .7'/%3E%3C/svg%3E"); }
+  .ti-thumb-up{ --ti: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 11v8a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1v-7a1 1 0 0 1 1 -1h3a4 4 0 0 0 4 -4v-1a2 2 0 0 1 4 0v5h3a2 2 0 0 1 2 2l-1 5a2 3 0 0 1 -2 2h-7a3 3 0 0 1 -3 -3'/%3E%3C/svg%3E"); }
+  .ti-tools-kitchen-2{ --ti: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M19 3v12h-5c-.023 -3.681 .184 -7.406 5 -12zm0 12v6h-1v-3m-10 -14v17m-3 -17v3a3 3 0 1 0 6 0v-3'/%3E%3C/svg%3E"); }
+  .ti-trash{ --ti: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 7l16 0'/%3E%3Cpath d='M10 11l0 6'/%3E%3Cpath d='M14 11l0 6'/%3E%3Cpath d='M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12'/%3E%3Cpath d='M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3'/%3E%3C/svg%3E"); }
+  .ti-trophy{ --ti: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M8 21l8 0'/%3E%3Cpath d='M12 17l0 4'/%3E%3Cpath d='M7 4l10 0'/%3E%3Cpath d='M17 4v8a5 5 0 0 1 -10 0v-8'/%3E%3Cpath d='M5 9m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0'/%3E%3Cpath d='M19 9m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0'/%3E%3C/svg%3E"); }
+  .ti-x{ --ti: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M18 6l-12 12'/%3E%3Cpath d='M6 6l12 12'/%3E%3C/svg%3E"); }
 
   /* ============================================================
      Dark theme — 팔레트마다 배경·카드까지 물든 6가지 밤 (살구=숯, 라떼=에스프레소,
@@ -1313,7 +1351,8 @@
 
   /* === calendar === */
   .cal{
-    display:grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px;
+    /* 점심 캘린더라 주말은 거의 비어 있다 — 토·일 열을 좁혀 평일 칸을 넓힌다 */
+    display:grid; grid-template-columns: minmax(0, .6fr) repeat(5, minmax(0, 1fr)) minmax(0, .6fr); gap: 6px;
     animation: fadeUp .3s var(--ease) .08s both;
   }
 
@@ -1471,14 +1510,19 @@
     transition: all var(--dur-fast) var(--ease-out);
   }
   .more-lnk:hover{ color: var(--text-2); background: var(--surface-2); }
+  /* 모바일은 칩을 1개만 보여주므로 '+N' 숫자가 다르다 — .ml-m / .m-only 는 모바일 전용 */
+  .more-lnk .ml-m, .more-lnk.m-only{ display: none; }
 
+  /* 빈 평일 칸에 올리면 가운데에 + 가 돌면서 나타난다 (칸 높이에는 영향 없음) */
   .add-hint{
-    margin-top: auto; display:flex; align-items:center; gap: 4px;
-    color: transparent; font-size: 11px; padding-top: 2px;
-    transition: color var(--dur-fast);
+    position: absolute; left: 50%; top: 56%; width: 28px; height: 28px; margin: -14px 0 0 -14px;
+    display: grid; place-items: center; border-radius: 9999px;
+    border: 1px dashed var(--bd-strong); color: var(--text-3);
+    opacity: 0; transform: scale(.5) rotate(-90deg); pointer-events: none;
+    transition: opacity var(--dur-fast) var(--ease-out), transform .35s var(--ease-spring);
   }
-  .cell:hover .add-hint { color: var(--text-3); }
-  .add-hint i{ font-size: 12px; }
+  .cell:hover .add-hint, .cell:focus-visible .add-hint { opacity: 1; transform: none; }
+  .add-hint i{ font-size: 14px; }
 
   .notice{ margin-top: 16px; text-align:center; font-size: 12px; color: var(--text-3); padding: 8px 12px; }
 
@@ -1600,7 +1644,7 @@
   .edel:hover{ background: var(--hol-bg); color: var(--hol-t); }
 
   .empty-state{ text-align:center; padding: 22px 0 14px; color: var(--text-3); font-size: 13px; }
-  .empty-state i{ display:block; margin-bottom: 8px; font-size: 26px; opacity: .35; }
+  .empty-state i{ display:block; margin: 0 auto 8px; font-size: 26px; opacity: .35; }
 
   .hr{ border: 0; border-top: 1px solid var(--bd); margin: 14px 0 14px; }
   .igrp{ display:flex; flex-direction:column; gap: 10px; margin-bottom: 12px; }
@@ -2233,9 +2277,12 @@
     .cell.today::before { inset: -1.5px; }
     .dn { font-size: 14px; }
 
-    .chip { padding: 3px 5px; gap: 3px; border-radius: 4px; }
-    .chip-txt { font-size: 10.5px; line-height: 1.2; }
-    .chip-count { font-size: 9.5px; }
+    /* 모바일 칸 요약 — 좁은 칸에 칩 2개를 넣으면 이름이 안 보인다.
+       1위만 '이름 한 줄 + 득표'로 보여주고 나머지는 +N 으로 줄인다 */
+    .chip { padding: 3px 5px; gap: 1px 3px; border-radius: 4px; flex-wrap: wrap; }
+    .chip ~ .chip, .chip-crown, .chip-dot { display: none; }
+    .chip-txt { flex: 0 0 100%; font-size: 10.5px; line-height: 1.25; -webkit-line-clamp: 1; }
+    .chip-count { font-size: 9.5px; margin-top: 0; }
 
     .day-tag {
       padding: 2px 5px; font-size: 9.5px; line-height: 1.25;
@@ -2243,7 +2290,13 @@
       display: inline-block;
     }
 
-    .more-lnk { font-size: 10px; padding: 2px 5px; }
+    .more-lnk { font-size: 10px; padding: 0 2px; border: 0; font-family: var(--ff-numeric); font-weight: 500; }
+    .more-lnk .ml-d { display: none; }
+    .more-lnk .ml-m { display: inline; }
+    .more-lnk.m-only { display: block; }
+    /* 태그도 줄여서 — 회식은 🍻 만, 공동 휴무는 '휴무' */
+    .day-tag .dt-txt { display: none; }
+    .day-tag.dinner-tag { padding: 1px 4px; font-size: 12px; line-height: 1.3; }
 
     .add-hint { display: none; }
 
@@ -4094,7 +4147,7 @@ function render(animate){
       const t=document.createElement('div'); t.className='day-tag hol-tag'; t.textContent=h;
       cell.appendChild(t);
     } else if(isOff){
-      const t=document.createElement('div'); t.className='day-tag off-tag'; t.textContent='공동 휴무';
+      const t=document.createElement('div'); t.className='day-tag off-tag'; t.innerHTML='<span class="dt-txt">공동&nbsp;</span>휴무';
       cell.appendChild(t);
     }
 
@@ -4104,7 +4157,7 @@ function render(animate){
       const t=document.createElement('div');
       t.className='day-tag dinner-tag';
       t.title='회식 · 장소 정하기';
-      t.textContent='🍻 ' + (dnr.title || '회식');
+      t.innerHTML='🍻<span class="dt-txt"> ' + esc(dnr.title || '회식') + '</span>';
       t.onclick=ev=>{ ev.stopPropagation(); openDinnerModal(dnr.id); };
       cell.appendChild(t);
     }
@@ -4129,17 +4182,19 @@ function render(animate){
       cell.appendChild(c);
     });
 
-    if(sorted.length>2){
+    if(sorted.length>1){
       const more=document.createElement('div');
-      more.className='more-lnk';
-      more.textContent='+'+(sorted.length-2)+'개 더';
+      more.className='more-lnk'+(sorted.length===2?' m-only':'');
+      more.innerHTML=(sorted.length>2 ? '<span class="ml-d">+'+(sorted.length-2)+'개 더</span>' : '')+
+        '<span class="ml-m">+'+(sorted.length-1)+'</span>';
       more.onclick=ev=>{ ev.stopPropagation(); openModal(dn); };
       cell.appendChild(more);
     }
 
     if(entries.length===0 && !isWeekend){
       const ah=document.createElement('div'); ah.className='add-hint';
-      ah.innerHTML='<i class="ti ti-plus"></i>기록 추가';
+      ah.setAttribute('aria-hidden', 'true');
+      ah.innerHTML='<i class="ti ti-plus"></i>';
       cell.appendChild(ah);
     }
 
@@ -4523,427 +4578,12 @@ setInterval(() => {
   rerender();
 }, 60*1000);
 
-/* =================================================================
-   v2 polish — 연출 모음 (셀 미리보기 · 컨페티 · 소나 · 도장 · 모달 모핑 · 팁).
-   메인 코드는 window._animateModalOpen / _animateModalClose / _onDiceWinner /
-   _voteBurst / _sonar / _startTips 로만 부른다 — 이 블록이 없어도 앱은 동작한다.
-   ================================================================= */
-(function v2Polish(){
-  const REDUCE = matchMedia('(prefers-reduced-motion: reduce)').matches;
+</script>
 
-  /* Geist 리디자인에서 제거된 효과: 커서 보더 글로우, 3D 틸트,
-     클릭 리플, 히어로 블롭 패럴랙스, 마그네틱 버튼.
-     장식보다 콘텐츠 — 남긴 모션은 상태 변화를 설명하는 것들뿐. */
+<!-- 연출 모음(셀 미리보기 · 컨페티 · 모달 모핑 · 팁) — 없어도 앱은 동작한다. 부팅 전에 읽혀야 첫 화면 연출이 걸린다 -->
+<script src="/polish.js"></script>
 
-  /* (3) Cell hover preview — built from in-memory data D[y][m][d].
-     Only enabled for fine pointer (mouse) — on touch devices, synthetic
-     mouseover events make the preview flicker on tap. */
-  const FINE_POINTER = matchMedia('(pointer: fine)').matches;
-  let _pv = null, _pvTimer = null;
-  function getPv(){
-    if(_pv) return _pv;
-    _pv = document.createElement('div');
-    _pv.className = 'cell-preview';
-    document.body.appendChild(_pv);
-    return _pv;
-  }
-  function hidePv(){ if(_pv) _pv.classList.remove('in'); }
-  function showPvFor(cell){
-    const dnEl = cell.querySelector('.dn');
-    if(!dnEl) return;
-    const dn = parseInt(dnEl.textContent, 10);
-    if(!dn) return;
-    const dat = (((D[curYear]||{})[cur])||{})[dn];
-    const list = (dat && dat.entries) || [];
-    if(list.length === 0) return;
-    const sorted = list.slice().sort((a,b) => (b.voters.size - a.voters.size) || (a.id - b.id));
-    const pv = getPv();
-    const dow = DOW_KR[new Date(curYear, cur-1, dn).getDay()];
-    pv.innerHTML =
-      '<div class="cp-title">'+cur+'월 '+dn+'일 ('+dow+') · '+list.length+'개 후보</div>' +
-      sorted.map(e => {
-        const v = e.voters.size, my = e.voters.has(MY_VOTER_ID);
-        return '<div class="cp-row">' +
-          '<span class="cp-dot'+(my?' voted':'')+'"></span>' +
-          '<span class="cp-name">'+esc(e.name)+'</span>' +
-          (v>0 ? '<span class="cp-count'+(my?' voted':'')+'">👍 '+v+'</span>' : '') +
-          '</div>';
-      }).join('');
-    const r = cell.getBoundingClientRect();
-    const pvw = pv.offsetWidth || 280;
-    const pvh = pv.offsetHeight || 120;
-    let x = r.left + r.width/2 - pvw/2;
-    let y = r.top - pvh - 10;
-    if(x < 10) x = 10;
-    if(x + pvw > innerWidth - 10) x = innerWidth - 10 - pvw;
-    if(y < 10) y = r.bottom + 10;
-    pv.style.left = x + 'px';
-    pv.style.top  = y + 'px';
-    requestAnimationFrame(() => pv.classList.add('in'));
-  }
-  document.addEventListener('mouseover', e => {
-    if(!FINE_POINTER) return;
-    const cell = e.target.closest('.cell');
-    if(!cell || cell.classList.contains('empty') || cell.classList.contains('skeleton')){
-      clearTimeout(_pvTimer); hidePv(); return;
-    }
-    clearTimeout(_pvTimer);
-    _pvTimer = setTimeout(() => showPvFor(cell), 420);
-  });
-  document.addEventListener('mouseout', e => {
-    if(!FINE_POINTER) return;
-    const from = e.target.closest('.cell');
-    const to   = e.relatedTarget && e.relatedTarget.closest && e.relatedTarget.closest('.cell');
-    if(from && from !== to){
-      clearTimeout(_pvTimer);
-      hidePv();
-    }
-  });
-
-  /* (4) Confetti + vote-burst */
-  let _confettiHost = null;
-  function getHost(){
-    if(_confettiHost) return _confettiHost;
-    _confettiHost = document.createElement('div');
-    _confettiHost.className = 'confetti-host';
-    document.body.appendChild(_confettiHost);
-    return _confettiHost;
-  }
-  const FOOD_EMOJIS = ['🍜','🍙','🥟','🍣','🍱','🍛','🌮','🍕','🥗','🍰','🍩','🍔','🥪','🍝','🍤','🍲','🥘','🍚'];
-  function fireConfetti(el){
-    if(REDUCE) return;
-    const host = getHost();
-    const r = el.getBoundingClientRect();
-    const cx = r.left + r.width/2;
-    const cy = r.top + r.height/2;
-    // Pull live theme colors from CSS vars so confetti tints with the palette.
-    const cs = getComputedStyle(document.documentElement);
-    const COLORS = [
-      cs.getPropertyValue('--accent').trim()    || '#C8553D',
-      cs.getPropertyValue('--secondary').trim() || '#588157',
-      cs.getPropertyValue('--highlight').trim() || '#F2B441',
-      '#D17A8D', '#8E5A8C', '#7C9EF2',
-    ];
-    const total = 30;
-    for(let i = 0; i < total; i++){
-      // ~60% food emojis, ~40% color rects — keeps the rainbow burst alive
-      // but flips the character into a clearly food-themed celebration.
-      const isEmoji = Math.random() < 0.6;
-      const p = document.createElement('div');
-      if(isEmoji){
-        p.className = 'confetti-emoji';
-        p.textContent = FOOD_EMOJIS[Math.floor(Math.random()*FOOD_EMOJIS.length)];
-      } else {
-        p.className = 'confetti-piece';
-        p.style.background = COLORS[i % COLORS.length];
-      }
-      p.style.left = cx + 'px';
-      p.style.top  = cy + 'px';
-      const angle = (i / total) * Math.PI * 2 + Math.random()*0.6;
-      const dist  = 140 + Math.random()*140;
-      const dx = Math.cos(angle) * dist;
-      const dy = Math.sin(angle) * dist - 40;
-      p.style.setProperty('--cx', dx + 'px');
-      p.style.setProperty('--cy', dy + 'px');
-      p.style.setProperty('--cr', ((Math.random()-.5)*1440) + 'deg');
-      p.style.animationDelay = (Math.random()*0.12) + 's';
-      host.appendChild(p);
-      setTimeout(() => p.remove(), 2000);
-    }
-  }
-  // Steam wisps rising above the winner card — food-themed "갓 만든 점심" vibe.
-  function spawnSteam(el){
-    if(REDUCE) return;
-    const host = getHost();
-    const r = el.getBoundingClientRect();
-    const baseX = r.left + r.width/2;
-    const baseY = r.top + 6;
-    for(let i = 0; i < 5; i++){
-      const w = document.createElement('div');
-      w.className = 'steam-wisp';
-      const off = (i - 2) * 10 + (Math.random()-0.5)*8;
-      w.style.left = (baseX + off) + 'px';
-      w.style.top  = baseY + 'px';
-      w.style.setProperty('--sx', (off*1.4 + (Math.random()-0.5)*22) + 'px');
-      w.style.animationDelay = (i * 0.11 + Math.random()*0.06) + 's';
-      host.appendChild(w);
-      setTimeout(() => w.remove(), 2400);
-    }
-  }
-  // 요소 테두리에서 바깥으로 퍼지는 링 — 가로·세로 모두 같은 px 만큼 번지도록
-  // 축별 scale 을 따로 계산한다 (작은 버튼은 덜, 큰 칸은 더 — 최대 사방 22px).
-  // count 개를 시간차로 쏘면 소나처럼 보인다.
-  function sonar(el, color, count){
-    if(REDUCE || !el || !el.isConnected) return;
-    const r = el.getBoundingClientRect();
-    if(!r.width) return;
-    const host = getHost();
-    const radius = getComputedStyle(el).borderRadius || '12px';
-    const grow = Math.max(18, Math.min(44, Math.min(r.width, r.height) * .7));
-    for(let i = 0; i < (count || 1); i++){
-      const ring = document.createElement('div');
-      ring.className = 'sonar-ring';
-      ring.style.left = r.left + 'px';
-      ring.style.top = r.top + 'px';
-      ring.style.width = r.width + 'px';
-      ring.style.height = r.height + 'px';
-      ring.style.borderRadius = radius;
-      if(color) ring.style.setProperty('--ring-c', color);
-      ring.style.setProperty('--ring-sx', ((r.width + grow) / r.width).toFixed(3));
-      ring.style.setProperty('--ring-sy', ((r.height + grow) / r.height).toFixed(3));
-      ring.style.animationDelay = (i * 0.18) + 's';
-      host.appendChild(ring);
-      setTimeout(() => ring.remove(), 1000 + i * 180);
-    }
-  }
-  // 당첨 도장 — 당첨 카드 오른쪽에 쾅 찍힌다
-  const STAMP_TEXTS = ['당첨!', '오늘은 여기!', '이걸로 가자!', 'PICK!'];
-  function stamp(el){
-    if(REDUCE || !el || !el.isConnected) return;
-    const r = el.getBoundingClientRect();
-    if(!r.width) return;
-    const s = document.createElement('div');
-    s.className = 'win-stamp';
-    s.textContent = STAMP_TEXTS[Math.floor(Math.random() * STAMP_TEXTS.length)];
-    s.style.left = Math.max(60, Math.min(innerWidth - 60, r.right - Math.min(70, r.width * .25))) + 'px';
-    s.style.top = (r.top + Math.min(r.height / 2, 28)) + 'px';
-    getHost().appendChild(s);
-    setTimeout(() => s.remove(), 2400);
-  }
-  // 룰렛이 당첨자에 멈춘 순간 (점심·회식 공통) — 도장 쾅 → 링 → 김 + 컨페티
-  window._onDiceWinner = function(w){
-    if(!w || !w.isConnected) return;
-    stamp(w);
-    setTimeout(() => sonar(w, 'var(--accent)', 2), 120);
-    setTimeout(() => { if(w.isConnected){ spawnSteam(w); fireConfetti(w); } }, 200);
-  };
-  window._sonar = sonar;
-
-  function spawnVoteBurst(btn){
-    if(REDUCE) return;
-    const r = btn.getBoundingClientRect();
-    const host = getHost();
-    const cx = r.left + r.width/2;
-    const cy = r.top + r.height/2;
-    // 팔레트 색을 섞어 터뜨린다 — 액센트 위주 + 하이라이트/세컨더리 포인트
-    const cs = getComputedStyle(document.documentElement);
-    const COLORS = [
-      cs.getPropertyValue('--accent').trim(),
-      cs.getPropertyValue('--highlight').trim(),
-      cs.getPropertyValue('--accent').trim(),
-      cs.getPropertyValue('--secondary').trim(),
-    ];
-    for(let i = 0; i < 12; i++){
-      const p = document.createElement('div');
-      p.className = 'vote-burst';
-      p.style.left = (cx - 2.5) + 'px';
-      p.style.top  = (cy - 2.5) + 'px';
-      p.style.background = COLORS[i % COLORS.length] || '';
-      const angle = (i / 12) * Math.PI * 2 + Math.random() * 0.3;
-      const dist = 24 + Math.random()*18;
-      p.style.setProperty('--bx', Math.cos(angle)*dist + 'px');
-      p.style.setProperty('--by', (Math.sin(angle)*dist - 6) + 'px');
-      p.style.animationDelay = (i*0.015) + 's';
-      host.appendChild(p);
-      setTimeout(() => p.remove(), 800);
-    }
-    sonar(btn, 'var(--accent)', 1);
-  }
-  // 투표 확정 시 _animateVote 가 +1 과 함께 호출한다. (예전엔 document click
-  // 리스너였는데, 투표 버튼들이 stopPropagation 을 해서 한 번도 발동하지 않았다)
-  window._voteBurst = spawnVoteBurst;
-
-  // Click ripple on the dice button — radial flare originating from the
-  // cursor. Respects reduced motion via the global keyframes override.
-  document.addEventListener('pointerdown', e => {
-    const btn = e.target.closest && e.target.closest('.dice-btn');
-    if(!btn || btn.disabled) return;
-    const r = btn.getBoundingClientRect();
-    btn.style.setProperty('--rx', (e.clientX - r.left) + 'px');
-    btn.style.setProperty('--ry', (e.clientY - r.top)  + 'px');
-    btn.classList.remove('ripple');
-    void btn.offsetWidth; // restart animation
-    btn.classList.add('ripple');
-    setTimeout(() => btn.classList.remove('ripple'), 600);
-  });
-
-  /* (5) 모달 — 클릭한 칸에서 자라나오고(container transform), 닫으면 그 칸으로
-     다시 쏙 들어간다. 콘텐츠를 찌그러뜨리는 scale 대신 clip-path 창을 칸 크기에서
-     모달 크기로 넓히면서 위치만 옮긴다. 출발점이 없으면(키보드·설정 패널 등)
-     살짝 기울어진 채 떠오르는 기본 진입. */
-  const ORIGIN_SEL = '.cell, .more-lnk, .today-leader, .today-row, .ti-add, .today-empty, .bd-wd, .dinner-banner, .dinner-tag, .help-btn, [data-twk-dinner-open]';
-  let _lastOrigin = null;   // 마지막 클릭 { el, t } — 모달을 연 클릭인지 시간으로 판별
-  let _openOrigin = null;   // 지금 열린 모달의 출발점 — 닫을 때 다시 찾아 들어갈 단서들
-  document.addEventListener('click', e => {
-    const el = e.target.closest && e.target.closest(ORIGIN_SEL);
-    if(el) _lastOrigin = { el, t: Date.now() };
-  }, true);
-
-  function cellForDay(day){
-    return [...document.querySelectorAll('#calGrid .cell:not(.empty)')]
-      .find(c => { const d = c.querySelector('.dn'); return d && +d.textContent === day; }) || null;
-  }
-  function describeOrigin(el){
-    // 투표·추가로 rerender 되면 원래 요소는 사라지므로 다시 찾을 단서를 함께 저장
-    const host = el.closest('.cell');
-    const dn = host && host.querySelector('.dn');
-    const row = el.closest('[data-entry-id]');
-    return {
-      el,
-      day: dn ? +dn.textContent : null,
-      entryId: row ? row.getAttribute('data-entry-id') : null,
-      cls: el.classList.contains('dinner-banner') ? '.dinner-banner'
-         : el.classList.contains('ti-add') ? '.today-card .ti-add'
-         : el.classList.contains('help-btn') ? '.help-btn' : null,
-    };
-  }
-  function visibleRect(el){
-    if(!el || !el.isConnected) return null;
-    const r = el.getBoundingClientRect();
-    if(!r.width || !r.height || r.bottom < 0 || r.top > innerHeight || r.right < 0 || r.left > innerWidth) return null;
-    return r;
-  }
-  function resolveOrigin(o){
-    if(!o) return null;
-    const tries = [
-      () => o.el,
-      () => o.entryId && document.querySelector('[data-entry-id="' + o.entryId + '"]'),
-      () => o.day && cellForDay(o.day),
-      () => o.cls && document.querySelector(o.cls),
-    ];
-    for(const f of tries){ const el = f(); const r = visibleRect(el); if(r) return { el, r }; }
-    return null;
-  }
-  // 모달 rect(mr)와 출발 rect(or) → 출발점에 겹치는 transform + clip 창
-  function morphFrom(mr, or){
-    const dx = (or.left + or.width/2) - (mr.left + mr.width/2);
-    const dy = (or.top + or.height/2) - (mr.top + mr.height/2);
-    const ih = Math.max(0, (mr.height - or.height) / 2);
-    const iw = Math.max(0, (mr.width - or.width) / 2);
-    return {
-      transform: 'translate(' + dx + 'px, ' + dy + 'px) scale(.98)',
-      clipPath: 'inset(' + ih + 'px ' + iw + 'px round 12px)',
-    };
-  }
-  // 그림자까지 보이도록 끝 상태는 바깥으로 넉넉히 연 inset
-  const MORPH_OPEN = { transform: 'translate(0px, 0px) scale(1)', clipPath: 'inset(-48px -48px round 16px)' };
-
-  function animateModalOpen(){
-    requestAnimationFrame(() => {
-      const m = document.querySelector('#mw .modal');
-      if(!m || REDUCE || typeof m.animate !== 'function') return;
-      const bd = m.closest('.backdrop');
-      const mr = m.getBoundingClientRect();
-      const fresh = _lastOrigin && Date.now() - _lastOrigin.t < 800 ? _lastOrigin.el : null;
-      const src = fresh || (document.activeElement && document.activeElement.closest && document.activeElement.closest(ORIGIN_SEL));
-      _openOrigin = src ? describeOrigin(src) : null;
-      _lastOrigin = null;
-      const or = src && visibleRect(src);
-      if(bd){
-        // 배경 비네트의 밝은 중심을 출발점에 둔다
-        const cx = or ? or.left + or.width/2 : innerWidth/2;
-        const cy = or ? or.top + or.height/2 : innerHeight/2;
-        bd.style.setProperty('--bx', cx + 'px');
-        bd.style.setProperty('--by', cy + 'px');
-      }
-      if(or){
-        const from = morphFrom(mr, or);
-        m.animate([
-          { ...from, opacity: 0 },
-          { opacity: 1, offset: .2 },
-          { ...MORPH_OPEN, opacity: 1 }
-        ], { duration: 520, easing: 'cubic-bezier(.2, .85, .25, 1)' });
-      } else {
-        m.style.transformOrigin = '50% 0';
-        m.animate([
-          { opacity: 0, transform: 'perspective(1000px) rotateX(-14deg) translateY(28px) scale(.92)' },
-          { opacity: 1, transform: 'perspective(1000px) rotateX(2deg) translateY(-3px) scale(1.005)', offset: .7 },
-          { opacity: 1, transform: 'perspective(1000px) rotateX(0) translateY(0) scale(1)' }
-        ], { duration: 460, easing: 'cubic-bezier(.22, 1, .36, 1)' }).onfinish = () => { m.style.transformOrigin = ''; };
-      }
-      // 내용은 창이 거의 열렸을 때 위에서부터 차례로 떠오른다
-      [...m.children].forEach((c, i) => {
-        c.animate([
-          { opacity: 0, transform: 'translateY(10px)' },
-          { opacity: 1, transform: 'translateY(0)' }
-        ], { duration: 340, delay: (or ? 110 : 80) + i * 45, easing: 'cubic-bezier(.22, 1, .36, 1)', fill: 'backwards' });
-      });
-    });
-  }
-
-  // 닫는 애니메이션 — closeMod 가 부른다. 다 끝나면 finish() 로 #mw 를 비우게 하고,
-  // 실제로 닫혔으면(finish 가 true) 출발했던 칸이 살짝 받아주는 착지 반응을 보여준다.
-  function animateModalClose(m, finish){
-    // Cancel any running animations on the modal (a still-running open
-    // animation, or a leftover one from before) so this close starts from a
-    // clean transform stack and isn't visually absorbed by them.
-    if(typeof m.getAnimations === 'function'){
-      m.getAnimations({ subtree: true }).forEach(a => { try { a.cancel(); } catch(e){} });
-    }
-    // 출발한 칸이 아직 화면에 있으면 그 칸으로 빨려 들어가고, 없으면 기울며 가라앉는다
-    const target = REDUCE ? null : resolveOrigin(_openOrigin);
-    _openOrigin = null;
-    if(typeof m.animate !== 'function'){ setTimeout(finish, 220); return; }
-    let anim, dur;
-    if(target){
-      dur = 400;
-      anim = m.animate([
-        { ...MORPH_OPEN, opacity: 1 },
-        { opacity: 1, offset: .72 },
-        { ...morphFrom(m.getBoundingClientRect(), target.r), opacity: 0 }
-      ], { duration: dur, easing: 'cubic-bezier(.5, 0, .2, 1)', fill: 'forwards' });
-    } else {
-      dur = 260;
-      m.style.transformOrigin = '50% 100%';
-      anim = m.animate([
-        { opacity: 1, transform: 'perspective(1000px) rotateX(0) translateY(0) scale(1)' },
-        { opacity: 0, transform: 'perspective(1000px) rotateX(12deg) translateY(26px) scale(.93)' }
-      ], { duration: dur, easing: 'cubic-bezier(.55, 0, .75, .3)', fill: 'forwards' });
-    }
-    let done = false;
-    const end = () => {
-      if(done) return;
-      done = true;
-      if(!finish()) return;
-      if(target && target.el.isConnected && typeof target.el.animate === 'function'){
-        target.el.animate(
-          [{ transform: 'scale(.96)' }, { transform: 'scale(1.025)', offset: .5 }, { transform: 'scale(1)' }],
-          { duration: 380, easing: 'cubic-bezier(.34, 1.56, .64, 1)' }
-        );
-        sonar(target.el, 'var(--accent)', 1);
-      }
-    };
-    anim.onfinish = end;
-    // Safety net — if onfinish doesn't fire (e.g. WAA bug), clean up anyway.
-    setTimeout(end, dur + 150);
-  }
-
-  // 모달을 여는 쪽(_modalOpened)·닫는 쪽(closeMod)에서 부른다
-  window._animateModalOpen = animateModalOpen;
-  window._animateModalClose = animateModalClose;
-
-  /* (6) 팁 로테이터 — 이번 달에 기록이 하나도 없으면 아래 안내 자리에서 팁을 돌린다.
-     render() 가 빈 달을 그릴 때마다 _startTips() 를 부르고, 기록이 생기면 다음 차례에 스스로 멈춘다. */
-  const TIPS = [
-    '🎲 메뉴 정해줘! 는 오늘 후보 전부 중에서 무작위로 뽑아요',
-    '⌨️ ← → 키로 달 이동 · T 또는 Home 으로 오늘로',
-    '🌙 D 키로 다크 모드 바로 토글',
-    '👥 한 사람당 항목별 1표 · 한 디바이스 = 1명',
-    '📌 매달 마지막 금요일은 자동으로 공동휴무 표시',
-  ];
-  let _tipIdx = 0, _tipTimer = null;
-  function showTip(){
-    const n = document.getElementById('notice');
-    if(!n || hasDat(curYear, cur)){ clearInterval(_tipTimer); _tipTimer = null; return; }
-    n.innerHTML = '<span class="tip-rotator"><span class="tip">'+TIPS[_tipIdx]+'</span></span>';
-  }
-  window._startTips = function(){
-    showTip();
-    if(!_tipTimer) _tipTimer = setInterval(() => { _tipIdx = (_tipIdx + 1) % TIPS.length; showTip(); }, 5500);
-  };
-
-})();
-
+<script>
 /* ============================================================
    Tweaks panel — palette / font / dark mode picker (bottom-right)
    The pre-paint script at the top of <head> already restored saved
